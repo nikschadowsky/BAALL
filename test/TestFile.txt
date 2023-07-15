@@ -1,0 +1,8 @@
+test1234
+// das ist ein kommentar // das auch
+
+gege
+/*
+Block comment* / */ * /
+
+/ / lp,,em

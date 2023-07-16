@@ -1,4 +1,4 @@
-package nikschadowsky.baall.compiler;
+package de.nikschadowsky.baall.compiler;
 
 import java.io.File;
 import java.io.IOException;

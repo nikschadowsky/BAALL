@@ -1,5 +1,7 @@
-package nikschadowsky.baall.compiler;
+package de.nikschadowsky.baall.compiler.lexer;
 
+
+import de.nikschadowsky.baall.compiler.FileLoader;
 
 public class Lexer {
 
@@ -23,7 +25,7 @@ public class Lexer {
 
     public Lexer removeComments() {
 
-
+        // Damn that code sux, maybe someday ill rework this properly
         boolean notInString = true;
 
         if (content.length() > 1) {
@@ -48,6 +50,7 @@ public class Lexer {
         boolean notInString = true;
         boolean notInCharacter = true;
 
+        // same goes for this
         if (content.length() > 1) {
             int i = 0;
             while (i < content.length()) {
@@ -58,8 +61,7 @@ public class Lexer {
                     notInString ^= true;
                 } else if (notInString && currentChar == '\'') {
                     notInCharacter ^= true;
-                }else if(notInString && notInCharacter && Character.isWhitespace(currentChar)){
-
+                } else if (notInString && notInCharacter && Character.isWhitespace(currentChar)) {
 
 
                     content = content.substring(0, i) + content.substring(i).replaceFirst(WHITESPACE_REGEX, " ");
@@ -70,6 +72,12 @@ public class Lexer {
 
         }
         content = content.trim();
+
+        return this;
+    }
+
+    public Lexer tokenize() {
+
 
         return this;
     }

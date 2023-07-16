@@ -1,0 +1,5 @@
+0b010101 		Binary
+0x12021012 		Hexadecimal
+0o12314 		Octal
+0d12031233 | 12031233 	Decimal
+

@@ -1,0 +1,34 @@
+use math.ba; // import 
+
+struct: myStructure := (num: field1, string: field2, structure2: field3)
+
+
+num: b = 3;	/* Blockkommentar */
+char: c = 'A';	//Kommentar
+num[]: arr = [1,2,3,4,5];
+num[]: arr2 = (9) // array of numbers with size 9
+
+string: konstante1 := a + b;
+num: konstante2 := b + a;
+
+string: funktion1 := num: a, bool: b, char: c {
+	isTrue? {
+		funktion2(x, y, z);
+		return "Hahaha";
+	} | isFalse? {
+		// If Else
+		
+	} | {
+		// Else
+	} 
+	return "Hehehehoar";
+}
+
+while isTrue {
+	// while loop
+}
+for i=0::i<10{
+
+}@i++;
+
+export {b,c,arr,arr2, funktion1}

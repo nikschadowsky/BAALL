@@ -7,6 +7,7 @@ public class Lexer {
 
     private static final String SINGLE_LINE_COMMENT_REGEX = "(//.*\\R)";
     private static final String BLOCK_COMMENT_REGEX = "(/\\*(.|\\s)*?\\*/)";
+    private static final String WHITESPACE_REGEX = "\\s+";
 
     private String content;
 
@@ -44,8 +45,31 @@ public class Lexer {
     }
 
     public Lexer replaceAllWhitespace() {
+        boolean notInString = true;
+        boolean notInCharacter = true;
 
-        content = content.replaceAll("\\s+", " ");
+        if (content.length() > 1) {
+            int i = 0;
+            while (i < content.length()) {
+
+                char currentChar = content.charAt(i);
+
+                if (notInCharacter && currentChar == '\"') {
+                    notInString ^= true;
+                } else if (notInString && currentChar == '\'') {
+                    notInCharacter ^= true;
+                }else if(notInString && notInCharacter && Character.isWhitespace(currentChar)){
+
+
+
+                    content = content.substring(0, i) + content.substring(i).replaceFirst(WHITESPACE_REGEX, " ");
+                }
+
+                i++;
+            }
+
+        }
+        content = content.trim();
 
         return this;
     }

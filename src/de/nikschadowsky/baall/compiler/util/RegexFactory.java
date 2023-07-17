@@ -15,24 +15,6 @@ public class RegexFactory {
     public static final String BLOCK_COMMENT_REGEX = "(/\\*(.|\\s)*?\\*/)";
     public static final String WHITESPACE_REGEX = "\\s+";
 
-    /**
-     * Generate a Regular Expression from the defined Operators in {@link SyntaxSet}.
-     * Ordered by length descending, so remove need to peek ahead.
-     *
-     * @return Regular Expression String for Operators
-     */
-
-    public static String generateOperatorRegex() {
-
-        String removeLastOrRegex = "(?<=\\))\\|\\)"; // ...)|) -> ...))
-
-        return (SyntaxSet.OPERATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
-                .reduce("(", (akk, op) -> akk
-                        + "(" +
-                        regexifySymbols(op)
-                        + ")|")
-                + ")").replaceAll(removeLastOrRegex, ")");
-    }
 
     /**
      * Generate a Regular Expression from the defined Keywords in {@link SyntaxSet}.
@@ -43,6 +25,27 @@ public class RegexFactory {
         return (SyntaxSet.KEYWORDS.stream().reduce("(", (akk, op) -> akk + op + "|") + ")").replaceAll("\\|\\)", ")");
     }
 
+
+    private static final String REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX = "(?<=\\))\\|\\)"; // ...)|) -> ...))
+
+    /**
+     * Generate a Regular Expression from the defined Operators in {@link SyntaxSet}.
+     * Ordered by length descending, so remove need to peek ahead.
+     *
+     * @return Regular Expression String for Operators
+     */
+
+    public static String generateOperatorRegex() {
+
+
+        return (SyntaxSet.OPERATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
+                .reduce("(", (akk, op) -> akk
+                        + "(" +
+                        regexifySymbols(op)
+                        + ")|")
+                + ")").replaceAll(REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX, ")");
+    }
+
     /**
      * Generate a Regular Expression from the defined Separators in {@link SyntaxSet}.
      * Ordered by length descending, so remove need to peek ahead.
@@ -50,14 +53,14 @@ public class RegexFactory {
      * @return Regular Expression String for Separators
      */
     public static String generateSeparatorRegex() {
-        String removeLastOrRegex = "(?<=\\))\\|\\)"; // ...)|) -> ...))
+
 
         return (SyntaxSet.SEPARATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
                 .reduce("(", (akk, sep) -> akk
                         + "(" +
                         regexifySymbols(sep)
                         + ")|")
-                + ")").replaceAll(removeLastOrRegex, ")");
+                + ")").replaceAll(REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX, ")");
     }
 
     /**

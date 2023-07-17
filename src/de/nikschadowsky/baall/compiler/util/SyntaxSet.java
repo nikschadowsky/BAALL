@@ -1,12 +1,15 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.util;
 
+import org.junit.platform.commons.util.CollectionUtils;
+
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SyntaxSet {
     public static final Set<String> KEYWORDS = new HashSet<>();
-    public static final Set<String> OPERATORS= new HashSet<>();
-    public static final Set<String> SEPARATORS= new HashSet<>();
+    public static final Set<String> OPERATORS = new HashSet<>();
+    public static final Set<String> SEPARATORS = new HashSet<>();
 
 
     static {
@@ -16,7 +19,11 @@ public class SyntaxSet {
         // Operators
         addOperators();
 
-    }private static void addKeywords(){
+        // Separators
+        addSeparators();
+    }
+
+    private static void addKeywords() {
         KEYWORDS.add("use");
         KEYWORDS.add("num");
         KEYWORDS.add("string");
@@ -27,6 +34,7 @@ public class SyntaxSet {
         KEYWORDS.add("export");
         KEYWORDS.add("return");
 
+        System.out.println("Keywords: "  + KEYWORDS.size() + ", " + KEYWORDS);
     }
 
     private static void addOperators() {
@@ -69,9 +77,11 @@ public class SyntaxSet {
         OPERATORS.add("||");
 
         OPERATORS.add("?");
-    }
 
-    private static void setSeparators(){
+        System.out.println("Operators: " + OPERATORS.size() + ", " + OPERATORS);
+        }
+
+    private static void addSeparators() {
 
         SEPARATORS.add("{");
         SEPARATORS.add("}");
@@ -84,6 +94,8 @@ public class SyntaxSet {
         SEPARATORS.add("[");
         SEPARATORS.add("]");
         SEPARATORS.add(".");
+
+        System.out.println("Separators: " + SEPARATORS.size() + ", " + SEPARATORS);
     }
 
 }

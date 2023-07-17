@@ -5,8 +5,6 @@ import java.util.List;
 
 public class Tokenizer {
 
-    private static final String BOOLEAN_PRIMITIVE_REGEX = "(true|false)(?=[^a-zA-Z0-9]|$)";
-    private static final String STRING_PRIMITIVE_REGEX = "\".*?(?<!\\)\"";
 
     public Tokenizer(){
 

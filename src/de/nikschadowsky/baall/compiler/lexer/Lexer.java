@@ -1,15 +1,12 @@
 package de.nikschadowsky.baall.compiler.lexer;
 
 
-import de.nikschadowsky.baall.compiler.FileLoader;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
+import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
 public class Lexer {
 
     private final String path;
-
-    private static final String SINGLE_LINE_COMMENT_REGEX = "(//.*\\R)";
-    private static final String BLOCK_COMMENT_REGEX = "(/\\*(.|\\s)*?\\*/)";
-    private static final String WHITESPACE_REGEX = "\\s+";
 
     private String content;
 
@@ -35,9 +32,9 @@ public class Lexer {
                 if (content.charAt(i) == '\"') {
                     notInString ^= true;
                 } else if (notInString && content.substring(i - 1, i + 1).equals("//")) {
-                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(SINGLE_LINE_COMMENT_REGEX, "");
+                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.SINGLE_LINE_COMMENT_REGEX, "");
                 } else if (notInString && content.substring(i - 1, i + 1).equals("/*")) {
-                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(BLOCK_COMMENT_REGEX, "");
+                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.BLOCK_COMMENT_REGEX, "");
                 }
 
                 i++;
@@ -64,7 +61,7 @@ public class Lexer {
                 } else if (notInString && notInCharacter && Character.isWhitespace(currentChar)) {
 
 
-                    content = content.substring(0, i) + content.substring(i).replaceFirst(WHITESPACE_REGEX, " ");
+                    content = content.substring(0, i) + content.substring(i).replaceFirst(RegexFactory.WHITESPACE_REGEX, " ");
                 }
 
                 i++;

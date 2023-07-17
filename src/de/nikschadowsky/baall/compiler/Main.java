@@ -17,6 +17,7 @@ public class Main {
         if(args.length >= 2){
             path = args[0];
         }else {
+            System.out.println("Path of Source File: ");
             Scanner sc = new Scanner(System.in);
             path = sc.next();
         }

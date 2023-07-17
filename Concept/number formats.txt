@@ -1,5 +1,5 @@
+float64 for all computation
+
 0b010101 		Binary
 0x12021012 		Hexadecimal
-0o12314 		Octal
-0d12031233 | 12031233 	Decimal
-
+12031233 	Decimal

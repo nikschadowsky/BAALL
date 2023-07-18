@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.util.test;
 
-import de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,7 @@ class RegexFactoryTest {
     @Test
     void generateRegexesTest() {
 
-        String opRegex = RegexFactory.generateOperatorRegex();
+        String opRegex = RegexFactory.OPERATOR_REGEX;
         System.out.println(opRegex);
 
 
@@ -27,7 +26,7 @@ class RegexFactoryTest {
         }
 
 
-        String keywordRegex = RegexFactory.generateKeywordRegex();
+        String keywordRegex = RegexFactory.KEYWORD_REGEX;
         System.out.println(keywordRegex);
 
         for (String keyword : SyntaxSet.KEYWORDS) {
@@ -38,7 +37,7 @@ class RegexFactoryTest {
 
         }
 
-        String separatorRegex = RegexFactory.generateSeparatorRegex();
+        String separatorRegex = RegexFactory.SEPARATOR_REGEX;
         System.out.println(separatorRegex);
 
         for (String separator : SyntaxSet.SEPARATORS) {

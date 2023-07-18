@@ -7,13 +7,25 @@ import java.util.Comparator;
 
 public class RegexFactory {
 
-    public static final String END_OF_TOKEN_REGEX = "(?=\\W|$)";
-    public static final String BOOLEAN_PRIMITIVE_REGEX = "(true|false)" + END_OF_TOKEN_REGEX;
-    public static final String STRING_PRIMITIVE_REGEX = "\".*?(?<!\\)\"";
-    public static final String NUMBER_PRIMITIVE_REGEX = "(0((b[01]+)|(x[0-9A-Fa-f]+))|(\\d*\\.)?\\d+)" + END_OF_TOKEN_REGEX;
     public static final String SINGLE_LINE_COMMENT_REGEX = "(//.*\\R)";
     public static final String BLOCK_COMMENT_REGEX = "(/\\*(.|\\s)*?\\*/)";
     public static final String WHITESPACE_REGEX = "\\s+";
+
+    public static final String END_OF_WORD_REGEX = "(?=\\W|$)";
+
+    public static final String BOOLEAN_PRIMITIVE_REGEX = "(true|false)" + END_OF_WORD_REGEX;
+
+    public static final String STRING_PRIMITIVE_REGEX = "\".*?(?<!\\\\)\"";
+
+    public static final String NUMBER_PRIMITIVE_REGEX = "(0((b[01]+)|(x[0-9A-Fa-f]+))|(\\d*\\.)?\\d+)" + END_OF_WORD_REGEX;
+
+    public static final String OPERATOR_REGEX = generateOperatorRegex();
+
+    public static final String KEYWORD_REGEX = generateKeywordRegex();
+
+    public static final String SEPARATOR_REGEX = generateSeparatorRegex();
+
+    public static final String IDENTIFIER_REGEX = "[a-zA-Z]\\w*";
 
 
     /**
@@ -21,8 +33,8 @@ public class RegexFactory {
      *
      * @return Regular Expression String for Keywords
      */
-    public static String generateKeywordRegex() {
-        return (SyntaxSet.KEYWORDS.stream().reduce("(", (akk, op) -> akk + op + "|") + ")").replaceAll("\\|\\)", ")");
+    private static String generateKeywordRegex() {
+        return (SyntaxSet.KEYWORDS.stream().reduce("(", (akk, op) -> akk + op + "|") + ")").replaceAll("\\|\\)", ")") + END_OF_WORD_REGEX;
     }
 
 
@@ -35,7 +47,7 @@ public class RegexFactory {
      * @return Regular Expression String for Operators
      */
 
-    public static String generateOperatorRegex() {
+    private static String generateOperatorRegex() {
 
 
         return (SyntaxSet.OPERATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
@@ -52,7 +64,7 @@ public class RegexFactory {
      *
      * @return Regular Expression String for Separators
      */
-    public static String generateSeparatorRegex() {
+    private static String generateSeparatorRegex() {
 
 
         return (SyntaxSet.SEPARATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead

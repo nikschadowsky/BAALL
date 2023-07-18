@@ -1,0 +1,12 @@
+true false
+"String"
+// Comment
+:= / % @ :: +=
+0xFFFF,0b10101,
+1234.1234 .123 123
+identifier
+
+
+
+
+

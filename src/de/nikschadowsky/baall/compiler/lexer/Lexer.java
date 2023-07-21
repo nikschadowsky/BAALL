@@ -1,8 +1,12 @@
 package de.nikschadowsky.baall.compiler.lexer;
 
 
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
+
+import java.util.List;
 
 public class Lexer {
 
@@ -10,20 +14,21 @@ public class Lexer {
 
     private String content;
 
+    private boolean isPreprocessed;
     public Lexer(String path) {
         this.path = path;
+        readContent();
     }
 
-    public Lexer readContent() {
+    private void readContent() {
         content = FileLoader.loadFileContent(path);
-
-        return this;
     }
 
-    public Lexer removeComments() {
+    private void removeComments() {
 
         // Damn that code sux, maybe someday ill rework this properly
         boolean notInString = true;
+
 
         if (content.length() > 1) {
             int i = 1;
@@ -33,6 +38,7 @@ public class Lexer {
                     notInString ^= true;
                 } else if (notInString && content.substring(i - 1, i + 1).equals("//")) {
                     content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.SINGLE_LINE_COMMENT_REGEX, "");
+
                 } else if (notInString && content.substring(i - 1, i + 1).equals("/*")) {
                     content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.BLOCK_COMMENT_REGEX, "");
                 }
@@ -40,10 +46,10 @@ public class Lexer {
                 i++;
             }
         }
-        return this;
+
     }
 
-    public Lexer replaceAllWhitespace() {
+    public void replaceAllWhitespace() {
         boolean notInString = true;
         boolean notInCharacter = true;
 
@@ -70,16 +76,26 @@ public class Lexer {
         }
         content = content.trim();
 
-        return this;
     }
 
-    public Lexer tokenize() {
+    public void preprocessCode(){
+        removeComments();
+        replaceAllWhitespace();
 
-
-        return this;
+        isPreprocessed =true;
     }
 
-    public String getContent() {
+    public List<Token> tokenize() {
+
+        Tokenizer tokenizer = new Tokenizer(content);
+
+        return tokenizer.run();
+    }
+
+    public String getPreprocessedCode(){
+        if(!isPreprocessed){
+            preprocessCode();
+        }
         return content;
     }
 }

@@ -20,14 +20,8 @@ public class LexerTest {
     }
 
     @Test
-    void testLexerSteps() {
-
-
-        assertEquals(FileLoader.loadFileContent(TEST_PATH), lexer.readContent().getContent());
-
-        assertEquals(FileLoader.loadFileContent("test/RemoveComments.txt"), lexer.removeComments().getContent());
-
-        assertEquals(FileLoader.loadFileContent("test/RemoveWhitespaces.txt"), lexer.replaceAllWhitespace().getContent());
+    void testPreprocessing() {
+        assertEquals(FileLoader.loadFileContent("test/LexerTestExpected.txt"), lexer.getPreprocessedCode());
     }
 
 }

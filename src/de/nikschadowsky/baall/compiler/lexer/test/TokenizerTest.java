@@ -23,7 +23,7 @@ class TokenizerTest {
 
         Lexer lexer = new Lexer(path);
 
-        fileContent = lexer.readContent().removeComments().replaceAllWhitespace().getContent();
+        fileContent = lexer.getPreprocessedCode();
 
     }
 

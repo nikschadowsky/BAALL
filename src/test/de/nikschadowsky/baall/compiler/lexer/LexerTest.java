@@ -1,7 +1,7 @@
-package de.nikschadowsky.baall.compiler.lexer.test;
+package test.de.nikschadowsky.baall.compiler.lexer;
 
-import de.nikschadowsky.baall.compiler.util.FileLoader;
-import de.nikschadowsky.baall.compiler.lexer.Lexer;
+import main.de.nikschadowsky.baall.compiler.util.FileLoader;
+import main.de.nikschadowsky.baall.compiler.lexer.Lexer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

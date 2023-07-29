@@ -1,6 +1,8 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package main.de.nikschadowsky.baall.compiler.lexer.tokens;
 
-public class Token {
+import main.de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
+
+public class Token implements GrammarSymbol {
 
     private final TokenType type;
 
@@ -27,5 +29,10 @@ public class Token {
                 "type=" + type.getDescription() +
                 ", value='" + value + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equalsSymbol(GrammarSymbol s) {
+        return false;
     }
 }

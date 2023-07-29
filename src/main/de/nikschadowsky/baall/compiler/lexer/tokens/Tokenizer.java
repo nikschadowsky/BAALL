@@ -1,6 +1,6 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package main.de.nikschadowsky.baall.compiler.lexer.tokens;
 
-import de.nikschadowsky.baall.compiler.util.RegexFactory;
+import main.de.nikschadowsky.baall.compiler.util.RegexFactory;
 
 import java.util.LinkedList;
 import java.util.List;

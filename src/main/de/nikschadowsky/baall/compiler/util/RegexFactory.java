@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.util;
+package main.de.nikschadowsky.baall.compiler.util;
 
 import org.jetbrains.annotations.NotNull;
 

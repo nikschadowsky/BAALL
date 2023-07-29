@@ -1,6 +1,6 @@
-package de.nikschadowsky.baall.compiler.parser;
+package main.de.nikschadowsky.baall.compiler.parser;
 
-import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import org.w3c.dom.Node;
 
 import java.util.List;

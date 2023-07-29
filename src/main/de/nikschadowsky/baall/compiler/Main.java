@@ -1,6 +1,6 @@
-package de.nikschadowsky.baall.compiler;
+package main.de.nikschadowsky.baall.compiler;
 
-import de.nikschadowsky.baall.compiler.lexer.Lexer;
+import main.de.nikschadowsky.baall.compiler.lexer.Lexer;
 
 import java.util.Scanner;
 

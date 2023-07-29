@@ -1,10 +1,10 @@
-package de.nikschadowsky.baall.compiler.lexer;
+package main.de.nikschadowsky.baall.compiler.lexer;
 
 
-import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
-import de.nikschadowsky.baall.compiler.util.FileLoader;
-import de.nikschadowsky.baall.compiler.util.RegexFactory;
+import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import main.de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
+import main.de.nikschadowsky.baall.compiler.util.FileLoader;
+import main.de.nikschadowsky.baall.compiler.util.RegexFactory;
 
 import java.util.List;
 

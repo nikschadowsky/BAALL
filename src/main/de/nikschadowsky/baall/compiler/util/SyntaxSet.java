@@ -1,8 +1,5 @@
-package de.nikschadowsky.baall.compiler.util;
+package main.de.nikschadowsky.baall.compiler.util;
 
-import org.junit.platform.commons.util.CollectionUtils;
-
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 

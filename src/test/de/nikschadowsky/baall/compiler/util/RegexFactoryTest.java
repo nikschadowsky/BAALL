@@ -1,7 +1,7 @@
-package de.nikschadowsky.baall.compiler.util.test;
+package test.de.nikschadowsky.baall.compiler.util;
 
-import de.nikschadowsky.baall.compiler.util.RegexFactory;
-import de.nikschadowsky.baall.compiler.util.SyntaxSet;
+import main.de.nikschadowsky.baall.compiler.util.RegexFactory;
+import main.de.nikschadowsky.baall.compiler.util.SyntaxSet;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

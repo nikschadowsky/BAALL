@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package main.de.nikschadowsky.baall.compiler.lexer.tokens;
 
 public enum TokenType {
 
@@ -8,8 +8,8 @@ public enum TokenType {
     KEYWORD("Keyword"),
     IDENTIFIER("Identifier"),
     OPERATOR("Operator"),
-    SEPARATOR("Separator");
-
+    SEPARATOR("Separator"),
+    ANY("Any");
 
     private String description;
 

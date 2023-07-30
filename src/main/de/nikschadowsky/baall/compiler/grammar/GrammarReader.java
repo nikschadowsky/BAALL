@@ -144,7 +144,6 @@ public class GrammarReader {
 
             }
             nonterminal.setDerivationList(allDerivationsList);
-            System.out.println(set.stream().toList());
         }
     }
 

@@ -1,0 +1,151 @@
+package main.de.nikschadowsky.baall.compiler.grammar;
+
+import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import main.de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
+import main.de.nikschadowsky.baall.compiler.util.FileLoader;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class GrammarReader {
+
+    private final String path;
+
+    private String content;
+
+    public GrammarReader(String path) {
+        this.path = path;
+
+        content = FileLoader.loadFileContent(path);
+    }
+
+
+    public Grammar generateGrammar() {
+
+        Set<GrammarNonterminal> nonterminalSet = new HashSet<>();
+
+        String preprocessed = preprocess(content);
+
+        String[] lines = preprocessed.split("\\v");
+
+        GrammarNonterminal first = addAllNonterminal(nonterminalSet, lines);
+
+        addDerivations(nonterminalSet, lines);
+
+        return new Grammar(first, nonterminalSet);
+
+    }
+
+    private boolean isNonterminalAlreadyInSet(Set<GrammarNonterminal> set, String e) {
+        return set.stream().anyMatch(token -> token.getIdentifier().equals(e.toUpperCase()));
+    }
+
+    private GrammarNonterminal getNonterminalFromSet(Set<GrammarNonterminal> set, String e) {
+        return set.stream().filter(token -> token.getIdentifier()
+                        .equals(e.toUpperCase())).findAny()
+                .orElseThrow(() -> new GrammarSyntaxException("Nonterminal " + e + " is not defined!"));
+    }
+
+    private String preprocess(String content) {
+        content = content.replaceAll("\\v+", "\n");
+        content = content.replaceAll(" +", " ").trim();
+        return content;
+    }
+
+
+    private static final String tokenRegex = "[^\\\\]->";
+
+    /**
+     * Traverses lines to find all Nonterminals and adds them to the provided Set
+     *
+     * @param set
+     * @param lines
+     * @return the First GrammarNonterminal mentioned in the input String
+     */
+    private GrammarNonterminal addAllNonterminal(Set<GrammarNonterminal> set, String[] lines) {
+        GrammarNonterminal first = null;
+        boolean firstSet = false;
+
+        for (String line : lines) {
+
+            String[] tokens = line.split(tokenRegex);
+
+            if (tokens.length != 2) {
+                throw new GrammarSyntaxException("Error while parsing line " + line + " in " + path + "! Invalid syntax!");
+            }
+
+            String identifier = tokens[0].toUpperCase();
+
+            if (identifier.equalsIgnoreCase("_EPSILON"))
+                throw new GrammarSyntaxException("Error while parsing line " + line + " in " + path + "! EPSILON cannot be an identifier for a Nonterminal!");
+
+            if (!isNonterminalAlreadyInSet(set, identifier)) {
+
+                GrammarNonterminal nonterminal = new GrammarNonterminal(identifier);
+
+                if (!firstSet) {
+                    first = nonterminal;
+                    firstSet = true;
+                }
+
+                set.add(nonterminal);
+            }
+
+        }
+        return first;
+    }
+
+    private void addDerivations(Set<GrammarNonterminal> set, String[] lines) {
+        for (String line : lines) {
+
+            String[] tokens = line.split(tokenRegex);
+
+            String identifier = tokens[0];
+            String rawDerivation = tokens[1];
+
+            GrammarNonterminal nonterminal = getNonterminalFromSet(set, identifier);
+
+            List<GrammarDerivation> allDerivationsList = new ArrayList<>();
+
+            for (String s : rawDerivation.split("\\|")) {
+
+                List<GrammarSymbol> derivation = new ArrayList<>();
+
+                for (String token : s.trim().split(" ")) {
+                    token = token.trim();
+                    if (token.equals("_EPSILON")) {
+                        // Epsilon
+                        break;
+                    } else if (token.matches("^\".*\"$")) {
+                        String tokenValue = token.substring(1, token.length()-1);
+
+                        derivation.add(new Token(TokenType.ANY, tokenValue));
+                    } else if (token.charAt(0)=='_'){
+                        if(token.equals("_STRING_PRIMITIVE")){
+                            derivation.add(new Token(TokenType.STRING, ""));
+                        }else if(token.equals("_NUMBER_PRIMITIVE")){
+                            derivation.add(new Token(TokenType.NUMBER, ""));
+                        }else if(token.equals("_BOOLEAN_PRIMITIVE")){
+                            derivation.add(new Token(TokenType.BOOLEAN, ""));
+                        }
+                        else {
+                            throw new GrammarSyntaxException("Unrecognized Meta-Token " + token + " in line " + line + "!");
+                        }
+
+                    }else {
+                        derivation.add(getNonterminalFromSet(set, token));
+                    }
+                }
+
+
+                allDerivationsList.add(new GrammarDerivation(derivation.toArray(GrammarSymbol[]::new)));
+
+            }
+            nonterminal.setDerivationList(allDerivationsList);
+            System.out.println(set.stream().toList());
+        }
+    }
+
+}

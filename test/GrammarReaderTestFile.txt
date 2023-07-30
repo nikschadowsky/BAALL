@@ -1,0 +1,4 @@
+START -> A B "T" | _EPSILON
+A -> B | "T"
+b -> b END
+END -> _EPSILON

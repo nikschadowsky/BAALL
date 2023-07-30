@@ -31,8 +31,4 @@ public class Token implements GrammarSymbol {
                 '}';
     }
 
-    @Override
-    public boolean equalsSymbol(GrammarSymbol s) {
-        return false;
-    }
 }

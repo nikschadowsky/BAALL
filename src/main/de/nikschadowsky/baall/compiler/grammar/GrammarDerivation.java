@@ -20,13 +20,6 @@ public class GrammarDerivation {
         return derivation.length;
     }
 
-    public boolean matches(List<GrammarSymbol> tokens) {
-        for (int i = 0; i < tokens.size(); i++) {
-            if (!tokens.get(i).equalsSymbol(derivation[i])) return false;
-        }
-
-        return true;
-    }
 
     @Override
     public String toString() {

@@ -123,15 +123,12 @@ public class GrammarReader {
 
                         derivation.add(new Token(TokenType.ANY, tokenValue));
                     } else if (token.charAt(0)=='_'){
-                        if(token.equals("_STRING_PRIMITIVE")){
-                            derivation.add(new Token(TokenType.STRING, ""));
-                        }else if(token.equals("_NUMBER_PRIMITIVE")){
-                            derivation.add(new Token(TokenType.NUMBER, ""));
-                        }else if(token.equals("_BOOLEAN_PRIMITIVE")){
-                            derivation.add(new Token(TokenType.BOOLEAN, ""));
-                        }
-                        else {
-                            throw new GrammarSyntaxException("Unrecognized Meta-Token " + token + " in line " + line + "!");
+                        switch (token) {
+                            case "_STRING_PRIMITIVE" -> derivation.add(new Token(TokenType.STRING, ""));
+                            case "_NUMBER_PRIMITIVE" -> derivation.add(new Token(TokenType.NUMBER, ""));
+                            case "_BOOLEAN_PRIMITIVE" -> derivation.add(new Token(TokenType.BOOLEAN, ""));
+                            default ->
+                                    throw new GrammarSyntaxException("Unrecognized Meta-Symbol " + token + " in line " + line + "!");
                         }
 
                     }else {

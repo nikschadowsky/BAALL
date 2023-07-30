@@ -25,10 +25,6 @@ public class GrammarNonterminal implements GrammarSymbol {
         return false;
     }
 
-    @Override
-    public final boolean equalsSymbol(GrammarSymbol s) {
-        return getClass().equals(s.getClass());
-    }
 
     public String getIdentifier() {
         return identifier;

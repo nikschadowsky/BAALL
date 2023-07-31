@@ -15,6 +15,7 @@ public class Lexer {
     private String content;
 
     private boolean isPreprocessed;
+
     public Lexer(String path) {
         this.path = path;
         readContent();
@@ -49,7 +50,7 @@ public class Lexer {
 
     }
 
-    public void replaceAllWhitespace() {
+    private void replaceAllWhitespace() {
         boolean notInString = true;
         boolean notInCharacter = true;
 
@@ -78,22 +79,34 @@ public class Lexer {
 
     }
 
-    public void preprocessCode(){
-        removeComments();
-        replaceAllWhitespace();
-
-        isPreprocessed =true;
+    /**
+     * Preprocesses this Lexer's content by removing Comments and replacing Whitespaces with Spaces
+     */
+    public void preprocessCode() {
+        if (!isPreprocessed) {
+            removeComments();
+            replaceAllWhitespace();
+        }
+        isPreprocessed = true;
     }
 
+    /**
+     * Tokenizes this Lexer's content. If it wasn't preprocessed, it's preprocessed before tokenizing.
+     * @return List of tokens in their respective order
+     */
     public List<Token> tokenize() {
 
-        Tokenizer tokenizer = new Tokenizer(content);
+        Tokenizer tokenizer = new Tokenizer(getPreprocessedCode());
 
         return tokenizer.run();
     }
 
-    public String getPreprocessedCode(){
-        if(!isPreprocessed){
+    /**
+     * Get this Lexer's preprocessed content. Preprocesses it, if it wasn't already.
+     * @return preprocessed content
+     */
+    public String getPreprocessedCode() {
+        if (!isPreprocessed) {
             preprocessCode();
         }
         return content;

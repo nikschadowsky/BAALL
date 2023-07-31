@@ -8,5 +8,5 @@ identifier
 
 
 
-
-
+struct //spaced
+string//not spaced

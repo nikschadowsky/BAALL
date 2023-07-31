@@ -41,7 +41,9 @@ class TokenizerTest {
 
                 TokenType.NUMBER,TokenType.SEPARATOR, TokenType.NUMBER, TokenType.SEPARATOR,
                 TokenType.NUMBER, TokenType.NUMBER, TokenType.NUMBER,
-                TokenType.IDENTIFIER
+                TokenType.IDENTIFIER,
+                TokenType.KEYWORD,
+                TokenType.KEYWORD
 
         ), tokens.stream().map(Token::getType).toList());
 

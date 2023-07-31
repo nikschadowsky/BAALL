@@ -140,7 +140,9 @@ public class GrammarReader {
                 allDerivationsList.add(new GrammarDerivation(derivation.toArray(GrammarSymbol[]::new)));
 
             }
-            nonterminal.setDerivationList(allDerivationsList);
+            if(!nonterminal.setDerivationList(allDerivationsList)){
+                throw new GrammarSyntaxException("Derivation of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
+            }
         }
     }
 

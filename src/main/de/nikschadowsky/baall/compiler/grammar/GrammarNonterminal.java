@@ -38,4 +38,9 @@ public class GrammarNonterminal implements GrammarSymbol {
     public String toString() {
         return "GrammarNonterminal { " + getIdentifier() + ", " + getDerivationList() + "}";
     }
+
+    @Override
+    public boolean isTerminal() {
+        return false;
+    }
 }

@@ -31,4 +31,8 @@ public class Token implements GrammarSymbol {
                 '}';
     }
 
+    @Override
+    public boolean isTerminal() {
+        return true;
+    }
 }

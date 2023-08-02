@@ -43,4 +43,21 @@ public class GrammarNonterminal implements GrammarSymbol {
     public boolean isTerminal() {
         return false;
     }
+
+    /**
+     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal they are compared accordingly. False otherwise.
+     * Compares the identifiers of both Nonterminals.
+     * @param s GrammarSymbol to compare to
+     * @return if symbols match
+     */
+    @Override
+    public boolean symbolMatches(GrammarSymbol s) {
+
+        // if we have
+        if(s instanceof GrammarNonterminal n){
+            return getIdentifier().equals(n.getIdentifier());
+        }
+
+        return false;
+    }
 }

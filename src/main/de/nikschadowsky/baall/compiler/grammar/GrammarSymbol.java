@@ -8,4 +8,11 @@ public interface GrammarSymbol {
      */
     boolean isTerminal();
 
+    /**
+     * Compares Symbols if they are of the same type (e.g. Token or GrammarNonterminal). Else false.
+     * @return if symbols match
+     */
+    boolean symbolMatches(GrammarSymbol s);
+
+
 }

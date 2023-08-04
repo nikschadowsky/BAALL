@@ -39,7 +39,7 @@ public class Token implements GrammarSymbol {
     /**
      * Compares Token to Symbol. If s is an instance of Token they are compared accordingly. False otherwise.
      * If any of both Tokens are of TokenType.ANY, value is compared.
-     * If both s and this are of either type TokenType.STRING, TokenType.NUMBER or TokenType.BOOLEAN return true.
+     * If both s and this instance are of either type TokenType.STRING, TokenType.NUMBER or TokenType.BOOLEAN return true.
      * Else type and value are compared.
      * @param s GrammarSymbol to compare to
      * @return if symbols match

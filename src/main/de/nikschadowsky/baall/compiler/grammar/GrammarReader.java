@@ -122,7 +122,8 @@ public class GrammarReader {
 
             List<GrammarDerivation> allDerivationsList = new ArrayList<>();
 
-            for (String s : rawDerivation.split("\\|")) {
+            // allow for literal "|" using the form "\|"
+            for (String s : rawDerivation.split("(?<!\\\\)\\|")) {
 
                 List<GrammarSymbol> derivation = new ArrayList<>();
 
@@ -132,7 +133,7 @@ public class GrammarReader {
                         // Epsilon
                         break;
                     } else if (token.matches("^\".*\"$")) {
-                        String tokenValue = token.substring(1, token.length()-1);
+                        String tokenValue = token.substring(1, token.length()-1).replaceAll("\\\\", "");
 
                         derivation.add(new Token(TokenType.ANY, tokenValue));
                     } else if (token.charAt(0)=='_'){

@@ -32,7 +32,7 @@ class GrammarReaderTest {
 
         String derivationRepresentation = g.getStart().getDerivationList().toString();
 
-        String derivA = "[A B \"T\"]";
+        String derivA = "[A B \"T\" \"\\|\"]";
         String derivB = "[]";
 
         System.out.println(derivationRepresentation);

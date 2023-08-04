@@ -15,6 +15,19 @@ public class GrammarReader {
 
     private String content;
 
+    /**
+     * Creates a GrammarReader object to generate a {@link Grammar} from a file provided by a path.
+     * Special Symbols in the File are:
+     * 1. _EPSILON
+     * 2. _STRING_PRIMITIVE, _BOOLEAN_PRIMITIVE, _NUMBER_PRIMITIVE
+     * 3. "any string"
+     * They are treated differently by the reader.
+     * _EPSILON denotes an Epsilon as a transition of a formal grammar,
+     * _*_PRIMITIVE denotes variable tokens
+     * and "any string" denotes a hard token, assigning it its literal value.
+     *
+     * @param path of Grammar File
+     */
     public GrammarReader(String path) {
         this.path = path;
 

@@ -1,5 +1,7 @@
 package main.de.nikschadowsky.baall.compiler.grammar;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class GrammarNonterminal implements GrammarSymbol {
@@ -51,7 +53,7 @@ public class GrammarNonterminal implements GrammarSymbol {
      * @return if symbols match
      */
     @Override
-    public boolean symbolMatches(GrammarSymbol s) {
+    public boolean symbolMatches(@NotNull GrammarSymbol s) {
 
         // if we have
         if(s instanceof GrammarNonterminal n){

@@ -13,7 +13,7 @@ public class GrammarReader {
 
     private final String path;
 
-    private String content;
+    private final String content;
 
     /**
      * Creates a GrammarReader object to generate a {@link Grammar} from a file provided by a path.
@@ -73,8 +73,8 @@ public class GrammarReader {
     /**
      * Traverses lines to find all Nonterminals and adds them to the provided Set
      *
-     * @param set
-     * @param lines
+     * @param set of Nonterminals
+     * @param lines dissected code preprocessed lines
      * @return the First GrammarNonterminal mentioned in the input String
      */
     private GrammarNonterminal addAllNonterminal(Set<GrammarNonterminal> set, String[] lines) {
@@ -133,10 +133,10 @@ public class GrammarReader {
                         // Epsilon
                         break;
                     } else if (token.matches("^\".*\"$")) {
-                        String tokenValue = token.substring(1, token.length()-1).replaceAll("\\\\", "");
+                        String tokenValue = token.substring(1, token.length() - 1).replaceAll("\\\\|", "|");
 
                         derivation.add(new Token(TokenType.ANY, tokenValue));
-                    } else if (token.charAt(0)=='_'){
+                    } else if (token.charAt(0) == '_') {
                         switch (token) {
                             case "_STRING_PRIMITIVE" -> derivation.add(new Token(TokenType.STRING, ""));
                             case "_NUMBER_PRIMITIVE" -> derivation.add(new Token(TokenType.NUMBER, ""));
@@ -145,7 +145,7 @@ public class GrammarReader {
                                     throw new GrammarSyntaxException("Unrecognized Meta-Symbol " + token + " in line " + line + "!");
                         }
 
-                    }else {
+                    } else {
                         derivation.add(getNonterminalFromSet(set, token));
                     }
                 }
@@ -154,7 +154,7 @@ public class GrammarReader {
                 allDerivationsList.add(new GrammarDerivation(derivation.toArray(GrammarSymbol[]::new)));
 
             }
-            if(!nonterminal.setDerivationList(allDerivationsList)){
+            if (!nonterminal.setDerivationList(allDerivationsList)) {
                 throw new GrammarSyntaxException("Derivation of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
             }
         }

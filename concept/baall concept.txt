@@ -1,12 +1,11 @@
-use math.ba; // import 
+use math.ba; // import
 
 struct: myStructure := (num: field1, string: field2, structure2: field3)
 
-
 num: b = 3;	/* Blockkommentar */
 char: c = 'A';	//Kommentar
-num[]: arr = [1,2,3,4,5];
-num[]: arr2 = (9) // array of numbers with size 9
+num[9]: arr = [1,2,3,4,5];
+num[9]: arr2 // array of numbers with size 9
 
 string: konstante1 := a + b;
 num: konstante2 := b + a;
@@ -17,18 +16,20 @@ string: funktion1 := num: a, bool: b, char: c {
 		return "Hahaha";
 	} | isFalse? {
 		// If Else
-		
 	} | {
 		// Else
-	} 
+	}
 	return "Hehehehoar";
 }
 
-while isTrue {
+while a<b {
 	// while loop
 }
-for i=0::i<10{
+for i=0..10::i++{
 
-}@i++;
+}
+for i=0..10{
+
+}
 
 export {b,c,arr,arr2, funktion1}

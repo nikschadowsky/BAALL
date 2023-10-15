@@ -1,11 +1,14 @@
 use math.ba; // import
 
-struct: myStructure := (num: field1, string: field2, structure2: field3)
+struct: myStructure := (num: field1, string: field2, structure2: field3);
 
+myStructure: grr := &(a,b,c)
+
+string: a = "GRRRRRR";
 num: b = 3;	/* Blockkommentar */
 char: c = 'A';	//Kommentar
 num[9]: arr = [1,2,3,4,5];
-num[9]: arr2 // array of numbers with size 9
+num[9]: arr2 = none; // array of numbers with size 9
 
 string: konstante1 := a + b;
 num: konstante2 := b + a;
@@ -31,5 +34,7 @@ for i=0..10::i++{
 for i=0..10{
 
 }
+
+char: no = none;
 
 export {b,c,arr,arr2, funktion1}

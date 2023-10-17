@@ -59,7 +59,7 @@ FUNCTION_BODY -> STATEMENT "return" VALUE
 # OPERATION_SERIES -> BINARY_OPERATOR VALUE OPERATION_SERIES | _EPSILON
 
 
-EXPRESSION -> TERM OPTIONAL_OPERATION
+EXPRESSION -> TERM OPTIONAL_OPERATION | PREFIX_OPERATOR EXPRESSION
 
 TERM -> "(" EXPRESSION ")" | VALUE
 
@@ -106,6 +106,8 @@ BINARY_OPERATOR -> "+" | "-" | "*" | "/" | "%" | "&" | "\|" | "^"  | "<<" | ">>"
 UNARY_OPERATOR -> "++" | "--"
 
 SHORTHAND_OPERATOR -> "=" | ":=" | "+=" | "-=" | "*=" | "/=" | "&=" | "|=" | "^="
+
+PREFIX_OPERATOR -> "+" | "-" | "!"
 
 TYPE -> "string" | "number" | "boolean" | "struct" | "function" | IDENTIFIER
 

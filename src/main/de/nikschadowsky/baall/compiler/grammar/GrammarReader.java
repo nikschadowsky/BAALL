@@ -62,7 +62,9 @@ public class GrammarReader {
     }
 
     private String preprocess(String content) {
+        // replace multiple line breaks
         content = content.replaceAll("\\v+", "\n");
+        // replace multiple regular spaces
         content = content.replaceAll(" +", " ").trim();
         return content;
     }
@@ -122,13 +124,27 @@ public class GrammarReader {
 
             List<GrammarDerivation> allDerivationsList = new ArrayList<>();
 
-            // allow for literal "|" using the form "\|"
+            // allow for literal "|" using the form "\|" 
+            // FIXME: 19.10.2023 why is this so complicated, just do '\|' maybe. having a backslash as a valid language token is weird and should be discouraged.
             for (String s : rawDerivation.split("(?<!\\\\)\\|")) {
 
                 List<GrammarSymbol> derivation = new ArrayList<>();
 
                 for (String token : s.trim().split(" ")) {
                     token = token.trim();
+
+                    // meta symbol
+                    if(token.startWith('_')){
+                        if(token.equals("_EPSILON"))
+                            // epsilon character
+                            break;
+
+                        else {
+                            // find possible match in tokentype enum
+                        }
+                    }
+
+
                     if (token.equals("_EPSILON")) {
                         // Epsilon
                         break;

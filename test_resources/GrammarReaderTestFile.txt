@@ -1,4 +1,5 @@
 START -> A B "T" "\|" | _EPSILON
-A -> B | "T"
+A -> B | "T" # comment
+# and here too
 b -> b END
 END -> _EPSILON

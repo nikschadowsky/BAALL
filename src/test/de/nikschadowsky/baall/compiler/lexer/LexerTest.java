@@ -10,7 +10,7 @@ public class LexerTest {
 
     private Lexer lexer;
 
-    private static final String TEST_PATH = "test/LexerTestFile.txt";
+    private static final String TEST_PATH = "test_resources/LexerTestFile.txt";
 
     @BeforeEach
     void setUp() {
@@ -20,7 +20,7 @@ public class LexerTest {
 
     @Test
     void testPreprocessing() {
-        assertEquals(FileLoader.loadFileContent("test/LexerTestExpected.txt"), lexer.getPreprocessedCode());
+        assertEquals(FileLoader.loadFileContent("test_resources/LexerTestExpected.txt"), lexer.getPreprocessedCode());
     }
 
 }

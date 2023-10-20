@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class TokenizerTest {
@@ -16,12 +17,11 @@ class TokenizerTest {
 
     @BeforeEach
     void setUp() {
-        final String path = "test/TokenizerTestFile.txt";
+        final String path = "test_resources/TokenizerTestFile.txt";
 
         Lexer lexer = new Lexer(path);
 
         fileContent = lexer.getPreprocessedCode();
-
     }
 
     @Test
@@ -30,19 +30,24 @@ class TokenizerTest {
         Tokenizer tokenizer = new Tokenizer(fileContent);
         List<Token> tokens = tokenizer.run();
 
-        assertIterableEquals(Arrays.asList(
+
+        List<TokenType> types = Arrays.asList(
                 TokenType.BOOLEAN, TokenType.BOOLEAN,
                 TokenType.STRING,
                 TokenType.OPERATOR, TokenType.OPERATOR, TokenType.OPERATOR,
                 TokenType.SEPARATOR, TokenType.SEPARATOR, TokenType.OPERATOR,
 
-                TokenType.NUMBER,TokenType.SEPARATOR, TokenType.NUMBER, TokenType.SEPARATOR,
+                TokenType.NUMBER, TokenType.SEPARATOR, TokenType.NUMBER, TokenType.SEPARATOR,
                 TokenType.NUMBER, TokenType.NUMBER, TokenType.NUMBER,
                 TokenType.IDENTIFIER,
                 TokenType.KEYWORD,
-                TokenType.KEYWORD
+                TokenType.KEYWORD,
+                TokenType.IDENTIFIER);
 
-        ), tokens.stream().map(Token::getType).toList());
+
+        assertEquals(types.size(), tokens.size());
+
+        assertIterableEquals(types, tokens.stream().map(Token::getType).toList());
 
         System.out.println(tokens);
     }

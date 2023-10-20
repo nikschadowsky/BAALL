@@ -1,6 +1,6 @@
-package main.de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.lexer.tokens;
 
-import main.de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
+import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import org.jetbrains.annotations.NotNull;
 
 public class Token implements GrammarSymbol {
@@ -38,10 +38,10 @@ public class Token implements GrammarSymbol {
     }
 
     /**
-     * Compares Token to Symbol. If s is an instance of Token they are compared accordingly. False otherwise.
-     * If any of both Tokens are of TokenType.ANY, value is compared.
-     * If both s and this instance are of either type TokenType.STRING, TokenType.NUMBER or TokenType.BOOLEAN return true.
-     * Else type and value are compared.
+     * Compares Token to Symbol. If s is an instance of Token they are compared accordingly. False otherwise. If any of
+     * both Tokens are of TokenType.ANY, value is compared. If both s and this instance are of either type
+     * TokenType.STRING, TokenType.NUMBER or TokenType.BOOLEAN return true. Else type and value are compared.
+     *
      * @param s GrammarSymbol to compare to
      * @return if symbols match
      */
@@ -56,9 +56,9 @@ public class Token implements GrammarSymbol {
                 return value.equals(token.getValue());
             }
 
-            if((type.equals(TokenType.STRING) && token.getType().equals(TokenType.STRING))
+            if ((type.equals(TokenType.STRING) && token.getType().equals(TokenType.STRING))
                     || (type.equals(TokenType.BOOLEAN) && token.getType().equals(TokenType.BOOLEAN))
-                    || (type.equals(TokenType.NUMBER) && token.getType().equals(TokenType.NUMBER))){
+                    || (type.equals(TokenType.NUMBER) && token.getType().equals(TokenType.NUMBER))) {
                 return true;
             }
 

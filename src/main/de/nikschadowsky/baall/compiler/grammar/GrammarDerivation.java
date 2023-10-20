@@ -1,8 +1,6 @@
-package main.de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar;
 
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-
-import java.util.List;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
 public class GrammarDerivation {
 

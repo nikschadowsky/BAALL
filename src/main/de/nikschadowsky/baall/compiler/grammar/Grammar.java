@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar;
 
 import org.jetbrains.annotations.NotNull;
 

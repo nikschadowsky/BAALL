@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.util;
+package de.nikschadowsky.baall.compiler.util;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class SyntaxSet {
         KEYWORDS.add("export");
         KEYWORDS.add("return");
 
-        System.out.println("Keywords: "  + KEYWORDS.size() + ", " + KEYWORDS);
+        System.out.println("Keywords: " + KEYWORDS.size() + ", " + KEYWORDS);
     }
 
     private static void addOperators() {
@@ -76,7 +76,7 @@ public class SyntaxSet {
         OPERATORS.add("?");
 
         System.out.println("Operators: " + OPERATORS.size() + ", " + OPERATORS);
-        }
+    }
 
     private static void addSeparators() {
 

@@ -1,8 +1,8 @@
-package main.de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar;
 
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
-import main.de.nikschadowsky.baall.compiler.util.FileLoader;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -75,7 +75,7 @@ public class GrammarReader {
     /**
      * Traverses lines to find all Nonterminals and adds them to the provided Set
      *
-     * @param set of Nonterminals
+     * @param set   of Nonterminals
      * @param lines dissected code preprocessed lines
      * @return the First GrammarNonterminal mentioned in the input String
      */
@@ -134,8 +134,8 @@ public class GrammarReader {
                     token = token.trim();
 
                     // meta symbol
-                    if(token.startsWith("_")){
-                        if(token.equals("_EPSILON"))
+                    if (token.startsWith("_")) {
+                        if (token.equals("_EPSILON"))
                             // epsilon character
                             break;
 

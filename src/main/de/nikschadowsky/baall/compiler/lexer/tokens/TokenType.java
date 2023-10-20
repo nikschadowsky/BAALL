@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.lexer.tokens;
 
 public enum TokenType {
 

@@ -1,6 +1,6 @@
-package main.de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.lexer.tokens;
 
-import main.de.nikschadowsky.baall.compiler.util.RegexFactory;
+import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,10 +12,11 @@ public class Tokenizer {
     private String preprocessedCode;
 
     public Tokenizer(String preprocessedCode) {
-        this.preprocessedCode =preprocessedCode;
+        this.preprocessedCode = preprocessedCode;
     }
 
     /**
+     *
      */
     public List<Token> run() {
         List<Token> tokens = new LinkedList<>();
@@ -31,7 +32,7 @@ public class Tokenizer {
         Pattern identifierPattern = Pattern.compile(startOfStringRegex + RegexFactory.IDENTIFIER_REGEX);
 
 
-        int lastCheckedIndex= 0;
+        int lastCheckedIndex = 0;
 
         while (!preprocessedCode.isBlank()) {
             Matcher m;

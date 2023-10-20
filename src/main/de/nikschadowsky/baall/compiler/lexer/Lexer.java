@@ -1,10 +1,10 @@
-package main.de.nikschadowsky.baall.compiler.lexer;
+package de.nikschadowsky.baall.compiler.lexer;
 
 
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
-import main.de.nikschadowsky.baall.compiler.util.FileLoader;
-import main.de.nikschadowsky.baall.compiler.util.RegexFactory;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
+import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
 import java.util.List;
 
@@ -92,6 +92,7 @@ public class Lexer {
 
     /**
      * Tokenizes this Lexer's content. If it wasn't preprocessed, it's preprocessed before tokenizing.
+     *
      * @return List of tokens in their respective order
      */
     public List<Token> tokenize() {
@@ -103,6 +104,7 @@ public class Lexer {
 
     /**
      * Get this Lexer's preprocessed content. Preprocesses it, if it wasn't already.
+     *
      * @return preprocessed content
      */
     public String getPreprocessedCode() {

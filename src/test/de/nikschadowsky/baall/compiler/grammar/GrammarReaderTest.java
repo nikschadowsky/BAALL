@@ -1,12 +1,7 @@
-package test.de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar;
 
-import main.de.nikschadowsky.baall.compiler.grammar.Grammar;
-import main.de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
-import main.de.nikschadowsky.baall.compiler.grammar.GrammarReader;
-import main.de.nikschadowsky.baall.compiler.grammar.GrammarSyntaxException;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +21,7 @@ class GrammarReaderTest {
 
         Set<String> testNonterminals = Set.of("START", "A", "B", "END");
 
-        assertTrue(g.getAllNonterminals().stream().map(elem -> testNonterminals.contains(elem.getIdentifier())).reduce(true, (a,b) -> a &&b  ));
+        assertTrue(g.getAllNonterminals().stream().map(elem -> testNonterminals.contains(elem.getIdentifier())).reduce(true, (a, b) -> a && b));
 
         assertEquals(4, g.getAllNonterminals().size());
 
@@ -40,6 +35,7 @@ class GrammarReaderTest {
         assertTrue(derivationRepresentation.contains(derivA) && derivationRepresentation.contains(derivB));
 
     }
+
     @Test
     void testCreateGrammarSyntaxError(){
         reader = new GrammarReader("test/GrammarReaderTestSyntaxError.txt");
@@ -54,6 +50,10 @@ class GrammarReaderTest {
     }@Test
     void testCreateGrammarEpsilonError(){
         reader = new GrammarReader("test/GrammarReaderTestEpsilonError.txt");
+    }
+
+    @Test
+    void testCreateGrammarEpsilonError() {
 
         Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
 

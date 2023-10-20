@@ -38,10 +38,10 @@ public class Lexer {
                 if (content.charAt(i) == '\"') {
                     notInString ^= true;
                 } else if (notInString && content.substring(i - 1, i + 1).equals("//")) {
-                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.SINGLE_LINE_COMMENT_REGEX, "");
+                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.SINGLE_LINE_COMMENT_REGEX, "\n");
 
                 } else if (notInString && content.substring(i - 1, i + 1).equals("/*")) {
-                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.BLOCK_COMMENT_REGEX, "");
+                    content = content.substring(0, i - 1) + content.substring(i - 1).replaceFirst(RegexFactory.BLOCK_COMMENT_REGEX, "\n");
                 }
 
                 i++;

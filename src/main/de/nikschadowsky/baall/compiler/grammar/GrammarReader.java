@@ -134,7 +134,7 @@ public class GrammarReader {
                     token = token.trim();
 
                     // meta symbol
-                    if(token.startWith('_')){
+                    if(token.startsWith("_")){
                         if(token.equals("_EPSILON"))
                             // epsilon character
                             break;

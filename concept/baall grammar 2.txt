@@ -105,7 +105,7 @@ INCREMENT_OPERATION -> UNARY_OPERATOR IDENTIFIER | IDENTIFIER UNARY_OPERATOR
 
 PRIMITIVE -> "none" | _STRING_PRIMITIVE | _NUMBER_PRIMITIVE | _BOOLEAN_PRIMITIVE
 
-BINARY_OPERATOR -> "+" | "-" | "*" | "/" | "%" | "&" | "\|" | "^"  | "<<" | ">>" | "==" | "<" | ">"
+BINARY_OPERATOR -> "+" | "-" | "*" | "/" | "%" | "&" | "\|" | "^"  | "<<" | ">>" | "==" | "<" | ">" | "&&" | "||"
 
 UNARY_OPERATOR -> "++" | "--"
 

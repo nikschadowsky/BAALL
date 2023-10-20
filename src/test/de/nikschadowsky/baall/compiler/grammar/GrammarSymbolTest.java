@@ -45,8 +45,8 @@ class GrammarSymbolTest {
         // for good measure
         assertFalse(token1.symbolMatches(token2));
         assertFalse(token1.symbolMatches(token3));
-        assertFalse(token1.symbolMatches(token4));
-        assertFalse(token1.symbolMatches(token5));
+        assertTrue(token1.symbolMatches(token4)); // Strings match regardless of content
+        assertTrue(token1.symbolMatches(token5));
         assertFalse(token1.symbolMatches(token6));
 
         // and just checking that one symbol matches itself

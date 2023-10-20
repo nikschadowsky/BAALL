@@ -62,6 +62,8 @@ public class GrammarReader {
     }
 
     private String preprocess(String content) {
+        // remove comments
+        content = content.replaceAll("#.*($|\\v)", "");
         // replace multiple line breaks
         content = content.replaceAll("\\v+", "\n");
         // replace multiple regular spaces
@@ -88,7 +90,7 @@ public class GrammarReader {
             String[] tokens = line.split(tokenRegex);
 
             if (tokens.length != 2) {
-                throw new GrammarSyntaxException("Error while parsing line " + line + " in " + path + "! Invalid syntax!");
+                throw new GrammarSyntaxException("Error while parsing line '" + line + "' in " + path + "! Invalid syntax!");
             }
 
             String identifier = tokens[0].toUpperCase();
@@ -134,7 +136,7 @@ public class GrammarReader {
                     token = token.trim();
 
                     // meta symbol
-                    if (token.startsWith("_")) {
+                    /*if (token.startsWith("_")) {
                         if (token.equals("_EPSILON"))
                             // epsilon character
                             break;
@@ -142,14 +144,15 @@ public class GrammarReader {
                         else {
                             // find possible match in tokentype enum
                         }
-                    }
+                    }*/
 
 
                     if (token.equals("_EPSILON")) {
                         // Epsilon
                         break;
                     } else if (token.matches("^\".*\"$")) {
-                        String tokenValue = token.substring(1, token.length() - 1).replaceAll("\\\\|", "|");
+                        // remove quotation and replace escaped pipe with regular pipe
+                        String tokenValue = token.substring(1, token.length() - 1).replaceAll("\\\\\\|", "|");
 
                         derivation.add(new Token(TokenType.ANY, tokenValue));
                     } else if (token.charAt(0) == '_') {

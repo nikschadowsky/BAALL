@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +47,9 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     /**
-     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal they are compared accordingly. False otherwise.
-     * Compares the identifiers of both Nonterminals.
+     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal they are compared accordingly.
+     * False otherwise. Compares the identifiers of both Nonterminals.
+     *
      * @param s GrammarSymbol to compare to
      * @return if symbols match
      */
@@ -56,7 +57,7 @@ public class GrammarNonterminal implements GrammarSymbol {
     public boolean symbolMatches(@NotNull GrammarSymbol s) {
 
         // if we have
-        if(s instanceof GrammarNonterminal n){
+        if (s instanceof GrammarNonterminal n) {
             return getIdentifier().equals(n.getIdentifier());
         }
 

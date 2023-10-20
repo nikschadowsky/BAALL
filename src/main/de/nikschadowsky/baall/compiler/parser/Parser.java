@@ -1,7 +1,7 @@
-package main.de.nikschadowsky.baall.compiler.parser;
+package de.nikschadowsky.baall.compiler.parser;
 
-import main.de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import org.w3c.dom.Node;
+import de.nikschadowsky.baall.compiler.grammar.Grammar;
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.util;
+package de.nikschadowsky.baall.compiler.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,10 +8,11 @@ public class FileLoader {
 
     /**
      * Reads in all Contents of a File provided by a path
+     *
      * @param path
      * @return String-Representation of content
      */
-    public static String loadFileContent(String path){
+    public static String loadFileContent(String path) {
 
         try {
             byte[] bytes = Files.readAllBytes(Paths.get(path));

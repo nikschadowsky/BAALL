@@ -1,4 +1,4 @@
-package main.de.nikschadowsky.baall.compiler.util;
+package de.nikschadowsky.baall.compiler.util;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -41,8 +41,8 @@ public class RegexFactory {
     private static final String REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX = "(?<=\\))\\|\\)"; // ...)|) -> ...))
 
     /**
-     * Generate a Regular Expression from the defined Operators in {@link SyntaxSet}.
-     * Ordered by length descending, so remove need to peek ahead.
+     * Generate a Regular Expression from the defined Operators in {@link SyntaxSet}. Ordered by length descending, so
+     * remove need to peek ahead.
      *
      * @return Regular Expression String for Operators
      */
@@ -59,8 +59,9 @@ public class RegexFactory {
     }
 
     /**
-     * Generate a Regular Expression from the defined Separators in {@link SyntaxSet}.
-     * Ordered by length descending, so remove need to peek ahead.
+     * Generate a Regular Expression from the defined Separators in
+     * {@link SyntaxSet}. Ordered by length descending, so remove need to peek
+     * ahead.
      *
      * @return Regular Expression String for Separators
      */
@@ -76,8 +77,8 @@ public class RegexFactory {
     }
 
     /**
-     * Since Operators consist of symbols, some may be interpreted by regular expressions as non literals.
-     * To prevent this, every symbol gets escaped, to interpret it as a literal.
+     * Since Operators consist of symbols, some may be interpreted by regular expressions as non literals. To prevent
+     * this, every symbol gets escaped, to interpret it as a literal.
      *
      * @param op not empty and not null String of symbols
      * @return Operator as regex literal

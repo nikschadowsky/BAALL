@@ -12,8 +12,8 @@ class GrammarReaderTest {
     private GrammarReader reader;
 
     @Test
-    void testCreateGrammar(){
-        reader = new GrammarReader("test/GrammarReaderTestFile.txt");
+    void testCreateGrammar() {
+        reader = new GrammarReader("test_resources/GrammarReaderTestFile.txt");
 
         Grammar g = reader.generateGrammar();
 
@@ -27,7 +27,7 @@ class GrammarReaderTest {
 
         String derivationRepresentation = g.getStart().getDerivationList().toString();
 
-        String derivA = "[A B \"T\" \"\\|\"]";
+        String derivA = "[A B \"T\" \"|\"]";
         String derivB = "[]";
 
         System.out.println(derivationRepresentation);
@@ -37,8 +37,8 @@ class GrammarReaderTest {
     }
 
     @Test
-    void testCreateGrammarSyntaxError(){
-        reader = new GrammarReader("test/GrammarReaderTestSyntaxError.txt");
+    void testCreateGrammarSyntaxError() {
+        reader = new GrammarReader("test_resources/GrammarReaderTestSyntaxError.txt");
 
         Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
 
@@ -47,13 +47,11 @@ class GrammarReaderTest {
         e.printStackTrace();
 
         assertTrue(e.getMessage().contains(expected));
-    }@Test
-    void testCreateGrammarEpsilonError(){
-        reader = new GrammarReader("test/GrammarReaderTestEpsilonError.txt");
     }
 
     @Test
     void testCreateGrammarEpsilonError() {
+        reader = new GrammarReader("test_resources/GrammarReaderTestEpsilonError.txt");
 
         Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
 

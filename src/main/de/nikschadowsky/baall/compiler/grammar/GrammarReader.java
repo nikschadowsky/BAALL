@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import de.nikschadowsky.baall.compiler.lexer.tokens.NoTokenTypeFoundException;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
@@ -16,15 +17,10 @@ public class GrammarReader {
     private final String content;
 
     /**
-     * Creates a GrammarReader object to generate a {@link Grammar} from a file provided by a path.
-     * Special Symbols in the File are:
-     * 1. _EPSILON
-     * 2. _STRING_PRIMITIVE, _BOOLEAN_PRIMITIVE, _NUMBER_PRIMITIVE
-     * 3. "any string"
-     * They are treated differently by the reader.
-     * _EPSILON denotes an Epsilon as a transition of a formal grammar,
-     * _*_PRIMITIVE denotes variable tokens
-     * and "any string" denotes a hard token, assigning it its literal value.
+     * Creates a GrammarReader object to generate a {@link Grammar} from a file provided by a path. Special Symbols in
+     * the File are: 1. _EPSILON 2. _STRING_PRIMITIVE, _BOOLEAN_PRIMITIVE, _NUMBER_PRIMITIVE 3. "any string" They are
+     * treated differently by the reader. _EPSILON denotes an Epsilon as a transition of a formal grammar, _*_PRIMITIVE
+     * denotes variable tokens and "any string" denotes a hard token, assigning it its literal value.
      *
      * @param path of Grammar File
      */
@@ -43,21 +39,23 @@ public class GrammarReader {
 
         String[] lines = preprocessed.split("\\v");
 
-        GrammarNonterminal first = addAllNonterminal(nonterminalSet, lines);
+        GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, lines);
 
         addDerivations(nonterminalSet, lines);
 
-        return new Grammar(first, nonterminalSet);
+        return new Grammar(startSymbol, nonterminalSet);
 
     }
 
     private boolean isNonterminalAlreadyInSet(Set<GrammarNonterminal> set, String e) {
-        return set.stream().anyMatch(token -> token.getIdentifier().equals(e.toUpperCase()));
+        return set.stream()
+                .anyMatch(token -> token.getIdentifier().equals(e.toUpperCase()));
     }
 
     private GrammarNonterminal getNonterminalFromSet(Set<GrammarNonterminal> set, String e) {
-        return set.stream().filter(token -> token.getIdentifier()
-                        .equals(e.toUpperCase())).findAny()
+        return set.stream()
+                .filter(token -> token.getIdentifier().equals(e.toUpperCase()))
+                .findAny()
                 .orElseThrow(() -> new GrammarSyntaxException("Nonterminal " + e + " is not defined!"));
     }
 
@@ -82,8 +80,7 @@ public class GrammarReader {
      * @return the First GrammarNonterminal mentioned in the input String
      */
     private GrammarNonterminal addAllNonterminal(Set<GrammarNonterminal> set, String[] lines) {
-        GrammarNonterminal first = null;
-        boolean firstSet = false;
+        GrammarNonterminal startSymbol = null;
 
         for (String line : lines) {
 
@@ -95,23 +92,22 @@ public class GrammarReader {
 
             String identifier = tokens[0].toUpperCase();
 
-            if (identifier.equalsIgnoreCase("_EPSILON"))
-                throw new GrammarSyntaxException("Error while parsing line " + line + " in " + path + "! EPSILON cannot be an identifier for a Nonterminal!");
+            if (identifier.startsWith("_"))
+                throw new GrammarSyntaxException("Error while parsing line " + line + " in " + path + "! Meta-Symbols cannot be identifiers for Nonterminals!");
 
             if (!isNonterminalAlreadyInSet(set, identifier)) {
 
                 GrammarNonterminal nonterminal = new GrammarNonterminal(identifier);
 
-                if (!firstSet) {
-                    first = nonterminal;
-                    firstSet = true;
+                if (startSymbol == null) {
+                    startSymbol = nonterminal;
                 }
 
                 set.add(nonterminal);
             }
 
         }
-        return first;
+        return startSymbol;
     }
 
     private void addDerivations(Set<GrammarNonterminal> set, String[] lines) {
@@ -136,15 +132,31 @@ public class GrammarReader {
                     token = token.trim();
 
                     // meta symbol
-                    /*if (token.startsWith("_")) {
+                    if (token.startsWith("_")) {
                         if (token.equals("_EPSILON"))
                             // epsilon character
                             break;
 
                         else {
                             // find possible match in tokentype enum
+                            try {
+                                TokenType type = TokenType.getTokenTypeForDescription(token.substring(1));
+
+                                derivation.add(new Token(type, ""));
+
+                            } catch (NoTokenTypeFoundException e) {
+                                throw new GrammarSyntaxException("Unrecognized Meta-Symbol: " + e.getMessage());
+                            }
                         }
-                    }*/
+                    } else if (token.matches("^\".*\"$")) {
+                        token = token.replaceAll("\\\\\\|", "|");
+
+                        derivation.add(new Token(TokenType.ANY, token));
+                    }
+                    // nonterminal
+                    else {
+                        derivation.add(getNonterminalFromSet(set, token));
+                    }
 
 
                     if (token.equals("_EPSILON")) {

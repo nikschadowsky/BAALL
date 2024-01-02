@@ -55,7 +55,7 @@ class GrammarReaderTest {
 
         Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
 
-        String expected = "EPSILON cannot be an identifier for a Nonterminal!";
+        String expected = "Meta-Symbols cannot be identifiers for Nonterminals!";
 
         e.printStackTrace();
 

@@ -41,7 +41,7 @@ public class GrammarReader {
 
         GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, lines);
 
-        addDerivations(nonterminalSet, lines);
+        addProductionRules(nonterminalSet, lines);
 
         return new Grammar(startSymbol, nonterminalSet);
 
@@ -110,7 +110,12 @@ public class GrammarReader {
         return startSymbol;
     }
 
-    private void addDerivations(Set<GrammarNonterminal> set, String[] lines) {
+    // uniquely identifies a
+    int productionRuleIdentifier = 0;
+
+    private void addProductionRules(Set<GrammarNonterminal> set, String[] lines) {
+
+
         for (String line : lines) {
 
             String[] tokens = line.split(tokenRegex);
@@ -120,19 +125,21 @@ public class GrammarReader {
 
             GrammarNonterminal nonterminal = getNonterminalFromSet(set, identifier);
 
-            List<GrammarDerivation> allDerivationsList = new ArrayList<>();
+            Set<GrammarProduction> productionRules = new HashSet<>();
 
             // allow for literal "|" using the form "\|" 
             // FIXME: 19.10.2023 why is this so complicated, just do '\|' maybe. having a backslash as a valid language token is weird and should be discouraged.
             for (String s : rawDerivation.split("(?<!\\\\)\\|")) {
 
-                List<GrammarSymbol> derivation = new ArrayList<>();
+                List<GrammarSymbol> sententialForm = new ArrayList<>();
+
+                boolean hasEpsilonProduction = false;
 
                 for (String token : s.trim().split(" ")) {
                     token = token.trim();
 
                     // meta symbol
-                    if (token.startsWith("_")) {
+                    /*if (token.startsWith("_")) {
                         if (token.equals("_EPSILON"))
                             // epsilon character
                             break;
@@ -156,37 +163,38 @@ public class GrammarReader {
                     // nonterminal
                     else {
                         derivation.add(getNonterminalFromSet(set, token));
-                    }
+                    }*/
 
 
                     if (token.equals("_EPSILON")) {
+                        if (hasEpsilonProduction)
+                            throw new GrammarSyntaxException("Cannot have more than one Epsilon Production Rule");
                         // Epsilon
-                        break;
+                        hasEpsilonProduction = true;
                     } else if (token.matches("^\".*\"$")) {
                         // remove quotation and replace escaped pipe with regular pipe
                         String tokenValue = token.substring(1, token.length() - 1).replaceAll("\\\\\\|", "|");
 
-                        derivation.add(new Token(TokenType.ANY, tokenValue));
+                        sententialForm.add(new Token(TokenType.ANY, tokenValue));
                     } else if (token.charAt(0) == '_') {
                         switch (token) {
-                            case "_STRING_PRIMITIVE" -> derivation.add(new Token(TokenType.STRING, ""));
-                            case "_NUMBER_PRIMITIVE" -> derivation.add(new Token(TokenType.NUMBER, ""));
-                            case "_BOOLEAN_PRIMITIVE" -> derivation.add(new Token(TokenType.BOOLEAN, ""));
+                            case "_STRING_PRIMITIVE" -> sententialForm.add(new Token(TokenType.STRING, ""));
+                            case "_NUMBER_PRIMITIVE" -> sententialForm.add(new Token(TokenType.NUMBER, ""));
+                            case "_BOOLEAN_PRIMITIVE" -> sententialForm.add(new Token(TokenType.BOOLEAN, ""));
                             default ->
                                     throw new GrammarSyntaxException("Unrecognized Meta-Symbol " + token + " in line " + line + "!");
                         }
 
                     } else {
-                        derivation.add(getNonterminalFromSet(set, token));
+                        sententialForm.add(getNonterminalFromSet(set, token));
                     }
                 }
 
-
-                allDerivationsList.add(new GrammarDerivation(derivation.toArray(GrammarSymbol[]::new)));
+                productionRules.add(new GrammarProduction(productionRuleIdentifier++, nonterminal, sententialForm.toArray(GrammarSymbol[]::new)));
 
             }
-            if (!nonterminal.setDerivationList(allDerivationsList)) {
-                throw new GrammarSyntaxException("Derivation of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
+            if (!nonterminal.setProductionRules(productionRules)) {
+                throw new GrammarSyntaxException("Production Rules of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
             }
         }
     }

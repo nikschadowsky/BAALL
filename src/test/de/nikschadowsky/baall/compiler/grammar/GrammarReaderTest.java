@@ -25,7 +25,7 @@ class GrammarReaderTest {
 
         assertEquals(4, g.getAllNonterminals().size());
 
-        String derivationRepresentation = g.getStart().getDerivationList().toString();
+        String derivationRepresentation = g.getStart().getProductionRules().toString();
 
         String derivA = "[A B \"T\" \"|\"]";
         String derivB = "[]";

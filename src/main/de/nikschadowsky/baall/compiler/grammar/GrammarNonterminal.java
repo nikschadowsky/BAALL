@@ -1,26 +1,36 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.text.html.Option;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
 
-    private List<GrammarDerivation> derivationList;
+    private Set<GrammarProduction> productionRules;
 
     private final String identifier;
 
-    private boolean isDerivationSet = false;
+    private boolean isProductionRulesSet = false;
 
     public GrammarNonterminal(String identifier) {
         this.identifier = identifier;
     }
 
-    public boolean setDerivationList(List<GrammarDerivation> derivations) {
+    /**
+     * Sets this Nonterminal's Production rules
+     * @param productionRules production rules of this Nonterminal
+     * @return whether this operation was successful
+     */
+    public boolean setProductionRules(Set<GrammarProduction> productionRules) {
 
-        if (!isDerivationSet) {
-            this.derivationList = derivations;
-            isDerivationSet = true;
+        if (!isProductionRulesSet) {
+            this.productionRules = productionRules;
+            isProductionRulesSet = true;
             return true;
         }
 
@@ -32,13 +42,13 @@ public class GrammarNonterminal implements GrammarSymbol {
         return identifier;
     }
 
-    public List<GrammarDerivation> getDerivationList() {
-        return derivationList;
+    public Set<GrammarProduction> getProductionRules() {
+        return productionRules;
     }
 
     @Override
     public String toString() {
-        return "GrammarNonterminal { " + getIdentifier() + ", " + getDerivationList() + "}";
+        return "GrammarNonterminal { " + getIdentifier() + ", " + getProductionRules() + "}";
     }
 
     @Override

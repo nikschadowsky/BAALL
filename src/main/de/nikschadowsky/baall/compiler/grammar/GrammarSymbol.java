@@ -16,7 +16,7 @@ public interface GrammarSymbol {
      *
      * @return if symbols match
      */
-    boolean symbolMatches(@NotNull(value = "Compared Symbol cannot be null!", exception = NullPointerException.class) GrammarSymbol s);
+    boolean symbolMatches(GrammarSymbol s);
 
 
 }

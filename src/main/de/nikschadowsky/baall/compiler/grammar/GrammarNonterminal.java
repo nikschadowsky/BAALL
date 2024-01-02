@@ -64,7 +64,8 @@ public class GrammarNonterminal implements GrammarSymbol {
      * @return if symbols match
      */
     @Override
-    public boolean symbolMatches(@NotNull GrammarSymbol s) {
+    public boolean symbolMatches(GrammarSymbol s) {
+        if(s == null) return false;
 
         // if we have
         if (s instanceof GrammarNonterminal n) {

@@ -46,7 +46,9 @@ public class Token implements GrammarSymbol {
      * @return if symbols match
      */
     @Override
-    public boolean symbolMatches(@NotNull GrammarSymbol s) {
+    public boolean symbolMatches(GrammarSymbol s) {
+
+        if (s == null) return false;
 
         // if we have a token, we wanna treat is as one
         if (s instanceof Token token) {

@@ -1,11 +1,13 @@
 package de.nikschadowsky.baall.compiler.parser;
 
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
+import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
+import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class Parser {
 
@@ -19,9 +21,9 @@ public class Parser {
 
     private void parse(List<Token> tokens, Grammar grammar) {
 
-        List<Integer> derivationIndices = new LinkedList<>();
+        List<Integer> appliedProductionRules = new LinkedList<>();
 
-        PriorityQueue<Token> tokenQueue = new PriorityQueue<>(tokens);
+        Queue<Token> tokenQueue = new LinkedList<>(tokens);
 
         ParserStack stack = new ParserStack(grammar.getStart());
 
@@ -29,14 +31,20 @@ public class Parser {
 
         while (!stack.empty() && !tokenQueue.isEmpty()) {
 
-            if (stack.peek().isTerminal()) {
+            GrammarSymbol currentSymbol = stack.pop();
 
-                if (!stack.pop().symbolMatches(tokenQueue.poll())) {
-                    throw new SyntaxException();
+            if (currentSymbol.isTerminal()) {
+
+                Token currentToken = tokenQueue.remove();
+
+                if (!currentSymbol.symbolMatches(currentToken)) {
+                    throw new SyntaxException(String.format("Expected: %s; Got %s",currentSymbol,currentToken.getValue()));
                 }
 
             } else {
+                GrammarNonterminal leftSideSymbol = (GrammarNonterminal) currentSymbol;
 
+                new ProductionRuleCandidateSelector().determineCandidate(tokenQueue.iterator());
             }
 
 

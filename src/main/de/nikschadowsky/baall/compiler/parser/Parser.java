@@ -4,11 +4,14 @@ import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
+/**
+ * File created on 21.07.2023
+ */
 public class Parser {
 
     private List<Token> tokens;
@@ -38,13 +41,13 @@ public class Parser {
                 Token currentToken = tokenQueue.remove();
 
                 if (!currentSymbol.symbolMatches(currentToken)) {
-                    throw new SyntaxException(String.format("Expected: %s; Got %s",currentSymbol,currentToken.getValue()));
+                    throw new SyntaxException(String.format("Expected: %s; Got %s", currentSymbol, currentToken.getValue()));
                 }
 
             } else {
                 GrammarNonterminal leftSideSymbol = (GrammarNonterminal) currentSymbol;
 
-                new ProductionRuleCandidateSelector().determineCandidate(tokenQueue.iterator());
+                ProductionRuleCandidateSelector.determineCandidate(leftSideSymbol, tokenQueue);
             }
 
 

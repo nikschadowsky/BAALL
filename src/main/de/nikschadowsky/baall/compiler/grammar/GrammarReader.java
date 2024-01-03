@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
-import de.nikschadowsky.baall.compiler.lexer.tokens.NoTokenTypeFoundException;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
@@ -14,28 +13,24 @@ public class GrammarReader {
 
     private final String path;
 
-    private final String content;
-
     /**
-     * Creates a GrammarReader object to generate a {@link Grammar} from a file provided by a path. Special Symbols in
-     * the File are: 1. _EPSILON 2. _STRING_PRIMITIVE, _BOOLEAN_PRIMITIVE, _NUMBER_PRIMITIVE 3. "any string" They are
-     * treated differently by the reader. _EPSILON denotes an Epsilon as a transition of a formal grammar, _*_PRIMITIVE
-     * denotes variable tokens and "any string" denotes a hard token, assigning it its literal value.
+     * Generates a {@link Grammar} from a file provided by a path. Special Symbols in the File are: 1. _EPSILON 2.
+     * _STRING_PRIMITIVE, _BOOLEAN_PRIMITIVE, _NUMBER_PRIMITIVE 3. "any string" They are treated differently by the
+     * reader. _EPSILON denotes an Epsilon as a transition of a formal grammar, _*_PRIMITIVE denotes variable tokens and
+     * "any string" denotes a hard token, assigning it its literal value.
      *
      * @param path of Grammar File
      */
     public GrammarReader(String path) {
         this.path = path;
-
-        content = FileLoader.loadFileContent(path);
     }
 
 
     public Grammar generateGrammar() {
 
-        Set<GrammarNonterminal> nonterminalSet = new HashSet<>();
+        String preprocessed = preprocess(FileLoader.loadFileContent(path));
 
-        String preprocessed = preprocess(content);
+        Set<GrammarNonterminal> nonterminalSet = new HashSet<>();
 
         String[] lines = preprocessed.split("\\v");
 
@@ -110,7 +105,7 @@ public class GrammarReader {
         return startSymbol;
     }
 
-    // uniquely identifies a
+    // uniquely identifies a Production Rule created by this Grammar Reader
     int productionRuleIdentifier = 0;
 
     private void addProductionRules(Set<GrammarNonterminal> set, String[] lines) {

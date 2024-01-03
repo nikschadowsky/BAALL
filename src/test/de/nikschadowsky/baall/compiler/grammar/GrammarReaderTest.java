@@ -13,9 +13,7 @@ class GrammarReaderTest {
 
     @Test
     void testCreateGrammar() {
-        reader = new GrammarReader("test_resources/GrammarReaderTestFile.txt");
-
-        Grammar g = reader.generateGrammar();
+        Grammar g = new GrammarReader("test_resources/GrammarReaderTestFile.txt").generateGrammar();
 
         assertTrue(g.getStart().getIdentifier().equalsIgnoreCase("start"));
 
@@ -27,8 +25,8 @@ class GrammarReaderTest {
 
         String derivationRepresentation = g.getStart().getProductionRules().toString();
 
-        String derivA = "[A B \"T\" \"|\"]";
-        String derivB = "[]";
+        String derivA = "A B \"T\" \"|\"";
+        String derivB = "ε";
 
         System.out.println(derivationRepresentation);
 
@@ -38,9 +36,8 @@ class GrammarReaderTest {
 
     @Test
     void testCreateGrammarSyntaxError() {
-        reader = new GrammarReader("test_resources/GrammarReaderTestSyntaxError.txt");
 
-        Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
+        Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestSyntaxError.txt").generateGrammar());
 
         String expected = "Invalid syntax!";
 
@@ -51,9 +48,8 @@ class GrammarReaderTest {
 
     @Test
     void testCreateGrammarEpsilonError() {
-        reader = new GrammarReader("test_resources/GrammarReaderTestEpsilonError.txt");
 
-        Exception e = assertThrows(GrammarSyntaxException.class, () -> reader.generateGrammar());
+        Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestEpsilonError.txt").generateGrammar());
 
         String expected = "Meta-Symbols cannot be identifiers for Nonterminals!";
 

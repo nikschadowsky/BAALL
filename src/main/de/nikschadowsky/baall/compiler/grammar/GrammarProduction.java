@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.grammar;
 
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
+import java.util.Arrays;
+
 public class GrammarProduction {
 
     private final GrammarSymbol[] sententialForm;
@@ -66,5 +68,14 @@ public class GrammarProduction {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof GrammarProduction gp)
+            return leftSideSymbol.equals(gp.getLeftSideSymbol()) && Arrays.equals(sententialForm, gp.getSententialForm());
+
+        return false;
     }
 }

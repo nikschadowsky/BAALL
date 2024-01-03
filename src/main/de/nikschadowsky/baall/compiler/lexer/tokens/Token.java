@@ -1,7 +1,6 @@
 package de.nikschadowsky.baall.compiler.lexer.tokens;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
-import org.jetbrains.annotations.NotNull;
 
 public class Token implements GrammarSymbol {
 
@@ -48,8 +47,6 @@ public class Token implements GrammarSymbol {
     @Override
     public boolean symbolMatches(GrammarSymbol s) {
 
-        if (s == null) return false;
-
         // if we have a token, we wanna treat is as one
         if (s instanceof Token token) {
 
@@ -69,6 +66,13 @@ public class Token implements GrammarSymbol {
 
         }
 
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Token token)
+            return symbolMatches(token);
         return false;
     }
 }

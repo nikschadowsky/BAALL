@@ -1,12 +1,5 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
-import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.text.html.Option;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
@@ -23,6 +16,7 @@ public class GrammarNonterminal implements GrammarSymbol {
 
     /**
      * Sets this Nonterminal's Production rules
+     *
      * @param productionRules production rules of this Nonterminal
      * @return whether this operation was successful
      */
@@ -57,21 +51,22 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     /**
-     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal they are compared accordingly.
-     * False otherwise. Compares the identifiers of both Nonterminals.
+     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal their identifiers are compared.
+     * False otherwise.
      *
      * @param s GrammarSymbol to compare to
      * @return if symbols match
      */
     @Override
     public boolean symbolMatches(GrammarSymbol s) {
-        if(s == null) return false;
+        return equals(s);
+    }
 
-        // if we have
-        if (s instanceof GrammarNonterminal n) {
-            return getIdentifier().equals(n.getIdentifier());
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof GrammarNonterminal g) {
+            return identifier.equals(g.getIdentifier());
         }
-
         return false;
     }
 }

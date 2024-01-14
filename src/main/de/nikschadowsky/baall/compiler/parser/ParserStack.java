@@ -9,6 +9,12 @@ public class ParserStack extends Stack<GrammarSymbol> {
     /**
      * Constructs a new ParserStack with an empty Stack.
      */
+    public ParserStack(){}
+
+    /**
+     * Construct a new ParserStack with a Startsymbol
+     * @param initial start symbol of this stack
+     */
     public ParserStack(GrammarSymbol initial) {
         push(initial);
     }

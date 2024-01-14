@@ -24,10 +24,10 @@ public class ProductionRuleCandidateSelector {
      * Determine a production rule candidate for a given nonterminal. Returns an optional of type
      * {@link GrammarProduction}.
      * <p>
-     * If there is only one production rule, then this method will validate it with one step before possibly returning
-     * it. If there is an ε-rule (epsilon-rule) and there is another matching rule, this method returns an optional of
-     * the matching rule and ignores the ε-rule. If there are multiple candidates, but they all get rolled out after
-     * evaluating, this method returns the epsilon rule or an empty optional if there is no ε-rule.
+     * If there is only one production rule, then this method immediately return it. If there is an ε-rule
+     * (epsilon-rule) and there is another matching rule, this method returns an optional of the matching rule and
+     * ignores the ε-rule. If there are multiple candidates, but they all get rolled out after evaluating, this method
+     * returns the epsilon rule or an empty optional if there is no ε-rule.
      *
      * @param lss        the grammar nonterminal of which to determine a candidate
      * @param tokenQueue the queue of tokens to evaluate the candidate
@@ -52,10 +52,10 @@ public class ProductionRuleCandidateSelector {
                         .map(r -> new PRIntermediate(r, finalTokenQueue))
                         .collect(Collectors.toSet());
 
-        do {
-            rulesEpsilonFiltered.removeIf(intermediate -> !intermediate.step());
-        } while (rulesEpsilonFiltered.size() > 1 && !tokenQueue.isEmpty());
 
+        while (rulesEpsilonFiltered.size() > 1 && !tokenQueue.isEmpty()) {
+            rulesEpsilonFiltered.removeIf(intermediate -> !intermediate.step());
+        }
 
         // tokenQueue was empty, and we have an ambiguous result -> no candidate
         if (rulesEpsilonFiltered.size() > 1) {

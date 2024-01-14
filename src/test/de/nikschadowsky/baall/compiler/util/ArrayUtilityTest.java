@@ -35,6 +35,6 @@ public class ArrayUtilityTest {
         // smaller array, notnull elements
         Integer[] integer = {1,2,3};
 
-        assertSame(integer, ArrayUtility.trimArrayToMaxLength(integer, integer.length + 10));
+        assertArrayEquals(integer, ArrayUtility.trimArrayToMaxLength(integer, integer.length + 10));
     }
 }

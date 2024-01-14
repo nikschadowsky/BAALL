@@ -22,7 +22,7 @@ public class ClassUtility {
      * @throws InstantiationException    see {@link Constructor#newInstance}
      * @throws IllegalAccessException    see {@link Constructor#newInstance}
      */
-    public static <T> T getInstance(@NotNull Class<T> clazz, Class<?>[] parameterTypes, Object... parameter)
+    public static <T> T getInstance(@NotNull Class<T> clazz, @NotNull Class<?>[] parameterTypes, Object... parameter)
             throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         Constructor<T> constructor = clazz.getDeclaredConstructor(parameterTypes);

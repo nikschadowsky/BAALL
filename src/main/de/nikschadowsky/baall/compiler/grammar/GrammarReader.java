@@ -105,11 +105,10 @@ public class GrammarReader {
         return startSymbol;
     }
 
-    // uniquely identifies a Production Rule created by this Grammar Reader
-    int productionRuleIdentifier = 0;
 
     private void addProductionRules(Set<GrammarNonterminal> set, String[] lines) {
-
+    // uniquely identifies a Production Rule created by this Grammar Reader
+        int productionRuleIdentifier = 0;
 
         for (String line : lines) {
 
@@ -122,7 +121,7 @@ public class GrammarReader {
 
             Set<GrammarProduction> productionRules = new HashSet<>();
 
-            // allow for literal "|" using the form "\|" 
+            // allow for literal "|" using the form "\|"
             // FIXME: 19.10.2023 why is this so complicated, just do '\|' maybe. having a backslash as a valid language token is weird and should be discouraged.
             for (String s : rawDerivation.split("(?<!\\\\)\\|")) {
 
@@ -132,34 +131,6 @@ public class GrammarReader {
 
                 for (String token : s.trim().split(" ")) {
                     token = token.trim();
-
-                    // meta symbol
-                    /*if (token.startsWith("_")) {
-                        if (token.equals("_EPSILON"))
-                            // epsilon character
-                            break;
-
-                        else {
-                            // find possible match in tokentype enum
-                            try {
-                                TokenType type = TokenType.getTokenTypeForDescription(token.substring(1));
-
-                                derivation.add(new Token(type, ""));
-
-                            } catch (NoTokenTypeFoundException e) {
-                                throw new GrammarSyntaxException("Unrecognized Meta-Symbol: " + e.getMessage());
-                            }
-                        }
-                    } else if (token.matches("^\".*\"$")) {
-                        token = token.replaceAll("\\\\\\|", "|");
-
-                        derivation.add(new Token(TokenType.ANY, token));
-                    }
-                    // nonterminal
-                    else {
-                        derivation.add(getNonterminalFromSet(set, token));
-                    }*/
-
 
                     if (token.equals("_EPSILON")) {
                         if (hasEpsilonProduction)

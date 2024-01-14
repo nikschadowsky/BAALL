@@ -1,13 +1,16 @@
-START -> A | B
-A -> "a" | "b"
-B -> "d" D | "c" C
-C -> "e" | E
-E -> "f" | _EPSILON
-D -> "g" A | "g" E
-F -> "x" "y" | G "y"
-G -> _EPSILON
+A -> "?"
+B -> "?" | "!"
+C -> X
+D -> X | Y
+E -> X | _EPSILON
+F -> "?" "?" | "?" "!"
+G -> "?" X | "?" Y
+H -> Z "?" | Z "!"
+I -> Z X | Z Y
+J -> Z X | Z "!"
+K -> Z X | "." Y
+L -> Z "?" | "." Y
 
-X -> Y "?" Z "?" | Y "?" Z "!"
-Y -> Z
-Z -> "z"
-
+X -> "?"
+Y -> "!"
+Z -> "."

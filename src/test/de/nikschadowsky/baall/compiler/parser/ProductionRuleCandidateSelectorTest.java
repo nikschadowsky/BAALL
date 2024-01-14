@@ -1,18 +1,16 @@
 package de.nikschadowsky.baall.compiler.parser;
 
-import de.nikschadowsky.baall.compiler.grammar.*;
-import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
-import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
-import org.jetbrains.annotations.NotNull;
+import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
+import de.nikschadowsky.baall.compiler.grammar.Grammar;
+import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
+import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
+import de.nikschadowsky.baall.compiler.grammar.GrammarReader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
+import static de.nikschadowsky.baall.compiler._utility.GrammarUtility.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * File created on 02.01.2024
@@ -26,85 +24,200 @@ class ProductionRuleCandidateSelectorTest {
         g = new GrammarReader("test_resources/ProductionRuleCandidateSelectorTestGrammar.txt").generateGrammar();
     }
 
-    /**
-     * Tests the production rule A -> "a" | "b". Depth: 1
-     */
     @Test
-    void testOneStepProductionTerminalOnly() {
-        GrammarNonterminal a = getNonterminal("A");
-
-        GrammarProduction target = getProductionRule(a, getToken("a"));
-
+    void testSingleTerminal() {
+        GrammarProduction target = getProductionRule(getNonterminal("A"), getTokenWithTypeAny("?"));
         assertEquals(target, ProductionRuleCandidateSelector
-                .determineCandidate(a, getQueue(getToken("a")))
-                .orElse(null));
+                .determineCandidate(getNonterminal("A"), getTokenQueue("?")).orElse(null));
 
-    }
-
-    /**
-     * Tests the production rule B -> "c" C | "d" D. Depth: 1
-     */
-    @Test
-    void testOneStepProductionMixedSymbols() {
-        GrammarNonterminal b = getNonterminal("B");
-
-        GrammarProduction target = getProductionRule(b, getToken("c"), getNonterminal("C"));
-
-        assertEquals(target, ProductionRuleCandidateSelector
-                .determineCandidate(b, getQueue(getToken("c"), getToken("e")))
-                .orElse(null));
-        assertEquals(target, ProductionRuleCandidateSelector
-                .determineCandidate(b, getQueue(getToken("c"), getToken("f")))
-                .orElse(null));
-        assertEquals(target, ProductionRuleCandidateSelector
-                .determineCandidate(b, getQueue(getToken("c")))
-                .orElse(null));
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("A"), getTokenQueue("!")).isEmpty());
     }
 
     @Test
-    void testProductionWithEpsilon() {
-        GrammarNonterminal f = getNonterminal("F");
+    void testTerminalOnlyChoice() {
+        GrammarProduction targetA = getProductionRule(getNonterminal("B"), getTokenWithTypeAny("?"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("B"), getTokenQueue("?")).orElse(null));
 
-        GrammarProduction target = getProductionRule(f, getNonterminal("G"), getToken("y"));
+        GrammarProduction targetB = getProductionRule(getNonterminal("B"), getTokenWithTypeAny("!"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("B"), getTokenQueue("!")).orElse(null));
 
-        assertEquals(target, ProductionRuleCandidateSelector.determineCandidate(f, getQueue(getToken("y"), getToken("z"))).orElse(null));
-        assertNotEquals(target, ProductionRuleCandidateSelector.determineCandidate(f, getQueue(getToken("u"), getToken("z"))).orElse(null));
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("B"), getTokenQueue(".")).isEmpty());
     }
 
     @Test
-    void testProductionMultipleSteps() {
-        GrammarNonterminal x = getNonterminal("X");
-
-        GrammarProduction target = getProductionRule(
-                x,
-                getNonterminal("Y"),
-                getToken("?"),
-                getNonterminal("Z"),
-                getToken("!")
-        );
+    void testSingleNonterminalWithDepthOne() {
+        GrammarProduction target = getProductionRule(getNonterminal("C"), getNonterminal("X"));
 
         assertEquals(target, ProductionRuleCandidateSelector
-                .determineCandidate(x, getQueue(getToken("z"), getToken("?"), getToken("z"), getToken("!")))
+                .determineCandidate(getNonterminal("C"), getTokenQueue("?"))
                 .orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("C"), getTokenQueue("!")).isEmpty());
     }
 
+    @Test
+    void testNonterminalOnlyChoiceWithDepthOne() {
+        GrammarProduction targetA = getProductionRule(getNonterminal("D"), getNonterminal("X"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("D"), getTokenQueue("?"))
+                .orElse(null));
+
+        GrammarProduction targetB = getProductionRule(getNonterminal("D"), getNonterminal("Y"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("D"), getTokenQueue("!"))
+                .orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("D"), getTokenQueue(".")).isEmpty());
+    }
+
+    @Test
+    void testSingleNonterminalWithEpsilon() {
+        GrammarProduction target = getProductionRule(getNonterminal("E"), getNonterminal("X"));
+
+        assertEquals(target, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("E"), getTokenQueue("?")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("E"), getTokenQueue("!"))
+                .orElseThrow().isEpsilonProduction());
+    }
+
+    @Test
+    void testTerminalOnlyChainChoice() {
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("F"),
+                getTokenWithTypeAny("?"), getTokenWithTypeAny("?"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("F"), getTokenQueue("?", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("F"),
+                getTokenWithTypeAny("?"), getTokenWithTypeAny("!"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("F"), getTokenQueue("?", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("F"), getTokenQueue("?", ".")).isEmpty());
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("F"), getTokenQueue(".")).isEmpty());
+    }
+
+    @Test
+    void testTerminalThenNonterminalChoice() {
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("G"),
+                getTokenWithTypeAny("?"), getNonterminal("X"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("G"), getTokenQueue("?", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("G"),
+                getTokenWithTypeAny("?"), getNonterminal("Y"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("G"), getTokenQueue("?", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("G"), getTokenQueue("?", ".")).isEmpty());
+    }
+
+    @Test
+    void testNonterminalThenTerminalChoice() {
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("H"),
+                getNonterminal("Z"), getTokenWithTypeAny("?"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("H"), getTokenQueue(".", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("H"),
+                getNonterminal("Z"), getTokenWithTypeAny("!"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("H"), getTokenQueue(".", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("H"), getTokenQueue(".", ".")).isEmpty());
+    }
+    @Test
+    void testNonterminalThenNonterminalChoice(){
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("I"),
+                getNonterminal("Z"), getNonterminal("X"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("I"), getTokenQueue(".", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("I"),
+                getNonterminal("Z"), getNonterminal("Y"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("I"), getTokenQueue(".", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("I"), getTokenQueue(".", ".")).isEmpty());
+    }
+
+    @Test
+    void testNonterminalThenMixedChoice(){
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("J"),
+                getNonterminal("Z"), getNonterminal("X"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("J"), getTokenQueue(".", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("J"),
+                getNonterminal("Z"), getTokenWithTypeAny("!"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("J"), getTokenQueue(".", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("J"), getTokenQueue(".", ".")).isEmpty());
+    }
+
+    @Test
+    void testMixedThenNonterminalChoice(){
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("K"),
+                getNonterminal("Z"), getNonterminal("X"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("K"), getTokenQueue(".", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("K"),
+                getTokenWithTypeAny("."), getNonterminal("Y"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("K"), getTokenQueue(".", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("K"), getTokenQueue(".", ".")).isEmpty());
+    }
+
+    @Test
+    void testMixedThenMixedChoice(){
+        GrammarProduction targetA = getProductionRule(
+                getNonterminal("L"),
+                getNonterminal("Z"), getTokenWithTypeAny("?"));
+        assertEquals(targetA, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("L"), getTokenQueue(".", "?")).orElse(null));
+
+        GrammarProduction targetB = getProductionRule(
+                getNonterminal("L"),
+                getTokenWithTypeAny("."), getNonterminal("Y"));
+        assertEquals(targetB, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("L"), getTokenQueue(".", "!")).orElse(null));
+
+        assertTrue(ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("L"), getTokenQueue(".", ".")).isEmpty());
+    }
 
     private GrammarNonterminal getNonterminal(String identifier) {
-        return g.getAllNonterminals().stream().filter(
-                        grammarNonterminal -> grammarNonterminal.symbolMatches(
-                                new GrammarNonterminal(identifier)))
-                .findAny().orElse(null);
+        return GrammarUtility.getNonterminal(g, identifier);
     }
 
-    private GrammarProduction getProductionRule(@NotNull GrammarNonterminal lss, GrammarSymbol... prod) {
-        return lss.getProductionRules().stream().filter(gp -> gp.equals(new GrammarProduction(-1, lss, prod))).findAny().orElse(null);
-    }
-
-    private Token getToken(String value) {
-        return new Token(TokenType.ANY, value);
-    }
-
-    private Queue<Token> getQueue(Token... tokens) {
-        return new LinkedList<>(List.of(tokens));
-    }
 }

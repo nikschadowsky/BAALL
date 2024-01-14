@@ -1,5 +1,8 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import org.jetbrains.annotations.Unmodifiable;
+
+import java.util.Collections;
 import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
@@ -15,7 +18,7 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     /**
-     * Sets this Nonterminal's Production rules
+     * Sets this nonterminal's production rules
      *
      * @param productionRules production rules of this Nonterminal
      * @return whether this operation was successful
@@ -36,8 +39,11 @@ public class GrammarNonterminal implements GrammarSymbol {
         return identifier;
     }
 
-    public Set<GrammarProduction> getProductionRules() {
-        return productionRules;
+    /**
+     * @return an immutable set of this nonterminal's production rules
+     */
+    public @Unmodifiable Set<GrammarProduction> getProductionRules() {
+        return Collections.unmodifiableSet(productionRules);
     }
 
     @Override
@@ -51,7 +57,7 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     /**
-     * Compares GrammarNonterminal to Symbol. If s is an instance of GrammarNonterminal their identifiers are compared.
+     * Compares this GrammarNonterminal to a GrammarSymbol. If s is an instance of GrammarNonterminal their identifiers are compared.
      * False otherwise.
      *
      * @param s GrammarSymbol to compare to

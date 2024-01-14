@@ -1,7 +1,9 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class Grammar {
@@ -28,7 +30,7 @@ public class Grammar {
         return start;
     }
 
-    public Set<GrammarNonterminal> getAllNonterminals() {
-        return nonterminals;
+    public @Unmodifiable Set<GrammarNonterminal> getAllNonterminals() {
+        return Collections.unmodifiableSet(nonterminals);
     }
 }

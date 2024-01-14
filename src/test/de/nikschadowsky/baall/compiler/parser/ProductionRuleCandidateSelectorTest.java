@@ -9,8 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static de.nikschadowsky.baall.compiler._utility.GrammarUtility.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * File created on 02.01.2024
@@ -30,8 +29,8 @@ class ProductionRuleCandidateSelectorTest {
         assertEquals(target, ProductionRuleCandidateSelector
                 .determineCandidate(getNonterminal("A"), getTokenQueue("?")).orElse(null));
 
-        assertTrue(ProductionRuleCandidateSelector
-                .determineCandidate(getNonterminal("A"), getTokenQueue("!")).isEmpty());
+        assertEquals(target, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("A"), getTokenQueue("!")).orElse(null));
     }
 
     @Test
@@ -56,8 +55,8 @@ class ProductionRuleCandidateSelectorTest {
                 .determineCandidate(getNonterminal("C"), getTokenQueue("?"))
                 .orElse(null));
 
-        assertTrue(ProductionRuleCandidateSelector
-                .determineCandidate(getNonterminal("C"), getTokenQueue("!")).isEmpty());
+        assertEquals(target, ProductionRuleCandidateSelector
+                .determineCandidate(getNonterminal("C"), getTokenQueue("!")).orElse(null));
     }
 
     @Test
@@ -83,7 +82,8 @@ class ProductionRuleCandidateSelectorTest {
         assertEquals(target, ProductionRuleCandidateSelector
                 .determineCandidate(getNonterminal("E"), getTokenQueue("?")).orElse(null));
 
-        assertTrue(ProductionRuleCandidateSelector
+        // since target is the only non-epsilon rule, it gets returned immediately
+        assertFalse(ProductionRuleCandidateSelector
                 .determineCandidate(getNonterminal("E"), getTokenQueue("!"))
                 .orElseThrow().isEpsilonProduction());
     }

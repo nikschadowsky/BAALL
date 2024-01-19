@@ -31,14 +31,15 @@ public class GrammarReader {
         String preprocessed = preprocess(FileLoader.loadFileContent(path));
 
         Set<GrammarNonterminal> nonterminalSet = new HashSet<>();
+        Set<GrammarProduction> ruleSet = new HashSet<>();
 
         String[] lines = preprocessed.split("\\v");
 
         GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, lines);
 
-        addProductionRules(nonterminalSet, lines);
+        addProductionRules(nonterminalSet, ruleSet, lines);
 
-        return new Grammar(startSymbol, nonterminalSet);
+        return new Grammar(startSymbol, nonterminalSet, ruleSet);
 
     }
 
@@ -106,8 +107,8 @@ public class GrammarReader {
     }
 
 
-    private void addProductionRules(Set<GrammarNonterminal> set, String[] lines) {
-    // uniquely identifies a Production Rule created by this Grammar Reader
+    private void addProductionRules(Set<GrammarNonterminal> nonterminalSet, Set<GrammarProduction> ruleSet, String[] lines) {
+        // uniquely identifies a Production Rule created by this Grammar Reader
         int productionRuleIdentifier = 0;
 
         for (String line : lines) {
@@ -117,7 +118,7 @@ public class GrammarReader {
             String identifier = tokens[0];
             String rawDerivation = tokens[1];
 
-            GrammarNonterminal nonterminal = getNonterminalFromSet(set, identifier);
+            GrammarNonterminal nonterminal = getNonterminalFromSet(nonterminalSet, identifier);
 
             Set<GrammarProduction> productionRules = new HashSet<>();
 
@@ -152,7 +153,7 @@ public class GrammarReader {
                         }
 
                     } else {
-                        sententialForm.add(getNonterminalFromSet(set, token));
+                        sententialForm.add(getNonterminalFromSet(nonterminalSet, token));
                     }
                 }
 
@@ -162,6 +163,9 @@ public class GrammarReader {
             if (!nonterminal.setProductionRules(productionRules)) {
                 throw new GrammarSyntaxException("Production Rules of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
             }
+
+            // add all production rules for this symbol
+            ruleSet.addAll(productionRules);
         }
     }
 

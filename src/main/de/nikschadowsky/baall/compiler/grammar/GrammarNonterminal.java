@@ -62,8 +62,8 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     /**
-     * Compares this GrammarNonterminal to a GrammarSymbol. If s is an instance of GrammarNonterminal their identifiers are compared.
-     * False otherwise.
+     * Compares this GrammarNonterminal to a GrammarSymbol. If s is an instance of GrammarNonterminal their identifiers
+     * are compared. False otherwise.
      *
      * @param s GrammarSymbol to compare to
      * @return if symbols match

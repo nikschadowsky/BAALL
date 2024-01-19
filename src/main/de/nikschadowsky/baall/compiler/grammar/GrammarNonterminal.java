@@ -52,6 +52,11 @@ public class GrammarNonterminal implements GrammarSymbol {
     }
 
     @Override
+    public String getFormatted() {
+        return getIdentifier();
+    }
+
+    @Override
     public boolean isTerminal() {
         return false;
     }

@@ -36,6 +36,11 @@ public class Token implements GrammarSymbol {
         return true;
     }
 
+    @Override
+    public String getFormatted() {
+        return "'" + getValue() + "'";
+    }
+
     /**
      * Compares Token to Symbol. If s is an instance of Token they are compared accordingly. False otherwise. If any of
      * both Tokens are of TokenType.ANY, value is compared. If both s and this instance are of either type

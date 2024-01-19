@@ -1,7 +1,5 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
-import org.jetbrains.annotations.NotNull;
-
 public interface GrammarSymbol {
 
     /**
@@ -18,5 +16,9 @@ public interface GrammarSymbol {
      */
     boolean symbolMatches(GrammarSymbol s);
 
+    /**
+     * @return a formatted representation of this symbol
+     */
+    String getFormatted();
 
 }

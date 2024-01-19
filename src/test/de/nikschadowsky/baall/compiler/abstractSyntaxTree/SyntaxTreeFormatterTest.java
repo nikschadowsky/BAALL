@@ -1,0 +1,93 @@
+package de.nikschadowsky.baall.compiler.abstractSyntaxTree;
+
+import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
+import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+/**
+ * File created on 19.01.2024
+ */
+class SyntaxTreeFormatterTest {
+
+    @Test
+    void treeToVisualizedString() {
+        String target = """
+                ROOT
+                ├───A
+                │   ├───B
+                │   │   ├───'c'
+                │   │   └───C
+                │   │       └───D
+                │   │           ├───'d'
+                │   │           ├───'e'
+                │   │           └───E
+                │   │               ├───'f'
+                │   │               ├───'g'
+                │   │               └───'h'
+                │   └───'b'
+                ├───'a'
+                └───B
+                    ├───'c'
+                    └───C
+                        └───D
+                            ├───'d'
+                            ├───'e'
+                            └───E
+                                ├───'f'
+                                ├───'g'
+                                └───'h'""";
+
+        SyntaxTreeInternalNode root = new SyntaxTreeInternalNode(new GrammarNonterminal("ROOT"));
+
+        GrammarNonterminal[] nonterminals = new GrammarNonterminal[5];
+        SyntaxTreeLeafNode[] leaves = new SyntaxTreeLeafNode[8];
+        SyntaxTreeInternalNode[] inodes = new SyntaxTreeInternalNode[5];
+
+        for (int i = 0; i < 5; i++) {
+            nonterminals[i] = new GrammarNonterminal(Character.toString((char)('A' + i)));
+        }
+
+        for (int i = 0; i < 8; i++) {
+            leaves[i] = new SyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(Character.toString((char)('a' + i))));
+        }
+
+        for (int i = 0; i < 5; i++) {
+            inodes[i] = new SyntaxTreeInternalNode(nonterminals[i]);
+        }
+
+        root.addChild(inodes[0]);
+        root.addChild(leaves[0]);
+        root.addChild(inodes[1]);
+
+        inodes[0].addChild(inodes[1]);
+        inodes[0].addChild(leaves[1]);
+        inodes[0].setUnmodifiable();
+
+        inodes[1].addChild(leaves[2]);
+        inodes[1].addChild(inodes[2]);
+        inodes[1].setUnmodifiable();
+
+        inodes[2].addChild(inodes[3]);
+        inodes[2].setUnmodifiable();
+
+        inodes[3].addChild(leaves[3]);
+        inodes[3].addChild(leaves[4]);
+        inodes[3].addChild(inodes[4]);
+        inodes[3].setUnmodifiable();
+
+        inodes[4].addChild(leaves[5]);
+        inodes[4].addChild(leaves[6]);
+        inodes[4].addChild(leaves[7]);
+        inodes[4].setUnmodifiable();
+
+
+        SyntaxTree tree = new SyntaxTree(root);
+
+        String visualization = SyntaxTreeFormatter.treeToVisualizedString(tree);
+
+        System.out.println(visualization);
+        assertEquals(target, visualization, "Expected: " + target);
+    }
+}

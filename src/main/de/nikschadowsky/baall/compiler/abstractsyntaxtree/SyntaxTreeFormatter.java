@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.abstractSyntaxTree;
+package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

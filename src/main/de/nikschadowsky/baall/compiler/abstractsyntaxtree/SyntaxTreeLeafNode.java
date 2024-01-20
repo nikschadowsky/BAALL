@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.abstractSyntaxTree;
+package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
 
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 

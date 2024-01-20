@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
+package de.nikschadowsky.baall.compiler.abstractsyntaxtree.node;
 
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
@@ -7,7 +7,8 @@ import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
  */
 public non-sealed class SyntaxTreeLeafNode extends SyntaxTreeNode<Token> implements SyntaxTreeLeaf {
 
-    public SyntaxTreeLeafNode(Token value) {
-        super(value);
+    public SyntaxTreeLeafNode(Token value, int depth) {
+        super(value, depth);
     }
+
 }

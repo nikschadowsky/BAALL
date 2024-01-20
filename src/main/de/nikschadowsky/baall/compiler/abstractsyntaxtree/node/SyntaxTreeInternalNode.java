@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
+package de.nikschadowsky.baall.compiler.abstractsyntaxtree.node;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
@@ -15,8 +15,8 @@ public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNon
     private boolean isModifiable;
     private final List<SyntaxTreeNode<? extends GrammarSymbol>> children = new ArrayList<>();
 
-    public SyntaxTreeInternalNode(GrammarNonterminal symbol) {
-        super(symbol);
+    public SyntaxTreeInternalNode(GrammarNonterminal symbol, int depth) {
+        super(symbol, depth);
     }
 
     public void addChild(SyntaxTreeNode<? extends GrammarSymbol> child) {
@@ -34,5 +34,13 @@ public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNon
 
     public void setUnmodifiable() {
         isModifiable = false;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof SyntaxTreeInternalNode inode) {
+            return super.equals(inode) && getChildren().equals(inode.getChildren()) && isModifiable() == inode.isModifiable();
+        }
+        return false;
     }
 }

@@ -1,5 +1,7 @@
 package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
 
+import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

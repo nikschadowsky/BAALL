@@ -1,6 +1,8 @@
 package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
+import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeLeafNode;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import org.junit.jupiter.api.Test;
 
@@ -39,22 +41,32 @@ class SyntaxTreeFormatterTest {
                                 ├───'g'
                                 └───'h'""";
 
-        SyntaxTreeInternalNode root = new SyntaxTreeInternalNode(new GrammarNonterminal("ROOT"));
+
+
+
+        String visualization = SyntaxTreeFormatter.treeToVisualizedString(getTree());
+
+        System.out.println(visualization);
+        assertEquals(target, visualization, "Expected: " + target);
+    }
+
+    private SyntaxTree getTree(){
+        SyntaxTreeInternalNode root = new SyntaxTreeInternalNode(new GrammarNonterminal("ROOT"), 0);
 
         GrammarNonterminal[] nonterminals = new GrammarNonterminal[5];
         SyntaxTreeLeafNode[] leaves = new SyntaxTreeLeafNode[8];
         SyntaxTreeInternalNode[] inodes = new SyntaxTreeInternalNode[5];
 
         for (int i = 0; i < 5; i++) {
-            nonterminals[i] = new GrammarNonterminal(Character.toString((char)('A' + i)));
+            nonterminals[i] = new GrammarNonterminal(Character.toString((char) ('A' + i)));
         }
 
         for (int i = 0; i < 8; i++) {
-            leaves[i] = new SyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(Character.toString((char)('a' + i))));
+            leaves[i] = new SyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(Character.toString((char) ('a' + i))), 0);
         }
 
         for (int i = 0; i < 5; i++) {
-            inodes[i] = new SyntaxTreeInternalNode(nonterminals[i]);
+            inodes[i] = new SyntaxTreeInternalNode(nonterminals[i], 0);
         }
 
         root.addChild(inodes[0]);
@@ -82,12 +94,6 @@ class SyntaxTreeFormatterTest {
         inodes[4].addChild(leaves[7]);
         inodes[4].setUnmodifiable();
 
-
-        SyntaxTree tree = new SyntaxTree(root);
-
-        String visualization = SyntaxTreeFormatter.treeToVisualizedString(tree);
-
-        System.out.println(visualization);
-        assertEquals(target, visualization, "Expected: " + target);
+        return new SyntaxTree(root);
     }
 }

@@ -1,0 +1,6 @@
+ROOT -> A "a" B
+A -> B "b"
+B -> "c" C
+C -> D
+D -> "d" "e" E
+E -> "f" "g" "h"

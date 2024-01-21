@@ -8,11 +8,13 @@ import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
 
+    private Set<GrammarNonterminalAnnotation> annotations;
     private Set<GrammarProduction> productionRules;
 
     private final String identifier;
 
-    private boolean isProductionRulesSet = false;
+    private boolean areProductionRulesSet = false;
+    private boolean areAnnotationsSet = false;
 
     public GrammarNonterminal(@NotNull String identifier) {
         this.identifier = identifier;
@@ -26,12 +28,20 @@ public class GrammarNonterminal implements GrammarSymbol {
      */
     public boolean setProductionRules(Set<GrammarProduction> productionRules) {
 
-        if (!isProductionRulesSet) {
+        if (!areProductionRulesSet) {
             this.productionRules = productionRules;
-            isProductionRulesSet = true;
+            areProductionRulesSet = true;
             return true;
         }
+        return false;
+    }
 
+    public boolean setAnnotations(Set<GrammarNonterminalAnnotation> annotations) {
+        if (!areAnnotationsSet) {
+            this.annotations = annotations;
+            areAnnotationsSet = true;
+            return true;
+        }
         return false;
     }
 
@@ -90,5 +100,9 @@ public class GrammarNonterminal implements GrammarSymbol {
             return getIdentifier().equals(g.getIdentifier()) && rulesMatch;
         }
         return false;
+    }
+
+    public @Unmodifiable Set<GrammarNonterminalAnnotation> getAnnotations() {
+        return Collections.unmodifiableSet(annotations);
     }
 }

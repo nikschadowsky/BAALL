@@ -26,9 +26,9 @@ public enum TokenType {
     /**
      * Finds a TokenType to the provided description String. It matches case-insensitive.
      *
-     * @param description
-     * @return
-     * @throws NoTokenTypeFoundException
+     * @param description description of this type
+     * @return the type associated to this description
+     * @throws NoTokenTypeFoundException if there is no type having this description
      */
     public static TokenType getTokenTypeForDescription(String description) throws NoTokenTypeFoundException {
         return Arrays.stream(values())

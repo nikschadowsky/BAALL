@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
@@ -13,7 +14,7 @@ public class GrammarNonterminal implements GrammarSymbol {
 
     private boolean isProductionRulesSet = false;
 
-    public GrammarNonterminal(String identifier) {
+    public GrammarNonterminal(@NotNull String identifier) {
         this.identifier = identifier;
     }
 
@@ -70,13 +71,23 @@ public class GrammarNonterminal implements GrammarSymbol {
      */
     @Override
     public boolean symbolMatches(GrammarSymbol s) {
-        return equals(s);
+        if (s instanceof GrammarNonterminal g) {
+            return getIdentifier().equals(g.getIdentifier());
+        }
+        return false;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GrammarNonterminal g) {
-            return identifier.equals(g.getIdentifier());
+            boolean rulesMatch;
+
+            if (productionRules == null) {
+                rulesMatch = g.productionRules == null;
+            } else {
+                rulesMatch = productionRules.equals(g.productionRules);
+            }
+            return getIdentifier().equals(g.getIdentifier()) && rulesMatch;
         }
         return false;
     }

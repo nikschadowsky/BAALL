@@ -51,23 +51,21 @@ public class Token implements GrammarSymbol {
      */
     @Override
     public boolean symbolMatches(GrammarSymbol s) {
-
-        // if we have a token, we wanna treat is as one
         if (s instanceof Token token) {
 
             // if one of the token is type ANY, compare literal value
-            if (type.equals(TokenType.ANY) || token.getType().equals(TokenType.ANY)) {
+            if (getType().equals(TokenType.ANY) || token.getType().equals(TokenType.ANY)) {
                 return value.equals(token.getValue());
             }
 
-            if ((type.equals(TokenType.STRING) && token.getType().equals(TokenType.STRING))
-                    || (type.equals(TokenType.BOOLEAN) && token.getType().equals(TokenType.BOOLEAN))
-                    || (type.equals(TokenType.NUMBER) && token.getType().equals(TokenType.NUMBER))) {
+            if ((getType().equals(TokenType.STRING) && token.getType().equals(TokenType.STRING))
+                    || (getType().equals(TokenType.BOOLEAN) && token.getType().equals(TokenType.BOOLEAN))
+                    || (getType().equals(TokenType.NUMBER) && token.getType().equals(TokenType.NUMBER))) {
                 return true;
             }
 
             // else the type must be equal too
-            return type.equals(token.getType()) && value.equals(token.getValue());
+            return getType().equals(token.getType()) && getValue().equals(token.getValue());
 
         }
 
@@ -77,7 +75,7 @@ public class Token implements GrammarSymbol {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Token token)
-            return symbolMatches(token);
+            return getType().equals(token.getType()) && getValue().equals(token.getValue());
         return false;
     }
 }

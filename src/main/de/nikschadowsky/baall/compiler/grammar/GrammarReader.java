@@ -32,9 +32,6 @@ public class GrammarReader {
 
         String[][] tokens = splitContent(preprocessed);
 
-        GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, lines);
-
-        addProductionRules(nonterminalSet, ruleSet, lines);
         GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, tokens);
         addProductionRules(nonterminalSet, ruleSet, tokens);
         enhanceNonterminalsWithAnnotations(nonterminalSet, tokens);
@@ -110,7 +107,6 @@ public class GrammarReader {
         for (int i = 0; i < tokens.length; i++) {
             String[] tokenizedLine = tokens[i];
 
-            String[] tokens = line.split(tokenRegex);
             String identifier = tokenizedLine[0];
             String rightSide = tokenizedLine[1];
 

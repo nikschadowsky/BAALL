@@ -30,7 +30,7 @@ public sealed abstract class SyntaxTreeNode<T extends GrammarSymbol> permits Syn
 
     @Override
     public String toString() {
-        return value.getFormatted();
+        return "%s(%s)".formatted(value.getFormatted(), getNodeDepth());
     }
 
     @Override

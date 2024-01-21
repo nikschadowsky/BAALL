@@ -42,7 +42,6 @@ public class GrammarProduction {
     @Override
     public String toString() {
 
-        boolean empty = true;
         StringBuilder builder = new StringBuilder();
 
         builder.append(productionRuleIdentifier);
@@ -74,7 +73,8 @@ public class GrammarProduction {
     public boolean equals(Object obj) {
 
         if (obj instanceof GrammarProduction gp)
-            return leftSideSymbol.equals(gp.getLeftSideSymbol()) && Arrays.equals(sententialForm, gp.getSententialForm());
+            return getLeftSideSymbol().equals(gp.getLeftSideSymbol())
+                    && Arrays.equals(getSententialForm(), gp.getSententialForm());
 
         return false;
     }

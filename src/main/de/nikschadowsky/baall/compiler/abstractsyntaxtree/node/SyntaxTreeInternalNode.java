@@ -19,7 +19,7 @@ public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNon
         super(symbol, depth);
     }
 
-    public void addChild(SyntaxTreeNode<? extends GrammarSymbol> child) {
+    public void addChild(SyntaxTreeNode<?> child) {
         children.add(child);
     }
 
@@ -37,9 +37,14 @@ public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNon
     }
 
     @Override
+    public String toString() {
+        return "%s: %s".formatted(super.toString(), children);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof SyntaxTreeInternalNode inode) {
-            return super.equals(inode) && getChildren().equals(inode.getChildren()) && isModifiable() == inode.isModifiable();
+            return super.equals(inode) && children.equals(inode.children) && isModifiable() == inode.isModifiable();
         }
         return false;
     }

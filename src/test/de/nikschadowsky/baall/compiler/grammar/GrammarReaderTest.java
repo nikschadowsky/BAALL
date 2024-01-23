@@ -1,8 +1,10 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -10,6 +12,8 @@ class GrammarReaderTest {
 
 
     private GrammarReader reader;
+
+    private final Logger logger = Logger.getAnonymousLogger();
 
     @Test
     void testCreateGrammar() {
@@ -23,37 +27,39 @@ class GrammarReaderTest {
 
         assertEquals(4, g.getAllNonterminals().size());
 
+        assertTrue(GrammarUtility.getNonterminal(g, "START").getAnnotations().contains(new GrammarNonterminalAnnotation("StartAnnotation")));
+        assertTrue(GrammarUtility.getNonterminal(g, "END").getAnnotations().contains(new GrammarNonterminalAnnotation("EndAnnotation")));
+        assertTrue(GrammarUtility.getNonterminal(g, "END").getAnnotations().contains(new GrammarNonterminalAnnotation("AdditionalAnnotation")));
+        assertEquals(2, GrammarUtility.getNonterminal(g, "END").getAnnotations().size());
+
         String derivationRepresentation = g.getStart().getProductionRules().toString();
 
-        String derivA = "A B \"T\" \"|\"";
-        String derivB = "ε";
+        String productionA = "A B \"T\" \"|\"";
+        String productionB = "ε";
 
-        System.out.println(derivationRepresentation);
+        logger.info(derivationRepresentation);
 
-        assertTrue(derivationRepresentation.contains(derivA) && derivationRepresentation.contains(derivB));
-
+        assertTrue(derivationRepresentation.contains(productionA) && derivationRepresentation.contains(productionB));
     }
 
     @Test
     void testCreateGrammarSyntaxError() {
-
         Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestSyntaxError.txt").generateGrammar());
 
-        String expected = "Invalid syntax!";
+        String expected = "Missing symbols";
 
-        e.printStackTrace();
+        logger.warning(e.getMessage());
 
         assertTrue(e.getMessage().contains(expected));
     }
 
     @Test
     void testCreateGrammarEpsilonError() {
-
         Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestEpsilonError.txt").generateGrammar());
 
-        String expected = "Meta-Symbols cannot be identifiers for Nonterminals!";
+        String expected = "Meta symbols cannot be used as identifiers for nonterminals!";
 
-        e.printStackTrace();
+        logger.warning(e.getMessage());
 
         assertTrue(e.getMessage().contains(expected));
     }

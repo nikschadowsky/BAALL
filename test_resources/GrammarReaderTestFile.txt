@@ -1,5 +1,7 @@
-START -> A B "T" "\|" | _EPSILON
+START -> A B "T" "\|" | _EPSILON @StartAnnotation
 A -> B | "T" # comment
 # and here too
 b -> b END
-END -> _EPSILON
+
+
+END -> _EPSILON @EndAnnotation @AdditionalAnnotation

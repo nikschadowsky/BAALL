@@ -33,8 +33,23 @@ public class ArrayUtilityTest {
         IntStream.range(0, trimmed2.length).forEach(i -> assertEquals(arr2[i], trimmed2[i]));
 
         // smaller array, notnull elements
-        Integer[] integer = {1,2,3};
+        Integer[] integer = {1, 2, 3};
 
         assertArrayEquals(integer, ArrayUtility.trimArrayToMaxLength(integer, integer.length + 10));
+    }
+
+    @Test
+    void testSubarray() {
+
+        Integer[] arr1 = new Integer[10];
+        IntStream.range(0, 10).forEach(i -> arr1[i] = i);
+
+        assertArrayEquals(arr1, ArrayUtility.subarray(arr1,0, arr1.length));
+
+        assertArrayEquals(Arrays.stream(new int[]{1,2,3}).boxed().toArray(), ArrayUtility.subarray(arr1, 1,4));
+
+        assertArrayEquals(new Integer[0], ArrayUtility.subarray(arr1, 1,1));
+
+        assertThrows(IllegalArgumentException.class, () -> ArrayUtility.subarray(arr1, 1,0));
     }
 }

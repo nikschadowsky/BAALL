@@ -1,5 +1,7 @@
 package de.nikschadowsky.baall.compiler.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Arrays;
 
 /**
@@ -9,15 +11,27 @@ public class ArrayUtility {
 
     /**
      * Copy the {@code array} argument and trim it, if its length is larger than the second argument {@code length}
-     * @param array array to copy and trim
+     *
+     * @param array  array to copy and trim
      * @param length the max length
+     * @param <T>    type of array
      * @return copy of the array with maximum length
-     * @param <T> type of array
      */
-    public static <T> T[] trimArrayToMaxLength(T[] array, int length){
-        if(array.length < length) return Arrays.copyOf(array, array.length);
+    public static <T> T[] trimArrayToMaxLength(T[] array, int length) {
+        if (array.length < length) return Arrays.copyOf(array, array.length);
 
         return Arrays.copyOf(array, length);
+    }
+
+    public static <T> T[] subarray(@NotNull T[] array, int lowerIndex, int upperIndex) {
+        if (upperIndex > array.length) {
+            throw new IllegalArgumentException("Upper index may not lie outside array!");
+        }
+        if (upperIndex == -1) {
+            return Arrays.copyOfRange(array, lowerIndex, array.length);
+        }
+
+        return Arrays.copyOfRange(array, lowerIndex, upperIndex);
     }
 
 }

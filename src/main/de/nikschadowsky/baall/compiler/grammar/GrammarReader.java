@@ -4,11 +4,12 @@ import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
 import de.nikschadowsky.baall.compiler.util.ArrayUtility;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
+import de.nikschadowsky.baall.compiler.util.RegexFactory;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
 public class GrammarReader {
-
     private final String path;
 
     /**
@@ -25,18 +26,31 @@ public class GrammarReader {
 
 
     public Grammar generateGrammar() {
-        String preprocessed = preprocess(FileLoader.loadFileContent(path));
+        GrammarFileContent content = createFileContentContainer(path);
+
+        validateGrammarFileContent(content);
 
         Set<GrammarNonterminal> nonterminalSet = new HashSet<>();
         Set<GrammarProduction> ruleSet = new HashSet<>();
 
-        String[][] tokens = splitContent(preprocessed);
-
-        GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, tokens);
-        addProductionRules(nonterminalSet, ruleSet, tokens);
-        enhanceNonterminalsWithAnnotations(nonterminalSet, tokens);
+        GrammarNonterminal startSymbol = addAllNonterminal(nonterminalSet, content);
+        addProductionRules(nonterminalSet, ruleSet, content);
+        enhanceNonterminalsWithAnnotations(nonterminalSet, content);
 
         return new Grammar(startSymbol, nonterminalSet, ruleSet);
+    }
+
+    private GrammarFileContent createFileContentContainer(String path) {
+        String preprocessed = preprocess(FileLoader.loadFileContent(path));
+        String[] lines = preprocessed.split(RegexFactory.NEWLINE_REGEX);
+        String[][] tokens = splitLines(lines);
+
+        return new GrammarFileContent(
+                path,
+                preprocessed,
+                lines,
+                tokens
+        );
     }
 
     private String preprocess(String content) {
@@ -49,42 +63,50 @@ public class GrammarReader {
         return content;
     }
 
-    private static String[][] splitContent(String content) {
-        String[] lines = content.split("\\v");
+    private static final String TOKENIZING_REGEX = "(?<!\\\\)@|(?<!\\\\)->";
+
+    private String[][] splitLines(String[] lines) {
         String[][] tokens = new String[lines.length][];
 
         for (int i = 0; i < tokens.length; i++) {
-            tokens[i] = lines[i].split("(?<!\\\\)@|(?<!\\\\)->");
+            tokens[i] = lines[i].split(TOKENIZING_REGEX);
+
+            int index = i;
+            Arrays.setAll(tokens[index], j -> tokens[index][j].trim());
         }
 
         return tokens;
     }
 
+    private void validateGrammarFileContent(GrammarFileContent content) {
+        for (int l = 0; l < content.lineCount(); l++) {
+            String exceptionMessage = createExceptionMessage(l, content.lines()[l], "Missing symbols");
 
-    private static final String tokenRegex = "[^\\\\]->";
-
-    /**
-     * Traverses lines to find all Nonterminals and adds them to the provided Set
-     *
-     * @param set    of Nonterminals
-     * @param tokens
-     * @return the First GrammarNonterminal mentioned in the input String
-     */
-    private GrammarNonterminal addAllNonterminal(Set<GrammarNonterminal> set, String[][] tokens) {
-        GrammarNonterminal startSymbol = null;
-
-        for (int i = 0; i < tokens.length; i++) {
-
-            String[] tokenizedLine = tokens[i];
-
-            if (tokens.length != 2) {
-                throw new GrammarSyntaxException("Error while parsing line '" + i + "' in " + path + "! Invalid syntax!");
+            if (content.tokens[l].length < 2) {
+                throw new GrammarSyntaxException(exceptionMessage);
             }
 
-            String identifier = tokenizedLine[0].toUpperCase();
+            for (int i = 0; i < content.tokens()[l].length; i++) {
+                if (content.tokens()[l][i].isEmpty()) {
+                    throw new GrammarSyntaxException(exceptionMessage);
+                }
+            }
+        }
+
+    }
+
+
+    private GrammarNonterminal addAllNonterminal(Set<GrammarNonterminal> set, GrammarFileContent content) {
+        GrammarNonterminal startSymbol = null;
+
+        for (int l = 0; l < content.lineCount(); l++) {
+
+            String[] tokens = content.tokens()[l];
+
+            String identifier = tokens[0].toUpperCase();
 
             if (identifier.startsWith("_"))
-                throw new GrammarSyntaxException("Error while parsing line " + i + " in " + path + "! Meta-Symbols cannot be identifiers for Nonterminals!");
+                throw new GrammarSyntaxException(createExceptionMessage(l, content.lines()[l], "Meta symbols cannot be used as identifiers for nonterminals!"));
 
             if (!isNonterminalAlreadyInSet(set, identifier)) {
                 GrammarNonterminal nonterminal = new GrammarNonterminal(identifier);
@@ -100,34 +122,35 @@ public class GrammarReader {
     }
 
 
-    private void addProductionRules(Set<GrammarNonterminal> nonterminalSet, Set<GrammarProduction> ruleSet, String[][] tokens) {
+    private void addProductionRules(Set<GrammarNonterminal> nonterminalSet, Set<GrammarProduction> ruleSet, GrammarFileContent content) {
         // uniquely identifies a Production Rule created by this Grammar Reader
         int productionRuleIdentifier = 0;
 
-        for (int i = 0; i < tokens.length; i++) {
-            String[] tokenizedLine = tokens[i];
-
-            String identifier = tokenizedLine[0];
-            String rightSide = tokenizedLine[1];
-
-            String[] ruleStrings = rightSide.split("(?<!\\\\)\\|"); // any '|' without a '\' preceding
+        for (int l = 0; l < content.lineCount(); l++) {
+            String identifier = content.tokens()[l][0];
+            String rules = content.tokens()[l][1];
 
             GrammarNonterminal nonterminal = getNonterminalFromSet(nonterminalSet, identifier);
-
             // rules for the current nonterminal
             Set<GrammarProduction> productionRules = new HashSet<>();
 
-            for (String s : ruleStrings) {
+            String[] ruleStrings = rules.split("(?<!\\\\)\\|"); // any '|' without a '\' preceding
+
+            for (String singleRule : ruleStrings) {
                 List<GrammarSymbol> sententialForm = new ArrayList<>();
 
                 boolean hasEpsilonProduction = false;
 
-                for (String token : s.trim().split(" ")) {
+                for (String token : singleRule.trim().split(" ")) {
                     token = token.trim();
 
                     if (token.equals("_EPSILON")) {
                         if (hasEpsilonProduction)
-                            throw new GrammarSyntaxException("Cannot have more than one Epsilon Production Rule");
+                            throw new GrammarSyntaxException(createExceptionMessage(
+                                    l,
+                                    content.lines()[l],
+                                    "Cannot have more than one Epsilon Production Rule for each Nonterminal"
+                            ));
                         // Epsilon
                         hasEpsilonProduction = true;
                     } else if (token.matches("^\".*\"$")) {
@@ -140,10 +163,11 @@ public class GrammarReader {
                             case "_STRING_PRIMITIVE" -> sententialForm.add(new Token(TokenType.STRING, ""));
                             case "_NUMBER_PRIMITIVE" -> sententialForm.add(new Token(TokenType.NUMBER, ""));
                             case "_BOOLEAN_PRIMITIVE" -> sententialForm.add(new Token(TokenType.BOOLEAN, ""));
-                            default ->
-                                    throw new GrammarSyntaxException("Unrecognized Meta-Symbol " + token + " in line " + i + " in " + path + "!");
+                            default -> throw new GrammarSyntaxException(createExceptionMessage(
+                                    l,
+                                    content.lines()[l],
+                                    "Unrecognized Meta-Symbol '" + token + "'!"));
                         }
-
                     } else {
                         sententialForm.add(getNonterminalFromSet(nonterminalSet, token));
                     }
@@ -151,7 +175,10 @@ public class GrammarReader {
                 productionRules.add(new GrammarProduction(productionRuleIdentifier++, nonterminal, sententialForm.toArray(GrammarSymbol[]::new)));
             }
             if (!nonterminal.setProductionRules(productionRules)) {
-                throw new GrammarSyntaxException("Production Rules of Nonterminal " + nonterminal.getIdentifier() + " can only be assigned once! ");
+                throw new GrammarSyntaxException(createExceptionMessage(
+                        l,
+                        content.lines()[l],
+                        "Production rules for '" + nonterminal.getFormatted() + "' can only be assigned once! "));
             }
 
             // add all production rules for this symbol
@@ -159,8 +186,8 @@ public class GrammarReader {
         }
     }
 
-    private void enhanceNonterminalsWithAnnotations(Set<GrammarNonterminal> nonterminalSet, String[][] tokens) {
-        for (String[] token : tokens) {
+    private void enhanceNonterminalsWithAnnotations(Set<GrammarNonterminal> nonterminalSet, GrammarFileContent content) {
+        for (String[] token : content.tokens()) {
             Set<GrammarNonterminalAnnotation> annotations =
                     Set.of(Arrays
                             .stream(ArrayUtility.subarray(token, 2, -1))
@@ -182,5 +209,20 @@ public class GrammarReader {
                 .filter(token -> token.getIdentifier().equals(e.toUpperCase()))
                 .findAny()
                 .orElseThrow(() -> new GrammarSyntaxException("Nonterminal " + e + " is not defined!"));
+    }
+
+    private static String createExceptionMessage(int lineNumber, String line, String reason) {
+        return "Invalid syntax in line %s: %s%nReason: %s".formatted(lineNumber, line, reason);
+    }
+
+    private record GrammarFileContent(
+            @NotNull String path,
+            @NotNull String preprocessed,
+            @NotNull String[] lines,
+            @NotNull String[][] tokens) {
+
+        public int lineCount() {
+            return lines.length;
+        }
     }
 }

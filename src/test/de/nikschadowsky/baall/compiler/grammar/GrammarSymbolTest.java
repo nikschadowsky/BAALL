@@ -16,7 +16,6 @@ class GrammarSymbolTest {
 
     @BeforeEach
     void setUp() {
-
         token1 = new Token(TokenType.STRING, "value");
         token2 = new Token(TokenType.KEYWORD, "same type a");
         token3 = new Token(TokenType.KEYWORD, "same type b");
@@ -33,9 +32,7 @@ class GrammarSymbolTest {
 
     @Test
     void testSymbolMatchesTokens() {
-
-
-        // always check both directions of the comparison
+        // always check for reflexivity
         assertTrue(token4.symbolMatches(token5) && token5.symbolMatches(token4));
         assertTrue(token5.symbolMatches(token6) && token6.symbolMatches(token5));
 
@@ -55,8 +52,7 @@ class GrammarSymbolTest {
 
     @Test
     void testSymbolMatchesNonterminal() {
-
-        // checking both directions just in case String.equals isn't commutative
+        // checking for reflexivity just in case String.equals isn't reflexive
         assertTrue(A.symbolMatches(B) && B.symbolMatches(A));
 
         assertFalse(B.symbolMatches(C) || C.symbolMatches(B));
@@ -64,7 +60,6 @@ class GrammarSymbolTest {
 
     @Test
     void testSymbolMatchesMixed() {
-
         assertFalse(A.symbolMatches(token1));
         assertFalse(token2.symbolMatches(B));
 

@@ -57,7 +57,7 @@ public class GrammarReader {
         // remove comments
         content = content.replaceAll("#.*($|\\v)", "");
         // replace multiple line breaks
-        content = content.replaceAll("\\v+", "\n");
+        content = content.replaceAll(RegexFactory.NEWLINE_REGEX, "\n");
         // replace multiple regular spaces
         content = content.replaceAll(" +", " ").trim();
         return content;

@@ -8,8 +8,12 @@ import java.util.Comparator;
 public class RegexFactory {
 
     public static final String SINGLE_LINE_COMMENT_REGEX = "(//.*\\R)";
+
     public static final String BLOCK_COMMENT_REGEX = "(/\\*(.|\\s)*?\\*/)";
+
     public static final String WHITESPACE_REGEX = "\\s+";
+
+    public static final String NEWLINE_REGEX = "\\v+";
 
     public static final String END_OF_WORD_REGEX = "(?=\\W|$)";
 

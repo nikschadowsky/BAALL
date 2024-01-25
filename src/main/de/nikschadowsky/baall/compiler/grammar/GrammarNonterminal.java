@@ -4,12 +4,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
 
-    private Set<GrammarNonterminalAnnotation> annotations;
-    private Set<GrammarProduction> productionRules;
+    private final Set<GrammarNonterminalAnnotation> annotations = new HashSet<>();
+    private final Set<GrammarProduction> productionRules = new HashSet<>();
 
     private final String identifier;
 
@@ -20,41 +21,54 @@ public class GrammarNonterminal implements GrammarSymbol {
         this.identifier = identifier;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
     /**
-     * Sets this nonterminal's production rules
+     * Adds production rules to this nonterminal and sets them unmodifiable.
      *
-     * @param productionRules production rules of this Nonterminal
+     * @param newProductionRules production rules to add
      * @return whether this operation was successful
      */
-    public boolean setProductionRules(Set<GrammarProduction> productionRules) {
-
+    public boolean addProductionRules(Set<GrammarProduction> newProductionRules) {
         if (!areProductionRulesSet) {
-            this.productionRules = productionRules;
+            productionRules.addAll(newProductionRules);
             areProductionRulesSet = true;
             return true;
         }
         return false;
     }
 
-    public boolean setAnnotations(Set<GrammarNonterminalAnnotation> annotations) {
-        if (!areAnnotationsSet) {
-            this.annotations = annotations;
-            areAnnotationsSet = true;
-            return true;
-        }
-        return false;
-    }
-
-
-    public String getIdentifier() {
-        return identifier;
-    }
 
     /**
      * @return an immutable set of this nonterminal's production rules
      */
     public @Unmodifiable Set<GrammarProduction> getProductionRules() {
         return Collections.unmodifiableSet(productionRules);
+    }
+
+    /**
+     * Adds annotations to this nonterminal and sets them unmodifiable.
+     *
+     * @param newAnnotations annotations to add
+     * @return whether this operation was successful
+     */
+    public boolean addAnnotations(Set<GrammarNonterminalAnnotation> newAnnotations) {
+        if (!areAnnotationsSet) {
+            annotations.addAll(newAnnotations);
+            areAnnotationsSet = true;
+            return true;
+        }
+        return false;
+    }
+
+    public @Unmodifiable Set<GrammarNonterminalAnnotation> getAnnotations() {
+        return Collections.unmodifiableSet(annotations);
+    }
+
+    public boolean hasAnnotation(@NotNull String value) {
+        return annotations.contains(new GrammarNonterminalAnnotation(value));
     }
 
     @Override
@@ -90,19 +104,8 @@ public class GrammarNonterminal implements GrammarSymbol {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GrammarNonterminal g) {
-            boolean rulesMatch;
-
-            if (productionRules == null) {
-                rulesMatch = g.productionRules == null;
-            } else {
-                rulesMatch = productionRules.equals(g.productionRules);
-            }
-            return getIdentifier().equals(g.getIdentifier()) && rulesMatch;
+            return getIdentifier().equals(g.getIdentifier()) && productionRules.equals(g.productionRules);
         }
         return false;
-    }
-
-    public @Unmodifiable Set<GrammarNonterminalAnnotation> getAnnotations() {
-        return Collections.unmodifiableSet(annotations);
     }
 }

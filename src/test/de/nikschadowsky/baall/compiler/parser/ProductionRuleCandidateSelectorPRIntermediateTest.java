@@ -28,8 +28,7 @@ class ProductionRuleCandidateSelectorPRIntermediateTest {
 
     @BeforeAll
     static void init() {
-
-        testGrammar = new GrammarReader("test_resources/ProductionRuleCandidateSelectorStepTestGrammar.txt").generateGrammar();
+        testGrammar = GrammarReader.getInstance().generateGrammar("test_resources/ProductionRuleCandidateSelectorStepTestGrammar.grammar");
     }
 
     @Test

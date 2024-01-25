@@ -10,26 +10,32 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GrammarReaderTest {
 
-
-    private GrammarReader reader;
-
     private final Logger logger = Logger.getAnonymousLogger();
 
     @Test
     void testCreateGrammar() {
-        Grammar g = new GrammarReader("test_resources/GrammarReaderTestFile.txt").generateGrammar();
+        Grammar g = GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestFile.grammar");
 
         assertTrue(g.getStart().getIdentifier().equalsIgnoreCase("start"));
 
         Set<String> testNonterminals = Set.of("START", "A", "B", "END");
 
-        assertTrue(g.getAllNonterminals().stream().map(elem -> testNonterminals.contains(elem.getIdentifier())).reduce(true, (a, b) -> a && b));
+        assertTrue(g.getAllNonterminals()
+                    .stream()
+                    .map(elem -> testNonterminals.contains(elem.getIdentifier()))
+                    .reduce(true, (a, b) -> a && b));
 
         assertEquals(4, g.getAllNonterminals().size());
 
-        assertTrue(GrammarUtility.getNonterminal(g, "START").getAnnotations().contains(new GrammarNonterminalAnnotation("StartAnnotation")));
-        assertTrue(GrammarUtility.getNonterminal(g, "END").getAnnotations().contains(new GrammarNonterminalAnnotation("EndAnnotation")));
-        assertTrue(GrammarUtility.getNonterminal(g, "END").getAnnotations().contains(new GrammarNonterminalAnnotation("AdditionalAnnotation")));
+        assertTrue(GrammarUtility.getNonterminal(g, "START")
+                                 .getAnnotations()
+                                 .contains(new GrammarNonterminalAnnotation("StartAnnotation")));
+        assertTrue(GrammarUtility.getNonterminal(g, "END")
+                                 .getAnnotations()
+                                 .contains(new GrammarNonterminalAnnotation("EndAnnotation")));
+        assertTrue(GrammarUtility.getNonterminal(g, "END")
+                                 .getAnnotations()
+                                 .contains(new GrammarNonterminalAnnotation("AdditionalAnnotation")));
         assertEquals(2, GrammarUtility.getNonterminal(g, "END").getAnnotations().size());
 
         String derivationRepresentation = g.getStart().getProductionRules().toString();
@@ -43,8 +49,31 @@ class GrammarReaderTest {
     }
 
     @Test
+    void testCreateGrammarWithStartNotInFirstLine() {
+        Grammar g =
+                GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderStartInLastLineTestFile.grammar");
+
+        assertEquals(GrammarUtility.getNonterminal(g, "B"), g.getStart());
+        assertTrue(GrammarUtility.getNonterminal(g, "START").getAnnotations().isEmpty());
+    }
+
+    @Test
+    void testCreateGrammarWithMultipleAnnotations() {
+        Grammar g =
+                GrammarReader.getInstance()
+                             .generateGrammar(
+                                     "test_resources/GrammarReaderNonterminalWithMultipleAnnotationsTestFile.grammar");
+
+        assertEquals(GrammarUtility.getNonterminal(g, "A"), g.getStart());
+        assertEquals(4, g.getStart().getAnnotations().size());
+    }
+
+    @Test
     void testCreateGrammarSyntaxError() {
-        Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestSyntaxError.txt").generateGrammar());
+        Exception e = assertThrows(
+                GrammarSyntaxException.class,
+                () -> GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestSyntaxError.grammar")
+        );
 
         String expected = "Missing symbols";
 
@@ -55,7 +84,10 @@ class GrammarReaderTest {
 
     @Test
     void testCreateGrammarEpsilonError() {
-        Exception e = assertThrows(GrammarSyntaxException.class, () -> new GrammarReader("test_resources/GrammarReaderTestEpsilonError.txt").generateGrammar());
+        Exception e = assertThrows(
+                GrammarSyntaxException.class,
+                () -> GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestEpsilonError.grammar")
+        );
 
         String expected = "Meta symbols cannot be used as identifiers for nonterminals!";
 

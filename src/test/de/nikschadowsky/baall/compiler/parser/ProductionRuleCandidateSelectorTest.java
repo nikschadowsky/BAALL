@@ -20,7 +20,7 @@ class ProductionRuleCandidateSelectorTest {
 
     @BeforeAll
     static void setup() {
-        g = new GrammarReader("test_resources/ProductionRuleCandidateSelectorTestGrammar.txt").generateGrammar();
+        g = GrammarReader.getInstance().generateGrammar("test_resources/ProductionRuleCandidateSelectorTestGrammar.grammar");
     }
 
     @Test
@@ -144,8 +144,9 @@ class ProductionRuleCandidateSelectorTest {
         assertTrue(ProductionRuleCandidateSelector
                 .determineCandidate(getNonterminal("H"), getTokenQueue(".", ".")).isEmpty());
     }
+
     @Test
-    void testNonterminalThenNonterminalChoice(){
+    void testNonterminalThenNonterminalChoice() {
         GrammarProduction targetA = getProductionRule(
                 getNonterminal("I"),
                 getNonterminal("Z"), getNonterminal("X"));
@@ -163,7 +164,7 @@ class ProductionRuleCandidateSelectorTest {
     }
 
     @Test
-    void testNonterminalThenMixedChoice(){
+    void testNonterminalThenMixedChoice() {
         GrammarProduction targetA = getProductionRule(
                 getNonterminal("J"),
                 getNonterminal("Z"), getNonterminal("X"));
@@ -181,7 +182,7 @@ class ProductionRuleCandidateSelectorTest {
     }
 
     @Test
-    void testMixedThenNonterminalChoice(){
+    void testMixedThenNonterminalChoice() {
         GrammarProduction targetA = getProductionRule(
                 getNonterminal("K"),
                 getNonterminal("Z"), getNonterminal("X"));
@@ -199,7 +200,7 @@ class ProductionRuleCandidateSelectorTest {
     }
 
     @Test
-    void testMixedThenMixedChoice(){
+    void testMixedThenMixedChoice() {
         GrammarProduction targetA = getProductionRule(
                 getNonterminal("L"),
                 getNonterminal("Z"), getTokenWithTypeAny("?"));

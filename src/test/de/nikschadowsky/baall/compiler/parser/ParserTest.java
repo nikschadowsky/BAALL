@@ -26,7 +26,7 @@ class ParserTest {
 
     @Test
     void generateSyntaxTree() {
-        g = new GrammarReader("test_resources/ParserTestGrammar.txt").generateGrammar();
+        g = GrammarReader.getInstance().generateGrammar("test_resources/ParserTestGrammar.grammar");
 
         SyntaxTree tree = new Parser().parse(g, new LinkedList<>(
                 getTokenQueue("c", "d", "e", "f", "g", "h", "b", "a", "c", "d", "e", "f", "g", "h")));

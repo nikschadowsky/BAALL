@@ -13,7 +13,7 @@ public record GrammarNonterminalAnnotation(String value) {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GrammarNonterminalAnnotation annotation) {
-            return value.equalsIgnoreCase(annotation.value);
+            return value.equals(annotation.value);
         }
 
         return false;

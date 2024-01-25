@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import de.nikschadowsky.baall.compiler.lexer.tokens.NoTokenTypeFoundException;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
 import de.nikschadowsky.baall.compiler.util.ArrayUtility;
@@ -176,12 +177,15 @@ public class GrammarReader {
                         // Epsilon
                         hasEpsilonProduction = true;
                     } else if (token.charAt(0) == '_') {
-                        TokenType type =
-                                TokenType.getTokenTypeForDescription(token.substring(1))
-                                         .orElseThrow(LambdaUtility.createSupplier(new GrammarSyntaxException(
-                                                 createLineString(l, content.lines()[l]),
-                                                 "Unrecognized meta symbol '" + token + "'!"
-                                         )));
+                        TokenType type;
+                        try {
+                            type = TokenType.getTokenTypeForDescription(token.substring(1));
+                        } catch (NoTokenTypeFoundException e) {
+                            throw new GrammarSyntaxException(
+                                    createLineString(l, content.lines()[l]),
+                                    "Unrecognized meta symbol '" + token + "'!"
+                            );
+                        }
 
                         if (!type.hasExactTokenMatching()) {
                             sententialForm.add(new Token(type, ""));

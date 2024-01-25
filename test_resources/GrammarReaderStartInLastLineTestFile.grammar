@@ -1,0 +1,3 @@
+START -> A
+A -> B
+B -> "C" @Start

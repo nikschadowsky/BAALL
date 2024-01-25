@@ -31,6 +31,8 @@ public class RegexFactory {
 
     public static final String IDENTIFIER_REGEX = "[a-zA-Z]\\w*";
 
+    public static final String GRAMMAR_LINE_TOKENIZING_REGEX = "(?<!\\\\)@|(?<!\\\\)->";
+
 
     /**
      * Generate a Regular Expression from the defined Keywords in {@link SyntaxSet}.

@@ -1,26 +1,35 @@
 package de.nikschadowsky.baall.compiler.lexer.tokens;
 
+import de.nikschadowsky.baall.compiler.util.LambdaUtility;
+
 import java.util.Arrays;
 
 public enum TokenType {
 
-    STRING("String"),
-    NUMBER("Number"),
-    BOOLEAN("Boolean"),
-    KEYWORD("Keyword"),
-    IDENTIFIER("Identifier"),
-    OPERATOR("Operator"),
-    SEPARATOR("Separator"),
-    ANY("Any");
+    STRING("String", false),
+    NUMBER("Number", false),
+    BOOLEAN("Boolean", false),
+    KEYWORD("Keyword", true),
+    IDENTIFIER("Identifier", false),
+    OPERATOR("Operator", true),
+    SEPARATOR("Separator", true),
+    ANY("Any", true);
 
     private final String description;
 
-    TokenType(String description) {
+    private final boolean hasExactTokenMatching;
+
+    TokenType(String description, boolean hasExactTokenMatching) {
         this.description = description;
+        this.hasExactTokenMatching = hasExactTokenMatching;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    public boolean hasExactTokenMatching() {
+        return hasExactTokenMatching;
     }
 
     /**
@@ -32,10 +41,9 @@ public enum TokenType {
      */
     public static TokenType getTokenTypeForDescription(String description) throws NoTokenTypeFoundException {
         return Arrays.stream(values())
-                .filter(entry -> entry.getDescription().equalsIgnoreCase(description))
-                .findAny()
-                .orElseThrow(() -> new NoTokenTypeFoundException("No Token found matching '" + description + "'!"));
-
-
+                     .filter(entry -> entry.getDescription().equalsIgnoreCase(description))
+                     .findAny()
+                     .orElseThrow(LambdaUtility.createSupplier(new NoTokenTypeFoundException(
+                             "No Token found matching description '" + description + "'!")));
     }
 }

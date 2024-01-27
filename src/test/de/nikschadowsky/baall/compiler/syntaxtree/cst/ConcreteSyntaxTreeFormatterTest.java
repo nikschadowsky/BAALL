@@ -1,9 +1,9 @@
-package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
+package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeLeafNode;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeLeafNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * File created on 19.01.2024
  */
-class SyntaxTreeFormatterTest {
+class ConcreteSyntaxTreeFormatterTest {
 
     @Test
     void treeToVisualizedString() {
@@ -50,7 +50,7 @@ class SyntaxTreeFormatterTest {
         assertEquals(target, visualization, "Expected: " + target);
     }
 
-    private SyntaxTree getTree(){
+    private ConcreteSyntaxTree getTree(){
         SyntaxTreeInternalNode root = new SyntaxTreeInternalNode(new GrammarNonterminal("ROOT"), 0);
 
         GrammarNonterminal[] nonterminals = new GrammarNonterminal[5];
@@ -94,6 +94,6 @@ class SyntaxTreeFormatterTest {
         inodes[4].addChild(leaves[7]);
         inodes[4].setUnmodifiable();
 
-        return new SyntaxTree(root);
+        return new ConcreteSyntaxTree(root);
     }
 }

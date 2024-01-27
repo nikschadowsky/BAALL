@@ -1,7 +1,7 @@
-package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
+package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class SyntaxTreeFormatter {
 
-    public static String treeToVisualizedString(@NotNull SyntaxTree tree) {
+    public static String treeToVisualizedString(@NotNull ConcreteSyntaxTree tree) {
         return traversePreOrder(tree.getRoot());
     }
 

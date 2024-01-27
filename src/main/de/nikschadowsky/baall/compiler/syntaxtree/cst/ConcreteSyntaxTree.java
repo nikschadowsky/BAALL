@@ -1,15 +1,15 @@
-package de.nikschadowsky.baall.compiler.abstractsyntaxtree;
+package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
 
 /**
  * File created on 14.01.2024
  */
-public class SyntaxTree {
+public class ConcreteSyntaxTree {
 
     private final SyntaxTreeInternalNode root;
 
-    public SyntaxTree(SyntaxTreeInternalNode root) {
+    public ConcreteSyntaxTree(SyntaxTreeInternalNode root) {
         this.root = root;
     }
 
@@ -26,7 +26,7 @@ public class SyntaxTree {
     public boolean equals(Object obj) {
         if (this == obj) return true;
 
-        if (obj instanceof SyntaxTree tree) {
+        if (obj instanceof ConcreteSyntaxTree tree) {
             return getRoot().equals(tree.getRoot());
         }
 

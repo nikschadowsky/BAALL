@@ -1,19 +1,19 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
 
 /**
  * File created on 14.01.2024
  */
 public class ConcreteSyntaxTree {
 
-    private final SyntaxTreeInternalNode root;
+    private final ConcreteSyntaxTreeInternalNode root;
 
-    public ConcreteSyntaxTree(SyntaxTreeInternalNode root) {
+    public ConcreteSyntaxTree(ConcreteSyntaxTreeInternalNode root) {
         this.root = root;
     }
 
-    public SyntaxTreeInternalNode getRoot() {
+    public ConcreteSyntaxTreeInternalNode getRoot() {
         return root;
     }
 

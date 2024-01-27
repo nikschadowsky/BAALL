@@ -1,14 +1,14 @@
 package de.nikschadowsky.baall.compiler.parser;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.SyntaxTree;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.SyntaxTreeFormatter;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeLeafNode;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeNode;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarReader;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.SyntaxTreeFormatter;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeNode;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
@@ -28,7 +28,7 @@ class ParserTest {
     void generateSyntaxTree() {
         g = GrammarReader.getInstance().generateGrammar("test_resources/ParserTestGrammar.grammar");
 
-        SyntaxTree tree = new Parser().parse(g, new LinkedList<>(
+        ConcreteSyntaxTree tree = new Parser().parse(g, new LinkedList<>(
                 getTokenQueue("c", "d", "e", "f", "g", "h", "b", "a", "c", "d", "e", "f", "g", "h")));
 
         System.out.println(SyntaxTreeFormatter.treeToVisualizedString(tree));
@@ -36,9 +36,9 @@ class ParserTest {
         assertEquals(getTree(), tree);
     }
 
-    private SyntaxTree getTree() {
+    private ConcreteSyntaxTree getTree() {
 
-        SyntaxTreeInternalNode A = getInternalNode("A", 1)
+        ConcreteSyntaxTreeInternalNode A = getInternalNode("A", 1)
                 .addC(getInternalNode("B", 2)
                         .addC(getLeafNode("c", 3))
                         .addC(getInternalNode("C", 3)
@@ -56,7 +56,7 @@ class ParserTest {
                 .addC(getLeafNode("b", 2));
 
 
-        SyntaxTreeInternalNode B = getInternalNode("B", 1)
+        ConcreteSyntaxTreeInternalNode B = getInternalNode("B", 1)
                 .addC(getLeafNode("c", 2))
                 .addC(getInternalNode("C", 2)
                         .addC(getInternalNode("D", 3)
@@ -71,29 +71,29 @@ class ParserTest {
 
                 );
 
-        InternalNodeWrapper root = getInternalNode("ROOT", 0);
+        InternalNodeWrapperConcrete root = getInternalNode("ROOT", 0);
 
         root.addC(A).addC(getLeafNode("a", 1)).addC(B);
 
-        return new SyntaxTree(root);
+        return new ConcreteSyntaxTree(root);
 
     }
 
-    private InternalNodeWrapper getInternalNode(String nonterminalId, int depth) {
-        return new InternalNodeWrapper(GrammarUtility.getNonterminal(g, nonterminalId), depth);
+    private InternalNodeWrapperConcrete getInternalNode(String nonterminalId, int depth) {
+        return new InternalNodeWrapperConcrete(GrammarUtility.getNonterminal(g, nonterminalId), depth);
     }
 
-    private SyntaxTreeLeafNode getLeafNode(String tokenValue, int depth) {
-        return new SyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(tokenValue), depth);
+    private ConcreteSyntaxTreeLeafNode getLeafNode(String tokenValue, int depth) {
+        return new ConcreteSyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(tokenValue), depth);
     }
 
 
-    private static class InternalNodeWrapper extends SyntaxTreeInternalNode {
-        public InternalNodeWrapper(GrammarNonterminal s, int depth) {
+    private static class InternalNodeWrapperConcrete extends ConcreteSyntaxTreeInternalNode {
+        public InternalNodeWrapperConcrete(GrammarNonterminal s, int depth) {
             super(s, depth);
         }
 
-        public InternalNodeWrapper addC(SyntaxTreeNode<?> child) {
+        public InternalNodeWrapperConcrete addC(ConcreteSyntaxTreeNode<?> child) {
             addChild(child);
             return this;
         }

@@ -2,8 +2,8 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeLeafNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,22 +51,22 @@ class ConcreteSyntaxTreeFormatterTest {
     }
 
     private ConcreteSyntaxTree getTree(){
-        SyntaxTreeInternalNode root = new SyntaxTreeInternalNode(new GrammarNonterminal("ROOT"), 0);
+        ConcreteSyntaxTreeInternalNode root = new ConcreteSyntaxTreeInternalNode(new GrammarNonterminal("ROOT"), 0);
 
         GrammarNonterminal[] nonterminals = new GrammarNonterminal[5];
-        SyntaxTreeLeafNode[] leaves = new SyntaxTreeLeafNode[8];
-        SyntaxTreeInternalNode[] inodes = new SyntaxTreeInternalNode[5];
+        ConcreteSyntaxTreeLeafNode[] leaves = new ConcreteSyntaxTreeLeafNode[8];
+        ConcreteSyntaxTreeInternalNode[] inodes = new ConcreteSyntaxTreeInternalNode[5];
 
         for (int i = 0; i < 5; i++) {
             nonterminals[i] = new GrammarNonterminal(Character.toString((char) ('A' + i)));
         }
 
         for (int i = 0; i < 8; i++) {
-            leaves[i] = new SyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(Character.toString((char) ('a' + i))), 0);
+            leaves[i] = new ConcreteSyntaxTreeLeafNode(GrammarUtility.getTokenWithTypeAny(Character.toString((char) ('a' + i))), 0);
         }
 
         for (int i = 0; i < 5; i++) {
-            inodes[i] = new SyntaxTreeInternalNode(nonterminals[i], 0);
+            inodes[i] = new ConcreteSyntaxTreeInternalNode(nonterminals[i], 0);
         }
 
         root.addChild(inodes[0]);

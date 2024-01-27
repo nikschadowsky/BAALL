@@ -1,7 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.SyntaxTreeNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,14 +16,14 @@ public class SyntaxTreeFormatter {
         return traversePreOrder(tree.getRoot());
     }
 
-    private static String traversePreOrder(@Nullable SyntaxTreeInternalNode root) {
+    private static String traversePreOrder(@Nullable ConcreteSyntaxTreeInternalNode root) {
         if (root == null) return "null";
 
         StringBuilder builder = new StringBuilder();
 
         builder.append(root.getValue().getFormatted());
 
-        List<SyntaxTreeNode<?>> children = root.getChildren();
+        List<ConcreteSyntaxTreeNode<?>> children = root.getChildren();
 
         for (int i = 0; i < children.size() - 1; i++) {
             traversePreOrder(builder, "", "├───", children.get(i), true);
@@ -38,7 +38,7 @@ public class SyntaxTreeFormatter {
             @NotNull StringBuilder builder,
             @NotNull String padding,
             @NotNull String pointer,
-            @NotNull SyntaxTreeNode<?> node,
+            @NotNull ConcreteSyntaxTreeNode<?> node,
             boolean hasRightSibling
     ) {
         builder.append("\n");
@@ -50,7 +50,7 @@ public class SyntaxTreeFormatter {
 
         if (node.isLeafNode()) return;
 
-        List<SyntaxTreeNode<?>> children = ((SyntaxTreeInternalNode) node).getChildren();
+        List<ConcreteSyntaxTreeNode<?>> children = ((ConcreteSyntaxTreeInternalNode) node).getChildren();
 
         for (int i = 0; i < children.size() - 1; i++) {
             traversePreOrder(builder, nextPadding, "├───", children.get(i), true);

@@ -10,20 +10,20 @@ import java.util.List;
 /**
  * File created on 14.01.2024
  */
-public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNonterminal> {
+public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTreeNode<GrammarNonterminal> {
 
     private boolean isModifiable;
-    private final List<SyntaxTreeNode<? extends GrammarSymbol>> children = new ArrayList<>();
+    private final List<ConcreteSyntaxTreeNode<? extends GrammarSymbol>> children = new ArrayList<>();
 
-    public SyntaxTreeInternalNode(GrammarNonterminal symbol, int depth) {
+    public ConcreteSyntaxTreeInternalNode(GrammarNonterminal symbol, int depth) {
         super(symbol, depth);
     }
 
-    public void addChild(SyntaxTreeNode<?> child) {
+    public void addChild(ConcreteSyntaxTreeNode<?> child) {
         children.add(child);
     }
 
-    public @Unmodifiable List<SyntaxTreeNode<?>> getChildren() {
+    public @Unmodifiable List<ConcreteSyntaxTreeNode<?>> getChildren() {
         return children;
     }
 
@@ -43,7 +43,7 @@ public non-sealed class SyntaxTreeInternalNode extends SyntaxTreeNode<GrammarNon
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SyntaxTreeInternalNode inode) {
+        if (obj instanceof ConcreteSyntaxTreeInternalNode inode) {
             return super.equals(inode) && children.equals(inode.children) && isModifiable() == inode.isModifiable();
         }
         return false;

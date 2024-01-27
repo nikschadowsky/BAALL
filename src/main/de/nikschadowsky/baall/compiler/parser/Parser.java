@@ -1,13 +1,13 @@
 package de.nikschadowsky.baall.compiler.parser;
 
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.SyntaxTree;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeInternalNode;
-import de.nikschadowsky.baall.compiler.abstractsyntaxtree.node.SyntaxTreeLeafNode;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -18,12 +18,12 @@ import java.util.Queue;
  */
 public class Parser {
 
-    public SyntaxTree parse(Grammar grammar, List<Token> tokens) {
+    public ConcreteSyntaxTree parse(Grammar grammar, List<Token> tokens) {
 
-        return generateSyntaxTree(grammar, tokens, parse1(grammar, tokens));
+        return generateConcreteSyntaxTree(grammar, tokens, determineAppliedRules(grammar, tokens));
     }
 
-    private List<Integer> parse1(Grammar grammar, List<Token> tokens) {
+    private List<Integer> determineAppliedRules(Grammar grammar, List<Token> tokens) {
 
         List<Integer> appliedProductionRules = new LinkedList<>();
         Queue<Token> tokenQueue = new LinkedList<>(tokens);
@@ -61,31 +61,31 @@ public class Parser {
         return appliedProductionRules;
     }
 
-    private SyntaxTree generateSyntaxTree(Grammar grammar, List<Token> tokens, List<Integer> appliedRules) {
+    private ConcreteSyntaxTree generateConcreteSyntaxTree(Grammar grammar, List<Token> tokens, List<Integer> appliedRules) {
         Queue<Token> tokenQueue = new LinkedList<>(tokens);
         Queue<Integer> rules = new LinkedList<>(appliedRules);
 
         final GrammarNonterminal rootNonterminal = grammar.getStart();
 
-        SyntaxTreeInternalNode root = createInternalNodeAndFill(grammar, rootNonterminal, rules, tokenQueue, 0);
+        ConcreteSyntaxTreeInternalNode root = createInternalNodeAndFill(grammar, rootNonterminal, rules, tokenQueue, 0);
 
-        return new SyntaxTree(root);
+        return new ConcreteSyntaxTree(root);
     }
 
-    private SyntaxTreeInternalNode createInternalNodeAndFill(
+    private ConcreteSyntaxTreeInternalNode createInternalNodeAndFill(
             Grammar grammar,
             GrammarNonterminal nonterminal,
             Queue<Integer> appliedRules,
             Queue<Token> tokenQueue,
             int depth
     ) {
-        SyntaxTreeInternalNode node = new SyntaxTreeInternalNode(nonterminal, depth);
+        ConcreteSyntaxTreeInternalNode node = new ConcreteSyntaxTreeInternalNode(nonterminal, depth);
 
         GrammarProduction rule = grammar.getRuleQualifiedById(appliedRules.remove());
 
         for (GrammarSymbol symbol : rule.getSententialForm()) {
             if (symbol.isTerminal()) {
-                node.addChild(new SyntaxTreeLeafNode(tokenQueue.remove(), depth + 1));
+                node.addChild(new ConcreteSyntaxTreeLeafNode(tokenQueue.remove(), depth + 1));
             } else {
                 node.addChild(createInternalNodeAndFill(grammar, (GrammarNonterminal) symbol, appliedRules, tokenQueue, depth + 1));
             }

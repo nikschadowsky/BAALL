@@ -3,11 +3,12 @@ package de.nikschadowsky.baall.compiler.grammar.optimization;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
-import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
-import de.nikschadowsky.baall.compiler.util.exception.AmbiguityException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -17,13 +18,6 @@ import java.util.stream.Collectors;
 public class GrammarMinimizer {
 
     public Grammar minimizeGrammar(Grammar source) {
-
-        /* todo:
-        * Map for Nonterminal -> prod rules of that symbol
-        set of nonterminals which were changed
-        iterate over all rules in prod map
-        */
-
         Map<GrammarNonterminal, GrammarNonterminal>
                 nonterminalTranslationMap = createNonterminalMapping(source);
 
@@ -63,8 +57,6 @@ public class GrammarMinimizer {
                                         .replace(toBeReplaced, builder.getRuleBuilder().getSententialForms());
                         }
                     }
-                    // may not be necessary
-                    //nonterminalTranslationMap.remove(nonterminal);
                     if(!builder.isStartNonterminalBuilder())
                         itr.remove();
                 }
@@ -72,12 +64,6 @@ public class GrammarMinimizer {
 
 
         } while (totalNewNonterminals != nonterminalBuilderMap.size());
-
-
-        // each nonterminal initially maps to a copy of itself as
-        //newNonterminalMap.forEach((o,n) -> translationTable.put(n, Collections.singleton(new GrammarSymbol[]{n})));
-
-        //int nonterminalsBefore;
 
         Set<GrammarNonterminal> newNonterminals =
                 nonterminalBuilderMap.values().stream()
@@ -103,19 +89,6 @@ public class GrammarMinimizer {
                              n -> new GrammarNonterminal(
                                      n.getIdentifier())
                      ));
-    }
-
-    private boolean isTerminalProductionRule(GrammarProduction rule) {
-        return Arrays.stream(rule.getSententialForm()).allMatch(GrammarSymbol::isTerminal);
-    }
-
-    private GrammarNonterminal getNonterminalFromId(Set<GrammarNonterminal> nonterminals, String id) {
-        List<GrammarNonterminal> candidates = nonterminals.stream().filter(n -> n.getIdentifier().equals(id)).toList();
-
-        if (candidates.size() <= 1) {
-            return candidates.stream().findFirst().orElseThrow();
-        }
-        throw new AmbiguityException("More nonterminals found for %s than expected!".formatted(id));
     }
 
 }

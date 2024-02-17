@@ -19,7 +19,7 @@ public class FileLoader {
             byte[] bytes = Files.readAllBytes(Paths.get(path));
             return new String(bytes);
         } catch (IOException e) {
-            throw new RuntimeException("Specified Input-File does not exist!");
+            throw new RuntimeException("Specified Input-File '%s' does not exist!".formatted(path), e);
         }
     }
 

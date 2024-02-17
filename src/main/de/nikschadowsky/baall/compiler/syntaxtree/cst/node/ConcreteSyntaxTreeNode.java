@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 
+import java.util.Objects;
+
 /**
  * File created on 14.01.2024
  */

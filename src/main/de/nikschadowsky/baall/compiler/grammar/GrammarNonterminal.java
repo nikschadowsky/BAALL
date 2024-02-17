@@ -108,4 +108,9 @@ public class GrammarNonterminal implements GrammarSymbol {
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, productionRules);
+    }
 }

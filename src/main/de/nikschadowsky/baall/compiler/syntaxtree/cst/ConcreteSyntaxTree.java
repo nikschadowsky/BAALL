@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
 
+import java.util.Objects;
+
 /**
  * File created on 14.01.2024
  */
@@ -27,9 +29,15 @@ public class ConcreteSyntaxTree {
         if (this == obj) return true;
 
         if (obj instanceof ConcreteSyntaxTree tree) {
-            return getRoot().equals(tree.getRoot());
+            return root.equals(tree.getRoot());
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(root);
+
     }
 }

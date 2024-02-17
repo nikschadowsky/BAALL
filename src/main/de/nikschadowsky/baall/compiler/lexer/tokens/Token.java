@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.lexer.tokens;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 
+import java.util.Objects;
+
 public record Token(TokenType type, String value) implements GrammarSymbol {
 
     @Override
@@ -52,9 +54,19 @@ public record Token(TokenType type, String value) implements GrammarSymbol {
     }
 
     @Override
+    public boolean symbolEquals(GrammarSymbol s) {
+        return equals(s);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof Token token)
             return type().equals(token.type()) && value().equals(token.value());
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type(), value());
     }
 }

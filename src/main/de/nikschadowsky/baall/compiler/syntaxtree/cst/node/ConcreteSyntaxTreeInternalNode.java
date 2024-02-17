@@ -6,6 +6,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * File created on 14.01.2024
@@ -47,5 +48,10 @@ public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTre
             return super.equals(inode) && children.equals(inode.children) && isModifiable() == inode.isModifiable();
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), isModifiable, children);
     }
 }

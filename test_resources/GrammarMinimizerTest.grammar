@@ -1,0 +1,2 @@
+A -> B @Start
+B -> "c" # expecting a single Rule 'A -> c'

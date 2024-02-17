@@ -1,0 +1,7 @@
+A -> _EPSILON @Start
+B -> B
+C -> "?" "?"
+D -> "?" | "!"
+E -> "?" | "?" E
+F -> "?" | _EPSILON
+G -> _EPSILON

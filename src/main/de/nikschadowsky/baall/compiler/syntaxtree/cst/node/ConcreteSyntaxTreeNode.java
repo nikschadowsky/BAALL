@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 
+import java.util.Objects;
+
 /**
  * File created on 14.01.2024
  */
@@ -41,5 +43,10 @@ public sealed abstract class ConcreteSyntaxTreeNode<T extends GrammarSymbol> per
             return getNodeDepth() == leafNode.getNodeDepth() && getValue().equals(leafNode.getValue());
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value, depth);
     }
 }

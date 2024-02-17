@@ -78,4 +78,9 @@ public class GrammarProduction {
 
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productionRuleIdentifier);
+    }
 }

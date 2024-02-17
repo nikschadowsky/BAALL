@@ -2,7 +2,9 @@ package de.nikschadowsky.baall.compiler.grammar.optimization;
 
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
-import org.junit.jupiter.api.Test;
+import de.nikschadowsky.baall.compiler.util.ArrayUtility;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,16 +13,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 class GrammarMinimizerTest {
 
-    @Test
-    void minimizeGrammar() {
-        Grammar g = GrammarReader.getInstance().generateGrammar("test_resources/GrammarMinimizerTest.grammar");
+    @ParameterizedTest
+    @MethodSource("parameterSupplier")
+    void minimizeGrammar(int value) {
+        Grammar g =
+                GrammarReader.getInstance()
+                             .generateGrammar("test_resources/minimizer/GrammarMinimizerTest" + value + ".grammar");
 
         GrammarMinimizer minimizer = new GrammarMinimizer();
 
         Grammar minimized = minimizer.minimizeGrammar(g);
 
-        Grammar expected = GrammarReader.getInstance().generateGrammar("test_resources/GrammarMinimizerExpectedGrammar.txt");
+        Grammar expected =
+                GrammarReader.getInstance()
+                             .generateGrammar("test_resources/minimizer/GrammarMinimizerExpectedGrammar" + value + ".grammar");
 
         assertEquals(expected, minimized);
+    }
+
+    static int[] parameterSupplier() {
+        return ArrayUtility.rangeClosed(1, 5);
     }
 }

@@ -47,7 +47,7 @@ class TokenizerTest {
 
         assertEquals(types.size(), tokens.size());
 
-        assertIterableEquals(types, tokens.stream().map(Token::getType).toList());
+        assertIterableEquals(types, tokens.stream().map(Token::type).toList());
 
         System.out.println(tokens);
     }

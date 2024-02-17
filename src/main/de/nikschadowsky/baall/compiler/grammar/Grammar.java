@@ -1,10 +1,12 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
+import de.nikschadowsky.baall.compiler.util.CollectionUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 public class Grammar {
@@ -39,8 +41,27 @@ public class Grammar {
 
     public @NotNull GrammarProduction getRuleQualifiedById(int identifier) {
         return grammarProductions.stream()
-                .filter(rule -> rule.getProductionRuleIdentifier() == identifier)
-                .findAny()
-                .orElseThrow(() -> new NoSuchElementException("No production rule with id %s found in this grammar!".formatted(identifier)));
+                                 .filter(rule -> rule.getProductionRuleIdentifier() == identifier)
+                                 .findAny()
+                                 .orElseThrow(() -> new NoSuchElementException(
+                                         "No production rule with id %s found in this grammar!".formatted(identifier)));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+
+        if (obj instanceof Grammar other) {
+            return start.symbolEquals(other.start) &&
+                    CollectionUtility.shallowCompareCollections(nonterminals, other.getAllNonterminals(), GrammarNonterminal::symbolEquals) &&
+                    CollectionUtility.shallowCompareCollections(grammarProductions, other.grammarProductions);
+        }
+
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(start, nonterminals, grammarProductions);
     }
 }

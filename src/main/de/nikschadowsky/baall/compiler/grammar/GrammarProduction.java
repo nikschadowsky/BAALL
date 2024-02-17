@@ -2,29 +2,22 @@ package de.nikschadowsky.baall.compiler.grammar;
 
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
-import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.IntStream;
 
 public class GrammarProduction {
 
     private final GrammarSymbol[] sententialForm;
 
-    private final GrammarNonterminal leftSideSymbol;
-
     private final int productionRuleIdentifier;
 
-    public GrammarProduction(int productionRuleIdentifier, GrammarNonterminal leftSideSymbol, GrammarSymbol... symbols) {
+    public GrammarProduction(int productionRuleIdentifier, GrammarSymbol... symbols) {
         this.productionRuleIdentifier = productionRuleIdentifier;
-        this.leftSideSymbol = leftSideSymbol;
         this.sententialForm = symbols;
     }
 
-
     public int getProductionRuleIdentifier() {
         return productionRuleIdentifier;
-    }
-
-    public GrammarNonterminal getLeftSideSymbol() {
-        return leftSideSymbol;
     }
 
     public GrammarSymbol[] getSententialForm() {
@@ -45,12 +38,9 @@ public class GrammarProduction {
         StringBuilder builder = new StringBuilder();
 
         builder.append(productionRuleIdentifier);
-        builder.append(": ");
+        builder.append(":");
 
-        builder.append(leftSideSymbol.getIdentifier());
-        builder.append(" ->");
-
-        if (getSentenceLength() == 0) {
+        if (isEpsilonProduction()) {
             builder.append(" ε");
         }
 
@@ -61,7 +51,7 @@ public class GrammarProduction {
                 builder.append(((GrammarNonterminal) s).getIdentifier());
             } else if (s instanceof Token) {
                 builder.append("\"");
-                builder.append(((Token) s).getValue());
+                builder.append(((Token) s).value());
                 builder.append("\"");
             }
         }
@@ -71,10 +61,15 @@ public class GrammarProduction {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj instanceof GrammarProduction gp) {
+            Objects.requireNonNull(gp.getSententialForm());
 
-        if (obj instanceof GrammarProduction gp)
-            return getLeftSideSymbol().equals(gp.getLeftSideSymbol())
-                    && Arrays.equals(getSententialForm(), gp.getSententialForm());
+            if (getSentenceLength() != gp.getSentenceLength()) return false;
+
+            return IntStream.range(0, getSentenceLength())
+                                .allMatch(i -> sententialForm[i].symbolEquals(
+                                        gp.getSententialForm()[i]));
+        }
 
         return false;
     }

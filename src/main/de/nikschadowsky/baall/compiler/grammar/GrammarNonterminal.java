@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class GrammarNonterminal implements GrammarSymbol {
@@ -48,6 +49,10 @@ public class GrammarNonterminal implements GrammarSymbol {
         return Collections.unmodifiableSet(productionRules);
     }
 
+    public boolean areProductionRulesSet() {
+        return areProductionRulesSet;
+    }
+
     /**
      * Adds annotations to this nonterminal and sets them unmodifiable.
      *
@@ -69,6 +74,10 @@ public class GrammarNonterminal implements GrammarSymbol {
 
     public boolean hasAnnotation(@NotNull String value) {
         return annotations.contains(new GrammarNonterminalAnnotation(value));
+    }
+
+    public boolean areAnnotationsSet() {
+        return areAnnotationsSet;
     }
 
     @Override
@@ -97,6 +106,14 @@ public class GrammarNonterminal implements GrammarSymbol {
     public boolean symbolMatches(GrammarSymbol s) {
         if (s instanceof GrammarNonterminal g) {
             return getIdentifier().equals(g.getIdentifier());
+        }
+        return false;
+    }
+
+    @Override
+    public boolean symbolEquals(GrammarSymbol s) {
+        if (s instanceof GrammarNonterminal other) {
+            return getIdentifier().equals(other.getIdentifier()) && annotations.equals(other.annotations);
         }
         return false;
     }

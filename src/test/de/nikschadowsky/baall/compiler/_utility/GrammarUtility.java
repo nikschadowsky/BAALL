@@ -8,9 +8,7 @@ import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -20,16 +18,20 @@ public class GrammarUtility {
 
     public static GrammarNonterminal getNonterminal(Grammar grammar, String id) {
         return grammar.getAllNonterminals()
-                .stream()
-                .filter(g -> g.getIdentifier().equals(id))
-                .findFirst()
-                .orElseThrow();
+                      .stream()
+                      .filter(g -> g.getIdentifier().equals(id))
+                      .findFirst()
+                      .orElseThrow();
     }
 
     public static Queue<Token> getTokenQueue(String... tokenValues) {
         return Arrays.stream(tokenValues)
-                .map(GrammarUtility::getTokenWithTypeAny)
-                .collect(Collectors.toCollection(LinkedList::new));
+                     .map(GrammarUtility::getTokenWithTypeAny)
+                     .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    public static List<Token> getTokenList(String... tokenValues) {
+        return new ArrayList<>(getTokenQueue(tokenValues));
     }
 
     public static Token getTokenWithTypeAny(String value) {
@@ -38,9 +40,13 @@ public class GrammarUtility {
 
     public static GrammarProduction getProductionRule(@NotNull GrammarNonterminal lss, GrammarSymbol... prod) {
         return lss.getProductionRules()
-                .stream()
-                .filter(gp -> gp.equals(new GrammarProduction(-1, lss, prod)))
-                .findAny()
-                .orElse(null);
+                  .stream()
+                  .filter(gp -> gp.equals(new GrammarProduction(-1, prod)))
+                  .findAny()
+                  .orElse(null);
+    }
+
+    public static GrammarProduction createProductionRule(GrammarSymbol... prod) {
+        return new GrammarProduction(-1, prod);
     }
 }

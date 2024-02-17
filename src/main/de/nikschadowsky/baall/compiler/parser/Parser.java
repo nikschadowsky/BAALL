@@ -8,6 +8,7 @@ import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
+import de.nikschadowsky.baall.compiler.util.CollectionUtility;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -37,18 +38,25 @@ public class Parser {
                 Token currentToken = tokenQueue.remove();
 
                 if (!currentSymbol.symbolMatches(currentToken)) {
-                    throw new SyntaxException(String.format("Expected: %s; Got %s", currentSymbol, currentToken.getValue()));
+                    throw new SyntaxException(String.format(
+                            "Expected: %s; Got %s",
+                            currentSymbol,
+                            CollectionUtility.getNextThreeQueueSymbols(
+                                    tokenQueue)
+                    ));
                 }
             } else {
                 GrammarNonterminal leftSideSymbol = (GrammarNonterminal) currentSymbol;
 
                 GrammarProduction production =
-                        ProductionRuleCandidateSelector.determineCandidate(leftSideSymbol, tokenQueue).orElseThrow(() ->
-                                new SyntaxException(
-                                        String.format(
-                                                "Expected: %s; Got %s",
-                                                leftSideSymbol,
-                                                "idk haven't determined yet how to handle these syntax exceptions")));
+                        ProductionRuleCandidateSelector.determineCandidate(leftSideSymbol, tokenQueue)
+                                                       .orElseThrow(
+                                                               () -> new SyntaxException(
+                                                                       String.format(
+                                                                               "Expected: %s; Got %s",
+                                                                               leftSideSymbol.getFormatted(),
+                                                                               tokenQueue
+                                                                       )));
 
                 stack.pushSeries(production.getSententialForm());
                 appliedProductionRules.add(production.getProductionRuleIdentifier());
@@ -56,7 +64,9 @@ public class Parser {
         }
         // assert that all symbols were used
         if (!stack.isEmpty()) throw new SyntaxException("Missing symbol: %s".formatted(stack.pop()));
-        if (!tokenQueue.isEmpty()) throw new SyntaxException("Got more than expected: %s".formatted(tokenQueue.poll()));
+        if (!tokenQueue.isEmpty())
+            throw new SyntaxException("Got more than expected: %s".formatted(CollectionUtility.getNextThreeQueueSymbols(
+                    tokenQueue)));
 
         return appliedProductionRules;
     }
@@ -87,7 +97,13 @@ public class Parser {
             if (symbol.isTerminal()) {
                 node.addChild(new ConcreteSyntaxTreeLeafNode(tokenQueue.remove(), depth + 1));
             } else {
-                node.addChild(createInternalNodeAndFill(grammar, (GrammarNonterminal) symbol, appliedRules, tokenQueue, depth + 1));
+                node.addChild(createInternalNodeAndFill(
+                        grammar,
+                        (GrammarNonterminal) symbol,
+                        appliedRules,
+                        tokenQueue,
+                        depth + 1
+                ));
             }
         }
 

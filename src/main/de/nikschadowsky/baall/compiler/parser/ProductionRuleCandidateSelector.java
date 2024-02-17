@@ -4,12 +4,14 @@ import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
+import de.nikschadowsky.baall.compiler.util.CollectionUtility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,10 @@ public class ProductionRuleCandidateSelector {
 
         Set<GrammarProduction> rulesUnfiltered = lss.getProductionRules();
 
+        if (rulesUnfiltered.size() == 1) {
+            return rulesUnfiltered.stream().findAny();
+        }
+
         Queue<Token> finalTokenQueue = tokenQueue;
 
         Set<PRIntermediate> rulesEpsilonFiltered =
@@ -52,21 +58,36 @@ public class ProductionRuleCandidateSelector {
                         .map(r -> new PRIntermediate(r, finalTokenQueue))
                         .collect(Collectors.toSet());
 
+        do {
+            rulesEpsilonFiltered.removeIf(intermediate -> {
 
-        while (rulesEpsilonFiltered.size() > 1 && !tokenQueue.isEmpty()) {
-            rulesEpsilonFiltered.removeIf(intermediate -> !intermediate.step());
-        }
+                boolean b = !intermediate.step();
+                if (b) Logger.getGlobal()
+                             .warning("Discarded %s, %s".formatted(
+                                     intermediate.getRule(),
+                                     CollectionUtility.getNextThreeQueueSymbols(finalTokenQueue)
+                             ));
+                return b;
+            });
+        } while (rulesEpsilonFiltered.size() > 1 && !tokenQueue.isEmpty());
 
         // tokenQueue was empty, and we have an ambiguous result -> no candidate
         if (rulesEpsilonFiltered.size() > 1) {
             return Optional.empty();
         }
         // get the determined candidate, or if there is none get an optional epsilon rule or none all together.
-        return rulesEpsilonFiltered
+        Optional<GrammarProduction> candidate = rulesEpsilonFiltered
                 .stream()
                 .map(PRIntermediate::getRule)
                 .findAny()
                 .or(() -> rulesUnfiltered.stream().filter(GrammarProduction::isEpsilonProduction).findAny());
+        Logger.getGlobal()
+              .info("%s lss: %s, %s".formatted(
+                      candidate,
+                      lss,
+                      CollectionUtility.getNextThreeQueueSymbols(tokenQueue)
+              ));
+        return candidate;
     }
 
     /**

@@ -1,5 +1,6 @@
-package de.nikschadowsky.baall.compiler.grammar;
+package de.nikschadowsky.baall.compiler.grammar.generation;
 
+import de.nikschadowsky.baall.compiler.grammar.*;
 import de.nikschadowsky.baall.compiler.lexer.tokens.NoTokenTypeFoundException;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
@@ -54,6 +55,13 @@ public class GrammarReader {
     }
 
 
+    /**
+     * Generate a grammar from a grammar definition specified by a path.
+     *
+     * @param path path of file
+     * @return a new grammar object representing the specified grammar definition
+     * @see GrammarReader
+     */
     public @NotNull Grammar generateGrammar(@NotNull String path) {
         GrammarFileContent content = createFileContentContainer(path);
 
@@ -69,6 +77,9 @@ public class GrammarReader {
     }
 
     private @NotNull GrammarFileContent createFileContentContainer(@NotNull String path) {
+        if (!FileLoader.getFileExtension(path).equals("grammar")) {
+            System.out.println("Grammar files should use the '.grammar' extension!");
+        }
         String preprocessed = preprocess(FileLoader.loadFileContent(path));
         String[] lines = preprocessed.split(RegexFactory.NEWLINE_REGEX);
         String[][] tokens = splitLines(lines);
@@ -142,12 +153,8 @@ public class GrammarReader {
         return nonterminalSet;
     }
 
-
     private @NotNull Set<GrammarProduction> addProductionRules(@NotNull Set<GrammarNonterminal> nonterminalSet, @NotNull GrammarFileContent content) {
         Set<GrammarProduction> ruleSet = new HashSet<>();
-
-        // uniquely identifies a Production Rule created by this Grammar Reader
-        int productionRuleIdentifier = 0;
 
         for (int l = 0; l < content.lineCount(); l++) {
             String identifier = content.tokens()[l][0];
@@ -206,8 +213,7 @@ public class GrammarReader {
                     }
                 }
                 productionRules.add(new GrammarProduction(
-                        productionRuleIdentifier++,
-                        nonterminal,
+                        GrammarProductionUIDGenerator.getInstance().nextID(),
                         sententialForm.toArray(GrammarSymbol[]::new)
                 ));
             }

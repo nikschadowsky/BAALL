@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.grammar;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
+import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

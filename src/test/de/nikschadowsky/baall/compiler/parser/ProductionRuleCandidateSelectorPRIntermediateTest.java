@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
-import de.nikschadowsky.baall.compiler.grammar.GrammarReader;
+import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

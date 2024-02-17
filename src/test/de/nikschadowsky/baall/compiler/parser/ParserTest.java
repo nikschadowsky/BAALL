@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.parser;
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
-import de.nikschadowsky.baall.compiler.grammar.GrammarReader;
+import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.SyntaxTreeFormatter;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;

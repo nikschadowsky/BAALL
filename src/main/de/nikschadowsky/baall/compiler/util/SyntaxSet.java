@@ -87,6 +87,7 @@ public class SyntaxSet {
         SEPARATORS.add(";");
         SEPARATORS.add(",");
         SEPARATORS.add("::");
+        SEPARATORS.add(":");
         SEPARATORS.add("@");
         SEPARATORS.add("[");
         SEPARATORS.add("]");

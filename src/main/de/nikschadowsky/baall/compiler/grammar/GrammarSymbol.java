@@ -16,6 +16,8 @@ public interface GrammarSymbol {
      */
     boolean symbolMatches(GrammarSymbol s);
 
+    boolean symbolEquals(GrammarSymbol s);
+
     /**
      * @return a formatted representation of this symbol
      */

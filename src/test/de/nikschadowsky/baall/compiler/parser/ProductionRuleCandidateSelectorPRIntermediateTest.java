@@ -28,14 +28,17 @@ class ProductionRuleCandidateSelectorPRIntermediateTest {
 
     @BeforeAll
     static void init() {
-        testGrammar = GrammarReader.getInstance().generateGrammar("test_resources/ProductionRuleCandidateSelectorStepTestGrammar.grammar");
+        testGrammar = GrammarReader.getInstance()
+                                   .generateGrammar(
+                                           "test_resources/ProductionRuleCandidateSelectorStepTestGrammar.grammar");
     }
 
     @Test
     void testStepTerminal() {
         GrammarNonterminal symbol = GrammarUtility.getNonterminal(testGrammar, "A");
 
-        ProductionRuleCandidateSelector.PRIntermediate intermediate = createTestIntermediate(getProductionRule(symbol, getTokenWithTypeAny("a")), getTokenQueue("a"));
+        ProductionRuleCandidateSelector.PRIntermediate intermediate =
+                createTestIntermediate(getProductionRule(symbol, getTokenWithTypeAny("a")), getTokenQueue("a"));
 
         assertTrue(intermediate.step());
 
@@ -51,16 +54,18 @@ class ProductionRuleCandidateSelectorPRIntermediateTest {
 
         GrammarNonterminal symbolForMock = GrammarUtility.getNonterminal(testGrammar, "A");
 
-        try (MockedStatic<ProductionRuleCandidateSelector> mockedStatic = Mockito.mockStatic(ProductionRuleCandidateSelector.class)) {
+        try (MockedStatic<ProductionRuleCandidateSelector> mockedStatic = Mockito.mockStatic(
+                ProductionRuleCandidateSelector.class)) {
             mockedStatic.when(() -> ProductionRuleCandidateSelector
-                            .determineCandidate(Mockito.eq(symbolForMock), Mockito.any()))
-                    .thenReturn(Optional.of(getProductionRule(symbolForMock, getTokenWithTypeAny("a"))));
+                                .determineCandidate(Mockito.eq(symbolForMock), Mockito.any()))
+                        .thenReturn(Optional.of(getProductionRule(symbolForMock, getTokenWithTypeAny("a"))));
 
 
             ProductionRuleCandidateSelector.PRIntermediate intermediate =
                     createTestIntermediate(
                             getProductionRule(symbol, getNonterminal(testGrammar, "A"),
-                                    getNonterminal(testGrammar, "A")), getTokenQueue("a", "b"));
+                                              getNonterminal(testGrammar, "A")
+                            ), getTokenQueue("a", "b"));
 
             // stack contains 'A A', queue contains 'a b'
             assertTrue(intermediate.step());
@@ -77,7 +82,12 @@ class ProductionRuleCandidateSelectorPRIntermediateTest {
     ProductionRuleCandidateSelector.PRIntermediate createTestIntermediate(GrammarProduction rule, Queue<Token> tokenQueue) {
 
         try {
-            return ClassUtility.getInstance(ProductionRuleCandidateSelector.PRIntermediate.class, new Class[]{GrammarProduction.class, Queue.class}, rule, tokenQueue);
+            return ClassUtility.getInstance(
+                    ProductionRuleCandidateSelector.PRIntermediate.class,
+                    new Class[]{GrammarProduction.class, Queue.class},
+                    rule,
+                    tokenQueue
+            );
         } catch (Exception e) {
             Logger.getAnonymousLogger().severe(e.getMessage());
             throw new RuntimeException(e);

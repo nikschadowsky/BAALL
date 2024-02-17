@@ -187,10 +187,11 @@ public class GrammarReader {
                         TokenType type;
                         try {
                             type = TokenType.getTokenTypeForDescription(token.substring(1));
-                        } catch (NoTokenTypeFoundException e) {
+                        } catch (NoTokenTypeFoundException exception) {
                             throw new GrammarSyntaxException(
                                     createLineString(l, content.lines()[l]),
-                                    "Unrecognized meta symbol '" + token + "'!"
+                                    "Unrecognized meta symbol '" + token + "'!",
+                                    exception
                             );
                         }
 

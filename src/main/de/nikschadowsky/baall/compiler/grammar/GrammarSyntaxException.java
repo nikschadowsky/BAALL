@@ -10,4 +10,11 @@ public class GrammarSyntaxException extends RuntimeException {
         this("", reason);
     }
 
+    public GrammarSyntaxException(String additionalInformation, String reason, Throwable cause) {
+        super("Invalid grammar syntax! %s%nReason: %s".formatted(additionalInformation, reason), cause);
+    }
+
+    public GrammarSyntaxException(String reason, Throwable cause) {
+        this("", reason, cause);
+    }
 }

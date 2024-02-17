@@ -2,26 +2,7 @@ package de.nikschadowsky.baall.compiler.lexer.tokens;
 
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 
-public class Token implements GrammarSymbol {
-
-    private final TokenType type;
-
-    private final String value;
-
-
-    public Token(TokenType type, String value) {
-        this.type = type;
-        this.value = value;
-
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public TokenType getType() {
-        return type;
-    }
+public record Token(TokenType type, String value) implements GrammarSymbol {
 
     @Override
     public String toString() {
@@ -38,7 +19,7 @@ public class Token implements GrammarSymbol {
 
     @Override
     public String getFormatted() {
-        return "'" + getValue() + "'";
+        return "'" + value() + "'";
     }
 
     /**
@@ -54,18 +35,16 @@ public class Token implements GrammarSymbol {
         if (s instanceof Token token) {
 
             // if one of the token is type ANY, compare literal value
-            if (getType().equals(TokenType.ANY) || token.getType().equals(TokenType.ANY)) {
-                return value.equals(token.getValue());
+            if (type().equals(TokenType.ANY) || token.type().equals(TokenType.ANY)) {
+                return value.equals(token.value());
             }
 
-            if ((getType().equals(TokenType.STRING) && token.getType().equals(TokenType.STRING))
-                    || (getType().equals(TokenType.BOOLEAN) && token.getType().equals(TokenType.BOOLEAN))
-                    || (getType().equals(TokenType.NUMBER) && token.getType().equals(TokenType.NUMBER))) {
+            if (!type().hasExactTokenMatching() && type().equals(token.type())) {
                 return true;
             }
 
             // else the type must be equal too
-            return getType().equals(token.getType()) && getValue().equals(token.getValue());
+            return type().equals(token.type()) && value().equals(token.value());
 
         }
 
@@ -75,7 +54,7 @@ public class Token implements GrammarSymbol {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Token token)
-            return getType().equals(token.getType()) && getValue().equals(token.getValue());
+            return type().equals(token.type()) && value().equals(token.value());
         return false;
     }
 }

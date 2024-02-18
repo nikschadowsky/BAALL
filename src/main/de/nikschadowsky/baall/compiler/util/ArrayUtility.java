@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler.util;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * File created on 14.01.2024
@@ -32,6 +33,14 @@ public class ArrayUtility {
         }
 
         return Arrays.copyOfRange(array, lowerIndex, upperIndex);
+    }
+
+    public static int[] range(int startInclusive, int endExclusive) {
+        return IntStream.range(startInclusive, endExclusive).toArray();
+    }
+
+    public static int[] rangeClosed(int startInclusive, int endInclusive) {
+        return range(startInclusive, endInclusive + 1);
     }
 
 }

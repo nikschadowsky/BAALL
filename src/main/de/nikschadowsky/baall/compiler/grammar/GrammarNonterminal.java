@@ -82,7 +82,21 @@ public class GrammarNonterminal implements GrammarSymbol {
 
     @Override
     public String toString() {
-        return "GrammarNonterminal { " + getIdentifier() + ", " + getProductionRules() + "}";
+        return "%s -> %s %s"
+                .formatted(
+                        identifier,
+                        String.join(
+                                " | ",
+                                productionRules.stream()
+                                               .map(GrammarProduction::toString)
+                                               .toList()),
+                        String.join(
+                                " ",
+                                annotations.stream()
+                                           .map(GrammarNonterminalAnnotation::toString)
+                                           .toList()
+                        )
+                );
     }
 
     @Override

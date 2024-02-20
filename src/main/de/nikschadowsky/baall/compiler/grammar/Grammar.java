@@ -48,12 +48,25 @@ public class Grammar {
     }
 
     @Override
+    public String toString() {
+        return "Grammar{%n     %s%n}"
+                .formatted(String.join(
+                        "\n     ",
+                        nonterminals.stream().map(GrammarNonterminal::toString).toList()
+                ));
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
 
         if (obj instanceof Grammar other) {
             return start.symbolEquals(other.start) &&
-                    CollectionUtility.shallowCompareCollections(nonterminals, other.getAllNonterminals(), GrammarNonterminal::symbolEquals) &&
+                    CollectionUtility.shallowCompareCollections(
+                            nonterminals,
+                            other.getAllNonterminals(),
+                            GrammarNonterminal::symbolEquals
+                    ) &&
                     CollectionUtility.shallowCompareCollections(grammarProductions, other.grammarProductions);
         }
 

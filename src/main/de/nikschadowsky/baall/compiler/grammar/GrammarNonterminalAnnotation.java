@@ -9,7 +9,7 @@ public record GrammarNonterminalAnnotation(String value) {
 
     @Override
     public String toString() {
-        return "[GrammarNonterminalAnnotation]@" + value;
+        return "@" + value;
     }
 
     @Override

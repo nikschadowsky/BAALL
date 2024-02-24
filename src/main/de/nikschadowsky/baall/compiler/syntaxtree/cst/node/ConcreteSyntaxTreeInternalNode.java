@@ -20,6 +20,11 @@ public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTre
         super(symbol, depth);
     }
 
+    @Override
+    public boolean isLeafNode() {
+        return getChildren().isEmpty();
+    }
+
     public void addChild(ConcreteSyntaxTreeNode<?> child) {
         children.add(child);
     }

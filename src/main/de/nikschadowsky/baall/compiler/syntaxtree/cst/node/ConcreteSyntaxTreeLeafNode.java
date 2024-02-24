@@ -11,4 +11,9 @@ public non-sealed class ConcreteSyntaxTreeLeafNode extends ConcreteSyntaxTreeNod
         super(value, depth);
     }
 
+    @Override
+    public boolean isLeafNode() {
+        return true;
+    }
+
 }

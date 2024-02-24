@@ -18,9 +18,7 @@ public sealed abstract class ConcreteSyntaxTreeNode<T extends GrammarSymbol> per
         this.depth = depth;
     }
 
-    public boolean isLeafNode() {
-        return this instanceof ConcreteSyntaxTreeLeaf;
-    }
+    public abstract boolean isLeafNode();
 
     public T getValue() {
         return value;

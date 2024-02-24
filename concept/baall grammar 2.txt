@@ -105,11 +105,11 @@ INCREMENT_OPERATION -> UNARY_OPERATOR IDENTIFIER | IDENTIFIER UNARY_OPERATOR
 
 PRIMITIVE -> "none" | _STRING | _NUMBER | _BOOLEAN
 
-BINARY_OPERATOR -> "+" | "-" | "*" | "/" | "%" | "&" | "\|" | "^"  | "<<" | ">>" | "==" | "<" | ">" | "&&" | "||"
+BINARY_OPERATOR -> "+" | "-" | "*" | "/" | "%" | "&" | "\|" | "^"  | "<<" | ">>" | "==" | "<" | ">" | "&&" | "\|\|"
 
 UNARY_OPERATOR -> "++" | "--"
 
-SHORTHAND_OPERATOR -> "=" | ":=" | "+=" | "-=" | "*=" | "/=" | "&=" | "|=" | "^="
+SHORTHAND_OPERATOR -> "=" | ":=" | "+=" | "-=" | "*=" | "/=" | "&=" | "\|=" | "^="
 
 PREFIX_OPERATOR -> "+" | "-" | "!"
 

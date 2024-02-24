@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
 import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ class GrammarBuilderTest {
 
     @BeforeAll
     static void setupAll() {
-        grammar = GrammarReader.getInstance().generateGrammar("test_resources/GrammarBuilderTestGrammar.grammar");
+        grammar = GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("GrammarBuilderTestGrammar.grammar"));
         nonterminalTranslationMap = grammar.getAllNonterminals()
                                            .stream()
                                            .collect(Collectors.toUnmodifiableMap(

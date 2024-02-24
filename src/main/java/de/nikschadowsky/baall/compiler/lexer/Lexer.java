@@ -6,23 +6,24 @@ import de.nikschadowsky.baall.compiler.lexer.tokens.Tokenizer;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
+import java.nio.file.Path;
 import java.util.List;
 
 public class Lexer {
 
-    private final String path;
+    private final Path path;
 
     private String content;
 
     private boolean isPreprocessed;
 
-    public Lexer(String path) {
+    public Lexer(Path path) {
         this.path = path;
         readContent();
     }
 
     private void readContent() {
-        content = FileLoader.loadFileContent(path);
+        content = FileLoader.getFileContent(path);
     }
 
     private void removeComments() {

@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler.grammar.optimization;
 import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
 import de.nikschadowsky.baall.compiler.util.ArrayUtility;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -18,7 +19,7 @@ class GrammarMinimizerTest {
     void minimizeGrammar(int value) {
         Grammar g =
                 GrammarReader.getInstance()
-                             .generateGrammar("test_resources/minimizer/GrammarMinimizerTest" + value + ".grammar");
+                             .generateGrammar(FileLoader.getPathFromClasspath("minimizer/GrammarMinimizerTest" + value + ".grammar"));
 
         GrammarMinimizer minimizer = new GrammarMinimizer();
 
@@ -26,7 +27,7 @@ class GrammarMinimizerTest {
 
         Grammar expected =
                 GrammarReader.getInstance()
-                             .generateGrammar("test_resources/minimizer/GrammarMinimizerExpectedGrammar" + value + ".grammar");
+                             .generateGrammar(FileLoader.getPathFromClasspath("minimizer/GrammarMinimizerExpectedGrammar" + value + ".grammar"));
 
         assertEquals(expected, minimized);
     }

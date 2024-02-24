@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.lexer.tokens;
 
 import de.nikschadowsky.baall.compiler.lexer.Lexer;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +18,9 @@ class TokenizerTest {
 
     @BeforeEach
     void setUp() {
-        final String path = "test_resources/TokenizerTestFile.txt";
+        final String path = "TokenizerTestFile.txt";
 
-        Lexer lexer = new Lexer(path);
+        Lexer lexer = new Lexer(FileLoader.getPathFromClasspath(path));
 
         fileContent = lexer.getPreprocessedCode();
     }

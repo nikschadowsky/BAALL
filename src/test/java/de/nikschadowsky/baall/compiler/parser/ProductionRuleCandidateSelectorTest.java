@@ -5,6 +5,7 @@ import de.nikschadowsky.baall.compiler.grammar.Grammar;
 import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
 import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,7 @@ class ProductionRuleCandidateSelectorTest {
     @BeforeAll
     static void setup() {
         g = GrammarReader.getInstance()
-                         .generateGrammar("test_resources/ProductionRuleCandidateSelectorTestGrammar.grammar");
+                         .generateGrammar(FileLoader.getPathFromClasspath("ProductionRuleCandidateSelectorTestGrammar.grammar"));
     }
 
     @Test

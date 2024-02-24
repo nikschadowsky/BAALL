@@ -9,11 +9,11 @@ import de.nikschadowsky.baall.compiler.syntaxtree.cst.SyntaxTreeFormatter;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeNode;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 
-import static de.nikschadowsky.baall.compiler._utility.GrammarUtility.getTokenQueue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -26,10 +26,10 @@ class ParserTest {
 
     @Test
     void generateSyntaxTree() {
-        g = GrammarReader.getInstance().generateGrammar("test_resources/ParserTestGrammar.grammar");
+        g = GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("ParserTestGrammar.grammar"));
 
         ConcreteSyntaxTree tree = new Parser().parse(g, new LinkedList<>(
-                getTokenQueue("c", "d", "e", "f", "g", "h", "b", "a", "c", "d", "e", "f", "g", "h")));
+                GrammarUtility.getTokenQueue("c", "d", "e", "f", "g", "h", "b", "a", "c", "d", "e", "f", "g", "h")));
 
         System.out.println(SyntaxTreeFormatter.treeToVisualizedString(tree));
 

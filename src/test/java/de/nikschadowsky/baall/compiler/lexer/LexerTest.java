@@ -10,17 +10,17 @@ public class LexerTest {
 
     private Lexer lexer;
 
-    private static final String TEST_PATH = "test_resources/LexerTestFile.txt";
+    private static final String TEST_PATH = "LexerTestFile.txt";
 
     @BeforeEach
     void setUp() {
 
-        lexer = new Lexer(TEST_PATH);
+        lexer = new Lexer(FileLoader.getPathFromClasspath(TEST_PATH));
     }
 
     @Test
     void testPreprocessing() {
-        assertEquals(FileLoader.loadFileContent("test_resources/LexerTestExpected.txt"), lexer.getPreprocessedCode());
+        assertEquals(FileLoader.getFileContentFromClasspath("LexerTestExpected.txt"), lexer.getPreprocessedCode());
     }
 
 }

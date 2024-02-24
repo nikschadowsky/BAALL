@@ -5,6 +5,7 @@ out/
 .idea/
 BAALL.iml
 /.idea/
+target/
 
 ### Eclipse ###
 .apt_generated

@@ -17,7 +17,8 @@ class GrammarProductionTest {
 
         GrammarNonterminal lss = new GrammarNonterminal("A");
 
-        GrammarProduction a1 = new GrammarProduction(0, lss, new Token(TokenType.ANY, "A"), lss, new Token(TokenType.ANY, "A"));
+        GrammarProduction
+                a1 = new GrammarProduction(0, lss, new Token(TokenType.ANY, "A"), lss, new Token(TokenType.ANY, "A"));
         GrammarProduction a2 = new GrammarProduction(1, lss, new Token(TokenType.ANY, "A"), lss, new Token(TokenType.ANY, "A"));
 
         GrammarProduction b = new GrammarProduction(2, lss, lss, new Token(TokenType.ANY, "A"));

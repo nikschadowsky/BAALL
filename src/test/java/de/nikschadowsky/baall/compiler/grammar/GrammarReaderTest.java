@@ -2,6 +2,8 @@ package de.nikschadowsky.baall.compiler.grammar;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
 import de.nikschadowsky.baall.compiler.grammar.generation.GrammarReader;
+import de.nikschadowsky.baall.compiler.util.FileLoader;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;
@@ -15,7 +17,7 @@ class GrammarReaderTest {
 
     @Test
     void testCreateGrammar() {
-        Grammar g = GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestFile.grammar");
+        Grammar g = GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("GrammarReaderTestFile.grammar"));
 
         assertTrue(g.getStart().getIdentifier().equalsIgnoreCase("start"));
 
@@ -28,9 +30,9 @@ class GrammarReaderTest {
 
         assertEquals(4, g.getAllNonterminals().size());
 
-        assertTrue(GrammarUtility.getNonterminal(g, "START")
-                                 .getAnnotations()
-                                 .contains(new GrammarNonterminalAnnotation("StartAnnotation")));
+        Assertions.assertTrue(GrammarUtility.getNonterminal(g, "START")
+                                            .getAnnotations()
+                                            .contains(new GrammarNonterminalAnnotation("StartAnnotation")));
         assertTrue(GrammarUtility.getNonterminal(g, "END")
                                  .getAnnotations()
                                  .contains(new GrammarNonterminalAnnotation("EndAnnotation")));
@@ -52,7 +54,7 @@ class GrammarReaderTest {
     @Test
     void testCreateGrammarWithStartNotInFirstLine() {
         Grammar g =
-                GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderStartInLastLineTestFile.grammar");
+                GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("GrammarReaderStartInLastLineTestFile.grammar"));
 
         assertEquals(GrammarUtility.getNonterminal(g, "B"), g.getStart());
         assertTrue(GrammarUtility.getNonterminal(g, "START").getAnnotations().isEmpty());
@@ -62,8 +64,8 @@ class GrammarReaderTest {
     void testCreateGrammarWithMultipleAnnotations() {
         Grammar g =
                 GrammarReader.getInstance()
-                             .generateGrammar(
-                                     "test_resources/GrammarReaderNonterminalWithMultipleAnnotationsTestFile.grammar");
+                             .generateGrammar(FileLoader.getPathFromClasspath(
+                                     "GrammarReaderNonterminalWithMultipleAnnotationsTestFile.grammar"));
 
         assertEquals(GrammarUtility.getNonterminal(g, "A"), g.getStart());
         assertEquals(4, g.getStart().getAnnotations().size());
@@ -73,7 +75,7 @@ class GrammarReaderTest {
     void testCreateGrammarSyntaxError() {
         Exception e = assertThrows(
                 GrammarSyntaxException.class,
-                () -> GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestSyntaxError.grammar")
+                () -> GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("GrammarReaderTestSyntaxError.grammar"))
         );
 
         String expected = "Missing symbols";
@@ -87,7 +89,7 @@ class GrammarReaderTest {
     void testCreateGrammarEpsilonError() {
         Exception e = assertThrows(
                 GrammarSyntaxException.class,
-                () -> GrammarReader.getInstance().generateGrammar("test_resources/GrammarReaderTestEpsilonError.grammar")
+                () -> GrammarReader.getInstance().generateGrammar(FileLoader.getPathFromClasspath("GrammarReaderTestEpsilonError.grammar"))
         );
 
         String expected = "Meta symbols cannot be used as identifiers for nonterminals!";

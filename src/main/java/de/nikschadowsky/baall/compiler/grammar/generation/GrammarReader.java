@@ -10,6 +10,7 @@ import de.nikschadowsky.baall.compiler.util.LambdaUtility;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public class GrammarReader {
      * @return a new grammar object representing the specified grammar definition
      * @see GrammarReader
      */
-    public @NotNull Grammar generateGrammar(@NotNull String path) {
+    public @NotNull Grammar generateGrammar(@NotNull Path path) {
         GrammarFileContent content = createFileContentContainer(path);
 
         validateGrammarFileContent(content);
@@ -76,11 +77,11 @@ public class GrammarReader {
         return new Grammar(startSymbol, nonterminalSet, ruleSet);
     }
 
-    private @NotNull GrammarFileContent createFileContentContainer(@NotNull String path) {
+    private @NotNull GrammarFileContent createFileContentContainer(@NotNull Path path) {
         if (!FileLoader.getFileExtension(path).equals("grammar")) {
             System.out.println("Grammar files should use the '.grammar' extension!");
         }
-        String preprocessed = preprocess(FileLoader.loadFileContent(path));
+        String preprocessed = preprocess(FileLoader.getFileContent(path));
         String[] lines = preprocessed.split(RegexFactory.NEWLINE_REGEX);
         String[][] tokens = splitLines(lines);
 
@@ -276,7 +277,7 @@ public class GrammarReader {
         return "Exception in line %s: %s".formatted(lineNumber, line);
     }
 
-    private record GrammarFileContent(@NotNull String path,
+    private record GrammarFileContent(@NotNull Path path,
                                       @NotNull String preprocessed,
                                       @NotNull String[] lines,
                                       @NotNull String[][] tokens) {

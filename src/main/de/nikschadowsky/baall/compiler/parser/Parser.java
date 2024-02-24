@@ -30,7 +30,7 @@ public class Parser {
         Queue<Token> tokenQueue = new LinkedList<>(tokens);
         ParserStack stack = new ParserStack(grammar.getStart());
 
-        while (!stack.empty() && !tokenQueue.isEmpty()) {
+        while (!stack.empty()) {
 
             GrammarSymbol currentSymbol = stack.pop();
 

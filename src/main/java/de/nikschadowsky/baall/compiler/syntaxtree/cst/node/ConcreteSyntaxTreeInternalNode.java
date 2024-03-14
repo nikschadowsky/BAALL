@@ -1,7 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 
-import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
-import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.ArrayList;
@@ -11,12 +9,12 @@ import java.util.Objects;
 /**
  * File created on 14.01.2024
  */
-public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTreeNode<GrammarNonterminal> {
+public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTreeNode<Object> {
 
     private boolean isModifiable;
-    private final List<ConcreteSyntaxTreeNode<? extends GrammarSymbol>> children = new ArrayList<>();
+    private final List<ConcreteSyntaxTreeNode<?>> children = new ArrayList<>();
 
-    public ConcreteSyntaxTreeInternalNode(GrammarNonterminal symbol, int depth) {
+    public ConcreteSyntaxTreeInternalNode(Object symbol, int depth) {
         super(symbol, depth);
     }
 

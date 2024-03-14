@@ -1,13 +1,12 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 
-import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 
 import java.util.Objects;
 
 /**
  * File created on 14.01.2024
  */
-public sealed abstract class ConcreteSyntaxTreeNode<T extends GrammarSymbol> permits ConcreteSyntaxTreeLeafNode, ConcreteSyntaxTreeInternalNode {
+public sealed abstract class ConcreteSyntaxTreeNode<T> permits ConcreteSyntaxTreeLeafNode, ConcreteSyntaxTreeInternalNode {
 
     private final T value;
 
@@ -30,7 +29,7 @@ public sealed abstract class ConcreteSyntaxTreeNode<T extends GrammarSymbol> per
 
     @Override
     public String toString() {
-        return "%s(%s)".formatted(value.getFormatted(), getNodeDepth());
+        return "%s(%s)".formatted(value, getNodeDepth());
     }
 
     @Override

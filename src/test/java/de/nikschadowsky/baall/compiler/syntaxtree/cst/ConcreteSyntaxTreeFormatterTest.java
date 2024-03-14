@@ -1,12 +1,12 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.cst;
 
 import de.nikschadowsky.baall.compiler._utility.GrammarUtility;
-import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInternalNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeLeafNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * File created on 19.01.2024
@@ -48,17 +48,18 @@ class ConcreteSyntaxTreeFormatterTest {
 
         System.out.println(visualization);
         assertEquals(target, visualization, "Expected: " + target);
+        fail("Implementation not final!");
     }
 
     private ConcreteSyntaxTree getTree(){
-        ConcreteSyntaxTreeInternalNode root = new ConcreteSyntaxTreeInternalNode(new GrammarNonterminal("ROOT"), 0);
+        ConcreteSyntaxTreeInternalNode root = new ConcreteSyntaxTreeInternalNode("ROOT", 0);
 
-        GrammarNonterminal[] nonterminals = new GrammarNonterminal[5];
+        String[] nonterminals = new String[5];
         ConcreteSyntaxTreeLeafNode[] leaves = new ConcreteSyntaxTreeLeafNode[8];
         ConcreteSyntaxTreeInternalNode[] inodes = new ConcreteSyntaxTreeInternalNode[5];
 
         for (int i = 0; i < 5; i++) {
-            nonterminals[i] = new GrammarNonterminal(Character.toString((char) ('A' + i)));
+            nonterminals[i] = Character.toString((char) ('A' + i));
         }
 
         for (int i = 0; i < 8; i++) {

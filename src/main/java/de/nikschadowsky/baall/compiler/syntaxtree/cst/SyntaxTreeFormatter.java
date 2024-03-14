@@ -21,7 +21,7 @@ public class SyntaxTreeFormatter {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append(root.getValue().getFormatted());
+        builder.append(root.getValue().toString());
 
         List<ConcreteSyntaxTreeNode<?>> children = root.getChildren();
 
@@ -44,7 +44,7 @@ public class SyntaxTreeFormatter {
         builder.append("\n");
         builder.append(padding);
         builder.append(pointer);
-        builder.append(node.getValue().getFormatted());
+        builder.append(node.getValue().toString());
 
         String nextPadding = hasRightSibling ? padding + "│   " : padding + "    ";
 

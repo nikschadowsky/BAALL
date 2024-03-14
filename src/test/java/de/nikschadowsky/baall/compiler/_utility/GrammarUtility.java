@@ -1,12 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
-import de.nikschadowsky.baall.compiler.grammar.Grammar;
-import de.nikschadowsky.baall.compiler.grammar.GrammarNonterminal;
-import de.nikschadowsky.baall.compiler.grammar.GrammarProduction;
-import de.nikschadowsky.baall.compiler.grammar.GrammarSymbol;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 import de.nikschadowsky.baall.compiler.lexer.tokens.TokenType;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,13 +11,6 @@ import java.util.stream.Collectors;
  */
 public class GrammarUtility {
 
-    public static GrammarNonterminal getNonterminal(Grammar grammar, String id) {
-        return grammar.getAllNonterminals()
-                      .stream()
-                      .filter(g -> g.getIdentifier().equals(id))
-                      .findFirst()
-                      .orElseThrow();
-    }
 
     public static Queue<Token> getTokenQueue(String... tokenValues) {
         return Arrays.stream(tokenValues)
@@ -38,15 +26,5 @@ public class GrammarUtility {
         return new Token(TokenType.ANY, value);
     }
 
-    public static GrammarProduction getProductionRule(@NotNull GrammarNonterminal lss, GrammarSymbol... prod) {
-        return lss.getProductionRules()
-                  .stream()
-                  .filter(gp -> gp.equals(new GrammarProduction(-1, prod)))
-                  .findAny()
-                  .orElse(null);
-    }
 
-    public static GrammarProduction createProductionRule(GrammarSymbol... prod) {
-        return new GrammarProduction(-1, prod);
-    }
 }

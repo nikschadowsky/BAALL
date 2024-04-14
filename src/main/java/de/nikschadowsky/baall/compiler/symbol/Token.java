@@ -1,8 +1,10 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.symbol;
+
+import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 
 import java.util.Objects;
 
-public record Token(TokenType type, String value) {
+public record Token(TokenType type, String value, int line, int index) {
 
     @Override
     public String toString() {
@@ -23,4 +25,5 @@ public record Token(TokenType type, String value) {
     public int hashCode() {
         return Objects.hash(type(), value());
     }
+
 }

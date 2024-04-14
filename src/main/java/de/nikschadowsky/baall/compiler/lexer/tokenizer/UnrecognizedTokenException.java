@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.lexer.tokenizer;
 
 public class UnrecognizedTokenException extends RuntimeException {
 

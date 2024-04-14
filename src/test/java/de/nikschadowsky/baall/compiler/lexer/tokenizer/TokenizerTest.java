@@ -1,6 +1,7 @@
-package de.nikschadowsky.baall.compiler.lexer.tokens;
+package de.nikschadowsky.baall.compiler.lexer.tokenizer;
 
 import de.nikschadowsky.baall.compiler.lexer.Lexer;
+import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

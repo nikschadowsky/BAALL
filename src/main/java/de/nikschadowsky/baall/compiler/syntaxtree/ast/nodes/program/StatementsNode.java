@@ -1,0 +1,15 @@
+package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program;
+
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.Node;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementNode;
+
+import java.util.List;
+
+/**
+ * File created on 29.07.2024
+ */
+public interface StatementsNode extends Node {
+
+    List<StatementNode> getStatements();
+
+}

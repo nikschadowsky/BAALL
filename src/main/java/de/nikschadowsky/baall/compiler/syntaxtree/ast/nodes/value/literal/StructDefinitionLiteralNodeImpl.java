@@ -1,0 +1,37 @@
+package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal;
+
+import de.nikschadowsky.baall.compiler.symbol.Token;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * File created on 29.07.2024
+ */
+public class StructDefinitionLiteralNodeImpl extends AbstractNode implements StructDefinitionLiteralNode {
+
+    private List<Map.Entry<TypeNode, Token>> fields;
+
+    public StructDefinitionLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
+        super(diagnostics);
+    }
+
+    @Override
+    public List<Map.Entry<TypeNode, Token>> getFields() {
+        return fields;
+    }
+
+    public void setFields(List<Map.Entry<TypeNode, Token>> fields) {
+        this.fields = fields;
+    }
+
+    @Override
+    public @NotNull NodeType getNodeType() {
+        return null;
+    }
+}

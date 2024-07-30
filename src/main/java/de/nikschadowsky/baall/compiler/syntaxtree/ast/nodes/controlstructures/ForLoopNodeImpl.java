@@ -1,0 +1,82 @@
+package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.controlstructures;
+
+import de.nikschadowsky.baall.compiler.symbol.Token;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Optional;
+
+/**
+ * File created on 21.04.2024
+ */
+public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
+
+    private Token identifier;
+
+    private ExpressionNode startIndex;
+
+    private ExpressionNode endIndex;
+
+    private ReassignmentNode optionalStepperFunction;
+
+    private StatementsNode body;
+
+    public ForLoopNodeImpl(NodeDiagnosticCollector diagnostics) {
+        super(diagnostics);
+    }
+
+    @Override
+    public Token getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(Token identifier) {
+        this.identifier = identifier;
+    }
+
+    @Override
+    public ExpressionNode getStartIndexExpression() {
+        return startIndex;
+    }
+
+    public void setStartIndex(ExpressionNode startIndex) {
+        this.startIndex = startIndex;
+    }
+
+    @Override
+    public ExpressionNode getEndIndexExpression() {
+        return endIndex;
+    }
+
+    public void setEndIndex(ExpressionNode endIndex) {
+        this.endIndex = endIndex;
+    }
+
+    @Override
+    public Optional<ReassignmentNode> getOptionalStepperFunction() {
+        return Optional.ofNullable(optionalStepperFunction);
+    }
+
+    public void setOptionalStepperFunction(ReassignmentNode optionalStepperFunction) {
+        this.optionalStepperFunction = optionalStepperFunction;
+    }
+
+    @Override
+    public StatementsNode getBody() {
+        return body;
+    }
+
+    public void setBody(StatementsNode body) {
+        this.body = body;
+    }
+
+    @Override
+    public @NotNull NodeType getNodeType() {
+        return NodeType.FOR;
+    }
+}

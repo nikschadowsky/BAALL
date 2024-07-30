@@ -1,0 +1,32 @@
+package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression;
+
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * File created on 29.07.2024
+ */
+public class ParenthesizedExpressionNodeImpl extends AbstractNode implements ParenthesizedExpressionNode {
+
+    private ExpressionNode innerExpression;
+
+    public ParenthesizedExpressionNodeImpl(NodeDiagnosticCollector diagnostics) {
+        super(diagnostics);
+    }
+
+    public void setInnerExpression(ExpressionNode innerExpression) {
+        this.innerExpression = innerExpression;
+    }
+
+    @Override
+    public ExpressionNode getInnerExpressionNode() {
+        return innerExpression;
+    }
+
+    @Override
+    public @NotNull NodeType getNodeType() {
+        return NodeType.PAREN_EXPRESSION;
+    }
+}

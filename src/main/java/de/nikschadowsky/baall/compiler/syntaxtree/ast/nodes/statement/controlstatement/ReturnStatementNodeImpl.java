@@ -1,0 +1,33 @@
+package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement;
+
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * File created on 30.07.2024
+ */
+public class ReturnStatementNodeImpl extends AbstractNode implements ReturnStatementNode {
+
+    private ExpressionNode returnExpression;
+
+    public ReturnStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
+        super(diagnostics);
+    }
+
+    @Override
+    public ExpressionNode getReturnExpression() {
+        return returnExpression;
+    }
+
+    public void setReturnExpression(ExpressionNode returnExpression) {
+        this.returnExpression = returnExpression;
+    }
+
+    @Override
+    public @NotNull NodeType getNodeType() {
+        return NodeType.RETURN;
+    }
+}

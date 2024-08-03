@@ -13,6 +13,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ProgramNodeI
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.ConstantDeclarationNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.VariableDeclarationNodeImpl;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.VariableReassignmentNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.BreakStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ContinueStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ReturnStatementNodeImpl;
@@ -61,8 +62,8 @@ public class ASTNodeFactory {
         return new ConstantDeclarationNodeImpl(diagnostics);
     }
 
-    public VariableDeclarationNodeImpl createVariableReassignmentNode() {
-        return new VariableDeclarationNodeImpl(diagnostics);
+    public VariableReassignmentNodeImpl createVariableReassignmentNode() {
+        return new VariableReassignmentNodeImpl(diagnostics);
     }
 
     public WhileLoopNodeImpl createWhileLoopNode() {
@@ -127,6 +128,10 @@ public class ASTNodeFactory {
 
     public StructInitializationLiteralNodeImpl createStructInitializationLiteralNode() {
         return new StructInitializationLiteralNodeImpl(diagnostics);
+    }
+
+    public StructInitializationLiteralNode createStructInitializationNone() {
+        return StructInitializationLiteralNodeImpl.createNone(diagnostics);
     }
 
     public ArrayLiteralNodeImpl createArrayLiteralNode() {

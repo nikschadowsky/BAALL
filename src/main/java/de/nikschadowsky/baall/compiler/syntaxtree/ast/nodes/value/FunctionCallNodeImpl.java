@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNode {
 
-    private IdentifierAccessNodeImpl functionIdentifier;
+    private IdentifierAccessNode functionIdentifier;
 
     private List<ExpressionNode> arguments;
 
@@ -26,7 +26,7 @@ public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNo
         return functionIdentifier;
     }
 
-    public void setFunctionIdentifier(IdentifierAccessNodeImpl functionIdentifier) {
+    public void setFunctionIdentifier(IdentifierAccessNode functionIdentifier) {
         this.functionIdentifier = functionIdentifier;
     }
 

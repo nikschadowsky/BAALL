@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpressionNode {
 
-    private IdentifierAccessNode identifier;
+    private IdentifierAccessNode identifierAccess;
 
     private boolean isPrefix;
 
@@ -23,12 +23,12 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
     }
 
     @Override
-    public IdentifierAccessNode getIdentifier() {
-        return identifier;
+    public IdentifierAccessNode getIdentifierAccess() {
+        return identifierAccess;
     }
 
-    public void setIdentifier(IdentifierAccessNode identifier) {
-        this.identifier = identifier;
+    public void setIdentifierAccess(IdentifierAccessNode identifier) {
+        this.identifierAccess = identifier;
     }
 
     @Override

@@ -24,7 +24,7 @@ public class VariableReassignmentNodeImpl extends AbstractNode implements Variab
     }
 
     @Override
-    public IdentifierAccessNode getIdentifier() {
+    public IdentifierAccessNode getIdentifierAccess() {
         return identifier;
     }
 

@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.Node;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 
 import java.util.List;

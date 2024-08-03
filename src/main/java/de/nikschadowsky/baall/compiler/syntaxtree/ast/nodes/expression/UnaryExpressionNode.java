@@ -1,11 +1,12 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression;
 
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
 
 /**
  * File created on 29.07.2024
  */
-public interface UnaryExpressionNode extends ExpressionNode, ReassignmentNode {
+public interface UnaryExpressionNode extends ValueNode, ReassignmentNode {
 
     boolean isPrefix();
 

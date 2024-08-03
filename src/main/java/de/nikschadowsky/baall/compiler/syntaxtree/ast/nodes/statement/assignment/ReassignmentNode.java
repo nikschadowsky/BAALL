@@ -9,7 +9,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAcce
  */
 public interface ReassignmentNode extends StatementNode {
 
-    IdentifierAccessNode getIdentifier();
+    IdentifierAccessNode getIdentifierAccess();
 
     Token getOperator();
 

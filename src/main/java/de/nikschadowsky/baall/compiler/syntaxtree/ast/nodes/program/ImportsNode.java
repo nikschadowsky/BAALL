@@ -1,7 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program;
 
 import de.nikschadowsky.baall.compiler.symbol.Token;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.Node;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
 
 import java.util.List;
 

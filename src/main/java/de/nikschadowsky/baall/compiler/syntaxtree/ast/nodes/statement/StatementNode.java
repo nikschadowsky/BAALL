@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.Node;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
 
 /**
  * File created on 29.07.2024

@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.Node;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 

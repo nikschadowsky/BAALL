@@ -6,8 +6,10 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,8 +35,8 @@ public class IdentifierAccessNodeImpl extends AbstractNode implements Identifier
     }
 
     @Override
-    public List<ExpressionNode> getArrayIndices() {
-        return arrayIndexes;
+    public @UnmodifiableView List<ExpressionNode> getArrayIndices() {
+        return Collections.unmodifiableList(arrayIndexes);
     }
 
     public void setArrayIndexes(List<ExpressionNode> arrayIndex) {

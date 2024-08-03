@@ -5,7 +5,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -20,8 +22,8 @@ public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNo
     }
 
     @Override
-    public List<ExpressionNode> getElements() {
-        return elements;
+    public @UnmodifiableView List<ExpressionNode> getElements() {
+        return Collections.unmodifiableList(elements);
     }
 
     public void setElements(List<ExpressionNode> elements) {

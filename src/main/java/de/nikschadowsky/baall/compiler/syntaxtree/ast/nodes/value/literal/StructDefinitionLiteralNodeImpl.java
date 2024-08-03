@@ -6,7 +6,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,8 +24,8 @@ public class StructDefinitionLiteralNodeImpl extends AbstractNode implements Str
     }
 
     @Override
-    public List<Map.Entry<TypeNode, Token>> getFields() {
-        return fields;
+    public @UnmodifiableView List<Map.Entry<TypeNode, Token>> getFields() {
+        return Collections.unmodifiableList(fields);
     }
 
     public void setFields(List<Map.Entry<TypeNode, Token>> fields) {
@@ -32,6 +34,6 @@ public class StructDefinitionLiteralNodeImpl extends AbstractNode implements Str
 
     @Override
     public @NotNull NodeType getNodeType() {
-        return null;
+        return NodeType.STRUCT_DEFINITION;
     }
 }

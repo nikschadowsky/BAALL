@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program;
 
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
  */
 public interface ExportsNode extends Node {
 
+    @UnmodifiableView
     List<IdentifierAccessNode> getExportedElements();
 
 }

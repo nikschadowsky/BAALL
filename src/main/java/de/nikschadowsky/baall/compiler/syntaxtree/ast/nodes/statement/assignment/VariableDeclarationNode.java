@@ -7,7 +7,7 @@ import java.util.Optional;
 /**
  * File created on 30.07.2024
  */
-public interface VariableDeclarationNode extends DeclarationNode{
+public interface VariableDeclarationNode extends DeclarationNode {
 
     Optional<ExpressionNode> getInitializationValue();
 

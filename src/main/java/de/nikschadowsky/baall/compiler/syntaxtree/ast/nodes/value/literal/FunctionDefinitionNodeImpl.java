@@ -7,7 +7,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNo
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +31,8 @@ public class FunctionDefinitionNodeImpl extends AbstractNode implements Function
     }
 
     @Override
-    public List<Map.Entry<TypeNode, Token>> getParameters() {
-        return parameters;
+    public @UnmodifiableView List<Map.Entry<TypeNode, Token>> getParameters() {
+        return Collections.unmodifiableList(parameters);
     }
 
     public void setFunctionBody(StatementsNode functionBody) {

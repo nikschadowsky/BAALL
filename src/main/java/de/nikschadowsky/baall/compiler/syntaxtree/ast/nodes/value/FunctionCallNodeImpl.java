@@ -5,7 +5,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,8 +33,8 @@ public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNo
     }
 
     @Override
-    public List<ExpressionNode> getArguments() {
-        return arguments;
+    public @UnmodifiableView List<ExpressionNode> getArguments() {
+        return Collections.unmodifiableList(arguments);
     }
 
     public void setArguments(List<ExpressionNode> arguments) {

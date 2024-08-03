@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +24,8 @@ public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
 
     @Override
-    public List<Token> getImports() {
-        return imports;
+    public @UnmodifiableView List<Token> getImports() {
+        return Collections.unmodifiableList(imports);
     }
 
     public void setImports(List<Token> imports) {

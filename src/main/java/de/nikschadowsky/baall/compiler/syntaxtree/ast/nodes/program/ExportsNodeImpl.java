@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAcce
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,8 +23,8 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     }
 
     @Override
-    public List<IdentifierAccessNode> getExportedElements() {
-        return exports;
+    public @UnmodifiableView List<IdentifierAccessNode> getExportedElements() {
+        return Collections.unmodifiableList(exports);
     }
 
     public void setExports(List<IdentifierAccessNode> exports) {

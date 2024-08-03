@@ -6,7 +6,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,8 +38,8 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
     }
 
     @Override
-    public List<ExpressionNode> getArrayDimensionDefinitions() {
-        return arrayDimensionDefinitions;
+    public @UnmodifiableView List<ExpressionNode> getArrayDimensionDefinitions() {
+        return Collections.unmodifiableList(arrayDimensionDefinitions);
     }
 
     @Override

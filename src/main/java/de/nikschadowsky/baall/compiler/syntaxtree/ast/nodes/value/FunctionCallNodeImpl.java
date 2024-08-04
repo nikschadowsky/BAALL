@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNo
     }
 
     public void setArguments(List<ExpressionNode> arguments) {
-        this.arguments = arguments;
+        this.arguments = new LinkedList<>(arguments);
     }
 
     @Override

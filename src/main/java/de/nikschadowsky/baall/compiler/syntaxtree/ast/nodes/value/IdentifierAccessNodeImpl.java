@@ -8,8 +8,8 @@ import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -40,7 +40,7 @@ public class IdentifierAccessNodeImpl extends AbstractNode implements Identifier
     }
 
     public void setArrayIndexes(List<ExpressionNode> arrayIndex) {
-        this.arrayIndexes = new ArrayList<>(arrayIndex);
+        this.arrayIndexes = new LinkedList<>(arrayIndex);
     }
 
     @Override

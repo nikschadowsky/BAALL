@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNo
     }
 
     public void setElements(List<ExpressionNode> elements) {
-        this.elements = elements;
+        this.elements = new LinkedList<>(elements);
     }
 
     @Override

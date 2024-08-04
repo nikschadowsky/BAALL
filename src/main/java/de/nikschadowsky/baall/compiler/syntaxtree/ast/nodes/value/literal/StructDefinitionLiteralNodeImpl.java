@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +30,7 @@ public class StructDefinitionLiteralNodeImpl extends AbstractNode implements Str
     }
 
     public void setFields(List<Map.Entry<TypeNode, Token>> fields) {
-        this.fields = fields;
+        this.fields = new LinkedList<>(fields);
     }
 
     @Override

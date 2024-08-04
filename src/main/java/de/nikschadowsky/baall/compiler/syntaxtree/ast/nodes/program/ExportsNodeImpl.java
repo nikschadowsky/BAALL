@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     }
 
     public void setExports(List<IdentifierAccessNode> exports) {
-        this.exports = exports;
+        this.exports = new LinkedList<>(exports);
 
         if (exports.isEmpty()) {
             getDiagnosticCollector().report(new NodeDiagnostic(

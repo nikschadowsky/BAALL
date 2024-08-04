@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,13 +34,13 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
         return identifier;
     }
 
-    public void setArrayDimensionDefinitions(List<ExpressionNode> arrayTypeDefinition) {
-        arrayDimensionDefinitions = arrayTypeDefinition;
-    }
-
     @Override
     public @UnmodifiableView List<ExpressionNode> getArrayDimensionDefinitions() {
         return Collections.unmodifiableList(arrayDimensionDefinitions);
+    }
+
+    public void setArrayDimensionDefinitions(List<ExpressionNode> arrayTypeDefinition) {
+        arrayDimensionDefinitions = new LinkedList<>(arrayTypeDefinition);
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
     }
 
     public void setStatements(List<StatementNode> statements) {
-        this.statements = statements;
+        this.statements = new LinkedList<>(statements);
     }
 
     @Override

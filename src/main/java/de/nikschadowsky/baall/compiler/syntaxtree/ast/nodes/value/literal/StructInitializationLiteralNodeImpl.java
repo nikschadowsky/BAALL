@@ -36,7 +36,7 @@ public class StructInitializationLiteralNodeImpl extends AbstractNode implements
     }
 
     public void setArguments(List<ExpressionNode> arguments) {
-        this.arguments = arguments;
+        this.arguments = new LinkedList<>(arguments);
     }
 
     @Override

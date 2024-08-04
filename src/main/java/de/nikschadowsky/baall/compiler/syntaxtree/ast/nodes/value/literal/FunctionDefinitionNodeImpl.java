@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +27,13 @@ public class FunctionDefinitionNodeImpl extends AbstractNode implements Function
         super(diagnostics);
     }
 
-    public void setParameters(List<Map.Entry<TypeNode, Token>> parameters) {
-        this.parameters = parameters;
-    }
-
     @Override
     public @UnmodifiableView List<Map.Entry<TypeNode, Token>> getParameters() {
         return Collections.unmodifiableList(parameters);
+    }
+
+    public void setParameters(List<Map.Entry<TypeNode, Token>> parameters) {
+        this.parameters = new LinkedList<>(parameters);
     }
 
     public void setFunctionBody(StatementsNode functionBody) {

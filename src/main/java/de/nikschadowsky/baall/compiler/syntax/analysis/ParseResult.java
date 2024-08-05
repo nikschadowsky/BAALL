@@ -7,30 +7,28 @@ import java.util.NoSuchElementException;
 
 /**
  * File created on 11.07.2024
- *
- * TODO hold a queue mark as a field. when #isSuccessful then step queue to the mark
  */
 class ParseResult<T> {
 
     private final @Nullable T parseResult;
     private final @Nullable SyntaxDiagnostic diagnostic;
+    private final boolean complete;
 
     public static <T> ParseResult<T> successfulParse(T parseResult) {
-        return new ParseResult<>(parseResult);
+        return new ParseResult<>(parseResult, true, null);
     }
 
     public static <T> ParseResult<T> unsuccessfulParse(SyntaxDiagnostic diagnostic) {
-        return new ParseResult<>(diagnostic);
+        return new ParseResult<>(null, false, diagnostic);
     }
 
-    private ParseResult(@Nullable T parseResult) {
+    public static <T> ParseResult<T> incompleteParse(T parseResult, SyntaxDiagnostic diagnostic) {
+        return new ParseResult<>(parseResult, false, diagnostic);
+    }
+
+    private ParseResult(@Nullable T parseResult, boolean complete, @Nullable SyntaxDiagnostic diagnostic) {
         this.parseResult = parseResult;
-        this.diagnostic = null;
-    }
-
-    // constructor for EMPTY
-    private ParseResult(@Nullable SyntaxDiagnostic diagnostic) {
-        this.parseResult = null;
+        this.complete = complete;
         this.diagnostic = diagnostic;
     }
 
@@ -49,10 +47,14 @@ class ParseResult<T> {
     }
 
     public boolean isUnsuccessful() {
-        return parseResult == null;
+        return !complete && parseResult == null;
     }
 
     public boolean isSuccessful() {
-        return !isUnsuccessful();
+        return complete;
+    }
+
+    public boolean isIncomplete() {
+        return !complete && parseResult != null;
     }
 }

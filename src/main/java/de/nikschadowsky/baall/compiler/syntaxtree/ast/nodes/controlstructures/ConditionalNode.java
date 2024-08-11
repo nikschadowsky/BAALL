@@ -19,6 +19,6 @@ public interface ConditionalNode extends ControlStructureNode{
     ConditionBranch getConditionBranch();
 
     enum ConditionBranch {
-        IF, ELSE_IF, ELSE
+        IF, ELSE
     }
 }

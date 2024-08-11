@@ -12,9 +12,9 @@ import java.util.List;
  */
 public interface InterceptStatementNode extends Node {
 
-    List<IdentifierAccessNode> getExceptions();
+    List<IdentifierAccessNode> getInterceptedExceptions();
 
-    Token getExceptionIdentifier();
+    Token getRaisedExceptionIdentifier();
 
     StatementsNode getBody();
 

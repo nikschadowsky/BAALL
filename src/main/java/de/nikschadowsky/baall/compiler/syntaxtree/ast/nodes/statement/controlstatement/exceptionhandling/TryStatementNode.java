@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementNode;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,7 +13,7 @@ public interface TryStatementNode extends StatementNode {
 
     StatementsNode getBody();
 
-    InterceptStatementNode getInterceptBlock();
+    List<InterceptStatementNode> getInterceptBlocks();
 
     Optional<EnsureStatementNode> getEnsureBlock();
 }

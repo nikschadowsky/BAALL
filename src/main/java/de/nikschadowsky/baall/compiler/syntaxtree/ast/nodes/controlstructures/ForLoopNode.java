@@ -18,7 +18,9 @@ public interface ForLoopNode extends ControlStructureNode{
 
     ExpressionNode getEndIndexExpression();
 
-    Optional<ReassignmentNode> getOptionalStepperFunction();
+    Optional<ReassignmentNode> getOptionalStepperStatement();
+
+    boolean hasOptionalStepperStatement();
 
     StatementsNode getBody();
 }

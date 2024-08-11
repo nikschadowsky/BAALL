@@ -22,9 +22,11 @@ public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
 
     private ExpressionNode endIndex;
 
-    private ReassignmentNode optionalStepperFunction;
+    private ReassignmentNode optionalStepperStatement;
 
     private StatementsNode body;
+
+    private boolean hasOptionalStepperStatement;
 
     public ForLoopNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -58,12 +60,21 @@ public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
     }
 
     @Override
-    public Optional<ReassignmentNode> getOptionalStepperFunction() {
-        return Optional.ofNullable(optionalStepperFunction);
+    public Optional<ReassignmentNode> getOptionalStepperStatement() {
+        return Optional.ofNullable(optionalStepperStatement);
     }
 
-    public void setOptionalStepperFunction(ReassignmentNode optionalStepperFunction) {
-        this.optionalStepperFunction = optionalStepperFunction;
+    public void setOptionalStepperStatement(ReassignmentNode optionalStepperStatement) {
+        this.optionalStepperStatement = optionalStepperStatement;
+    }
+
+    @Override
+    public boolean hasOptionalStepperStatement() {
+        return hasOptionalStepperStatement;
+    }
+
+    public void setHasOptionalStepperStatement(boolean hasOptionalStepperStatement) {
+        this.hasOptionalStepperStatement = hasOptionalStepperStatement;
     }
 
     @Override

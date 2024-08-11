@@ -50,7 +50,7 @@ public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode
         return Optional.ofNullable(elseBranch);
     }
 
-    public void setElseBranch(ConditionalNodeImpl elseBranch) {
+    public void setElseBranch(ConditionalNode elseBranch) {
         if (ConditionBranch.ELSE.equals(conditionBranch)) {
             getDiagnosticCollector().report(new NodeDiagnostic(
                     "Cannot set ELSE branch on ELSE type node!",

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Indicates that a parser method returns either a complete and valid node, a partially parsed node, or an unsuccessful
- * parse.
+ * parse. A method should be a partially parsing method if any of its components is partially parsed.
  *
  * @since 05.08.2024
  */

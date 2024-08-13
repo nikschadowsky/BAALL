@@ -17,7 +17,10 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.BreakStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ContinueStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ReturnStatementNodeImpl;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.*;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.EnsureStatementNodeImpl;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.InterceptStatementNodeImpl;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNodeImpl;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNodeImpl;
@@ -120,7 +123,7 @@ public class ASTNodeFactory {
 
 
     // exception handling
-    public RaiseStatementNode createRaiseStatementNode() {
+    public RaiseStatementNodeImpl createRaiseStatementNode() {
         return new RaiseStatementNodeImpl(diagnostics);
     }
 
@@ -128,7 +131,7 @@ public class ASTNodeFactory {
         return new ExceptionCallNodeImpl(diagnostics);
     }
 
-    public TryStatementNode createTryStatementNode() {
+    public TryStatementNodeImpl createTryStatementNode() {
         return new TryStatementNodeImpl(diagnostics);
     }
 

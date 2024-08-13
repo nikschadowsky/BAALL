@@ -11,8 +11,11 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.controlstructures.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.*;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -49,6 +52,15 @@ public class ControlStructureParser {
             queue.mergeBranch();
             return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
         }
+        parseResult = parseTryStatement(queue.branchOff(), astFactory);
+        if (parseResult.isSuccessful()) {
+            queue.mergeBranch();
+            return PartialParseResult.successfulParse(parseResult.getParseResult());
+        } else if (parseResult.isPartial()) {
+            queue.mergeBranch();
+            return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
+        }
+
         return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
     }
 
@@ -187,7 +199,8 @@ public class ControlStructureParser {
 
         if (Parser.TERMINAL_MAP.get("=").symbolMatches(queue.peek())) {
             queue.poll();
-            ParseResult<ExpressionNode> parsedStartIndexExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+            ParseResult<ExpressionNode> parsedStartIndexExpression =
+                    ExpressionParser.parseExpression(queue.branchOff(), astFactory);
             if (parsedStartIndexExpression.isSuccessful()) {
                 queue.mergeBranch();
                 node.setStartIndex(parsedStartIndexExpression.getParseResult());
@@ -202,7 +215,8 @@ public class ControlStructureParser {
 
         if (Parser.TERMINAL_MAP.get("..").symbolMatches(queue.peek())) {
             queue.poll();
-            ParseResult<ExpressionNode> parsedEndIndexExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+            ParseResult<ExpressionNode> parsedEndIndexExpression =
+                    ExpressionParser.parseExpression(queue.branchOff(), astFactory);
             if (parsedEndIndexExpression.isSuccessful()) {
                 queue.mergeBranch();
                 node.setEndIndex(parsedEndIndexExpression.getParseResult());
@@ -218,7 +232,8 @@ public class ControlStructureParser {
         if (Parser.TERMINAL_MAP.get("::").symbolMatches(queue.peek())) {
             queue.poll();
             node.setHasOptionalStepperStatement(true);
-            ParseResult<ReassignmentNode> parsedOptionalForStepper = Parser.parseReassignment(queue.branchOff(), astFactory);
+            ParseResult<ReassignmentNode> parsedOptionalForStepper =
+                    Parser.parseReassignment(queue.branchOff(), astFactory);
             if (parsedOptionalForStepper.isSuccessful()) {
                 queue.mergeBranch();
                 node.setOptionalStepperStatement(parsedOptionalForStepper.getParseResult());
@@ -313,6 +328,216 @@ public class ControlStructureParser {
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
 
+        return PartialParseResult.successfulParse(node);
+    }
+
+    @PartialParse
+    public static PartialParseResult<TryStatementNode> parseTryStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+        TryStatementNodeImpl node = astFactory.createTryStatementNode();
+        List<InterceptStatementNode> interceptStatements = new LinkedList<>();
+        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
+        boolean isPartial = false;
+
+        if (!Parser.TERMINAL_MAP.get("try").symbolMatches(queue.peek())) {
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+        }
+        queue.poll();
+
+        PartialParseResult<StatementsNode> parsedBody = AuxiliaryParser.parseCodeBlock(queue.branchOff(), astFactory);
+        if (parsedBody.isUnsuccessful()) {
+            diagnostics.add(parsedBody.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedBody.isPartial()) {
+                diagnostics.add(parsedBody.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            node.setBody(parsedBody.getParseResult());
+        }
+
+        PartialParseResult<InterceptStatementNode> parsedInterceptStatement =
+                parseInterceptStatement(queue.branchOff(), astFactory);
+        if (parsedInterceptStatement.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptStatement.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedInterceptStatement.isPartial()) {
+                diagnostics.add(parsedInterceptStatement.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            interceptStatements.add(parsedInterceptStatement.getParseResult());
+        }
+
+        PartialParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
+                parseInterceptStatements(queue.branchOff(), astFactory);
+        if (parsedInterceptStatements.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptStatements.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedInterceptStatements.isPartial()) {
+                diagnostics.add(parsedInterceptStatements.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            interceptStatements.addAll(parsedInterceptStatements.getParseResult());
+        }
+        node.setInterceptBlocks(interceptStatements);
+
+        PartialParseResult<EnsureStatementNode> parsedEnsureStatement =
+                parseEnsureStatement(queue.branchOff(), astFactory);
+        if (parsedEnsureStatement.isUnsuccessful()) {
+            diagnostics.add(parsedEnsureStatement.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedEnsureStatement.isPartial()) {
+                diagnostics.add(parsedEnsureStatement.getDiagnostic());
+                isPartial = true;
+            }
+        }
+
+        if (isPartial) {
+            return PartialParseResult.partialParse(node, diagnostics.get(0));
+        }
+
+        return PartialParseResult.successfulParse(node);
+    }
+
+    @PartialParse
+    public static PartialParseResult<List<InterceptStatementNode>> parseInterceptStatements(TokenQueue queue, ASTNodeFactory astFactory) {
+        List<InterceptStatementNode> interceptStatements = new LinkedList<>();
+        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
+        boolean isPartial = false;
+
+        if (!Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
+            return PartialParseResult.successfulParse(interceptStatements);
+        }
+        queue.poll();
+
+        PartialParseResult<InterceptStatementNode> parsedInterceptStatement =
+                parseInterceptStatement(queue.branchOff(), astFactory);
+
+        if (parsedInterceptStatement.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptStatement.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedInterceptStatement.isPartial()) {
+                diagnostics.add(parsedInterceptStatement.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            interceptStatements.add(parsedInterceptStatement.getParseResult());
+        }
+
+
+        ParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
+                parseInterceptStatements(queue.branchOff(), astFactory);
+        if (parsedInterceptStatements.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptStatements.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedInterceptStatement.isPartial()) {
+                diagnostics.add(parsedInterceptStatements.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            interceptStatements.addAll(parsedInterceptStatements.getParseResult());
+        }
+        if (isPartial) {
+            return PartialParseResult.partialParse(interceptStatements, diagnostics.get(0));
+        }
+        return PartialParseResult.successfulParse(interceptStatements);
+    }
+
+    @PartialParse
+    public static PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+        InterceptStatementNodeImpl node = astFactory.createInterceptStatementNode();
+        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
+        boolean isPartial = false;
+
+        if (!Parser.TERMINAL_MAP.get("intercept").symbolMatches(queue.peek())) {
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+        }
+        queue.poll();
+
+        PartialParseResult<List<IdentifierAccessNode>> parsedInterceptedExceptions =
+                AuxiliaryParser.parseIdentifierAccesses(queue.branchOff(), astFactory);
+        if (parsedInterceptedExceptions.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptedExceptions.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedInterceptedExceptions.isPartial()) {
+                diagnostics.add(parsedInterceptedExceptions.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            node.setInterceptedExceptions(parsedInterceptedExceptions.getParseResult());
+        }
+
+        if (!Parser.TERMINAL_MAP.get(":").symbolMatches(queue.peek())) {
+            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
+            isPartial = true;
+        } else {
+            queue.poll();
+        }
+
+        ParseResult<Token> parsedExceptionIdentifier = AuxiliaryParser.parseIdentifier(queue.branchOff(), astFactory);
+        if (parsedExceptionIdentifier.isUnsuccessful()) {
+            diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
+            isPartial = true;
+        } else {
+            queue.mergeBranch();
+            node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
+        }
+
+        PartialParseResult<StatementsNode> parsedBody = AuxiliaryParser.parseCodeBlock(queue.branchOff(), astFactory);
+        if (parsedBody.isUnsuccessful()) {
+            diagnostics.add(parsedBody.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedBody.isPartial()) {
+                diagnostics.add(parsedBody.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            node.setBody(parsedBody.getParseResult());
+        }
+
+        if (isPartial) {
+            return PartialParseResult.partialParse(node, diagnostics.get(0));
+        }
+
+        return PartialParseResult.successfulParse(node);
+    }
+
+    @PartialParse
+    public static PartialParseResult<EnsureStatementNode> parseEnsureStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+        EnsureStatementNodeImpl node = astFactory.createEnsureStatementNode();
+        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
+        boolean isPartial = false;
+
+        if (!Parser.TERMINAL_MAP.get("ensure").symbolMatches(queue.peek())) {
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+        }
+        queue.poll();
+
+        PartialParseResult<StatementsNode> parsedBody = AuxiliaryParser.parseCodeBlock(queue.branchOff(), astFactory);
+        if (parsedBody.isUnsuccessful()) {
+            diagnostics.add(parsedBody.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedBody.isPartial()) {
+                diagnostics.add(parsedBody.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+            node.setBody(parsedBody.getParseResult());
+        }
+
+        if (isPartial) {
+            return PartialParseResult.partialParse(node, diagnostics.get(0));
+        }
         return PartialParseResult.successfulParse(node);
     }
 }

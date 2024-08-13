@@ -6,18 +6,20 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
-import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNodeImpl;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +50,8 @@ public class LiteralParser {
         queue.mergeBranch();
         elements.add(parsedExpression.getParseResult());
 
-        ParseResult<List<ExpressionNode>> parsedArrayElements = AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+        ParseResult<List<ExpressionNode>> parsedArrayElements =
+                AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
         if (parsedArrayElements.isUnsuccessful()) {
             queue.skipOver(Parser.TERMINAL_MAP.get("]"));
             return ParseResult.unsuccessfulParse(parsedArrayElements.getDiagnostic());
@@ -73,7 +76,8 @@ public class LiteralParser {
         }
         queue.poll();
 
-        ParseResult<Map.Entry<TypeNode, Token>> parsedStructField = AuxiliaryParser.parseFieldDeclaration(queue.branchOff(), astFactory);
+        ParseResult<Map.Entry<TypeNode, Token>> parsedStructField =
+                AuxiliaryParser.parseFieldDeclaration(queue.branchOff(), astFactory);
         if (parsedStructField.isUnsuccessful()) {
             queue.skipOver(Parser.TERMINAL_MAP.get(")"));
             return ParseResult.unsuccessfulParse(parsedStructField.getDiagnostic());
@@ -112,7 +116,8 @@ public class LiteralParser {
         ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
-            ParseResult<List<ExpressionNode>> parsedArguments = AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+            ParseResult<List<ExpressionNode>> parsedArguments =
+                    AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
             if (parsedArguments.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -137,7 +142,6 @@ public class LiteralParser {
     @CompleteParse
     public static ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
         FunctionDefinitionNodeImpl node = astFactory.createFunctionDefinitionNode();
-        List<Map.Entry<TypeNode, Token>> parameters = new LinkedList<>();
 
         if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
             queue.poll();
@@ -167,7 +171,7 @@ public class LiteralParser {
                 return ParseResult.unsuccessfulParse(parsedFunctionParameters.getDiagnostic());
             }
             queue.mergeBranch();
-            parameters.addAll(parsedFunctionParameters.getParseResult());
+            List<Map.Entry<TypeNode, Token>> parameters = new LinkedList<>(parsedFunctionParameters.getParseResult());
             parameters.add(parsedFunctionParameter.getParseResult());
             node.setParameters(parameters);
             if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.poll())) {
@@ -221,7 +225,8 @@ public class LiteralParser {
             return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult());
         }
 
-        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition = parseFunctionDefinition(queue.branchOff(), astFactory);
+        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition =
+                parseFunctionDefinition(queue.branchOff(), astFactory);
         if (parsedFunctionDefinition.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parsedFunctionDefinition.getParseResult());
@@ -247,63 +252,54 @@ public class LiteralParser {
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a primitive literal"));
     }
 
-    @PartialParse
-    public static PartialParseResult<ExceptionCallNode> parseExceptionCall(TokenQueue queue, ASTNodeFactory astFactory) {
-        FunctionCallNodeImpl node = astFactory.createFunctionCallNode();
-        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
-        boolean isPartial = false;
+    @CompleteParse
+    public static ParseResult<ExceptionCallNode> parseExceptionCall(TokenQueue queue, ASTNodeFactory astFactory) {
+        ExceptionCallNodeImpl node = astFactory.createExceptionCallNode();
 
-        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
+                AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parsedIdentifierValueAccess.isSuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
         queue.mergeBranch();
-        node.setFunctionIdentifier(parsedIdentifierValueAccess.getParseResult());
+        node.setExceptionIdentifier(parsedIdentifierValueAccess.getParseResult());
 
-        if (Parser.TERMINAL_MAP.get("(").symbolMatches(queue.peek())) {
+        if (!Parser.TERMINAL_MAP.get("(").symbolMatches(queue.peek())) {
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
+        }
+        queue.poll();
+
+        // early positive return
+        if (Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
             queue.poll();
-            if (Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
-                queue.poll();
-                node.setArguments(new LinkedList<>());
-                return PartialParseResult.successfulParse(node);
-            }
-
-            ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
-            if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
-
-                ParseResult<List<ExpressionNode>> parsedFunctionArguments =
-                        AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
-                if (parsedFunctionArguments.isSuccessful()) {
-                    queue.mergeBranch();
-
-                    List<ExpressionNode> functionArguments = new LinkedList<>();
-                    functionArguments.add(parsedExpression.getParseResult());
-                    functionArguments.addAll(parsedFunctionArguments.getParseResult());
-                    node.setArguments(functionArguments);
-                } else {
-                    diagnostics.add(parsedFunctionArguments.getDiagnostic());
-                    isPartial = true;
-                }
-            } else {
-                diagnostics.add(parsedExpression.getDiagnostic());
-                isPartial = true;
-            }
-
-            if (!Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
-                isPartial = true;
-                queue.skipOver(Parser.TERMINAL_MAP.get(")"));
-            }
-
-        } else {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
-            isPartial = true;
+            node.setArguments(new LinkedList<>());
+            return PartialParseResult.successfulParse(node);
         }
 
-        if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+        ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+        if (!parsedExpression.isSuccessful()) {
+            queue.skipOver(Parser.TERMINAL_MAP.get(")"));
+            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
+        queue.mergeBranch();
+
+        ParseResult<List<ExpressionNode>> parsedFunctionArguments =
+                AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+        if (!parsedFunctionArguments.isSuccessful()) {
+            queue.skipOver(Parser.TERMINAL_MAP.get(")"));
+            return ParseResult.unsuccessfulParse(parsedFunctionArguments.getDiagnostic());
+        }
+        queue.mergeBranch();
+
+        List<ExpressionNode> functionArguments = new LinkedList<>();
+        functionArguments.add(parsedExpression.getParseResult());
+        functionArguments.addAll(parsedFunctionArguments.getParseResult());
+        node.setArguments(functionArguments);
+
+        if (!Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
+        }
+
         return PartialParseResult.successfulParse(node);
     }
 }

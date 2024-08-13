@@ -125,7 +125,7 @@ public class ExpressionParser {
         boolean isPartial = false;
 
         ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
-        if (parsedIdentifierValueAccess.isSuccessful()) {
+1        if (parsedIdentifierValueAccess.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
         queue.mergeBranch();

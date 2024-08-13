@@ -9,15 +9,13 @@ import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNodeImpl;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +23,7 @@ import java.util.stream.Stream;
  * @since 11.08.2024
  */
 public class AuxiliaryParser {
+
     @CompleteParse
     public static ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue, ASTNodeFactory astFactory) {
         if (Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
@@ -141,7 +140,6 @@ public class AuxiliaryParser {
      * Parses an identifier token and writes its value into the passed node.
      *
      * @param queue
-     * @param node
      * @return a parse result containing the filled passed node on success, or an unsuccessful parse on failure.
      */
     @CompleteParse
@@ -330,5 +328,39 @@ public class AuxiliaryParser {
         }
         // epsilon
         return PartialParseResult.successfulParse(new LinkedList<>());
+    }
+
+    @PartialParse
+    public static PartialParseResult<StatementsNode> parseCodeBlock(TokenQueue queue, ASTNodeFactory astFactory) {
+        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
+        boolean isPartial = false;
+
+        if (!Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
+        }
+        queue.poll();
+
+        PartialParseResult<StatementsNode> parsedStatements = Parser.parseStatements(queue.branchOff(), astFactory);
+        if (parsedStatements.isUnsuccessful()) {
+            return PartialParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
+        }else {
+            if(parsedStatements.isPartial()) {
+                diagnostics.add(parsedStatements.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch();
+        }
+
+        if (!Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
+            isPartial = true;
+            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+        }
+
+        if(isPartial) {
+            return PartialParseResult.partialParse(parsedStatements.getParseResult(), diagnostics.get(0));
+        }
+
+        return PartialParseResult.successfulParse(parsedStatements.getParseResult());
     }
 }

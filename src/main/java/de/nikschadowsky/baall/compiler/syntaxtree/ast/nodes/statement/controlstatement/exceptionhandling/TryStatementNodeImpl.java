@@ -37,7 +37,7 @@ public class TryStatementNodeImpl extends AbstractNode implements TryStatementNo
         return interceptBlocks;
     }
 
-    public void setInterceptBlock(List<InterceptStatementNode> interceptBlocks) {
+    public void setInterceptBlocks(List<InterceptStatementNode> interceptBlocks) {
         this.interceptBlocks = new LinkedList<>(interceptBlocks);
     }
 

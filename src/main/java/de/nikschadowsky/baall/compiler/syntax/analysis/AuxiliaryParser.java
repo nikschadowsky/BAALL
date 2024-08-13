@@ -296,7 +296,6 @@ public class AuxiliaryParser {
      * Parses 2..n exported elements and writes them into the passed node
      *
      * @param queue
-     * @param node
      * @return
      */
     @PartialParse

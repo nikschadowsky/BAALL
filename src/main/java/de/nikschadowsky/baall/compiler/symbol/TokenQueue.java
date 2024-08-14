@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.symbol;
 
-import de.nikschadowsky.baall.compiler.syntax.analysis.Parser;
+import de.nikschadowsky.baall.compiler.util.LanguageElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,10 +54,11 @@ public class TokenQueue {
     /**
      * Skips to and consumes the next token in queue that matches the passed symbol
      *
-     * @param skipped
+     * @param skipped the first queue element that matches LanguageElement via {@link LanguageElement#matches(Token)}
+     *                gets skipped.
      */
-    public void skipOver(Parser.TerminalSymbol skipped) {
-        while (!skipped.symbolMatches(peek())) {
+    public void skipOver(LanguageElement skipped) {
+        while (!skipped.matches(peek())) {
             poll();
         }
         // skip over matching token

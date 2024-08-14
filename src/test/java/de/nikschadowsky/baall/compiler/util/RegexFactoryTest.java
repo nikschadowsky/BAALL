@@ -2,59 +2,42 @@ package de.nikschadowsky.baall.compiler.util;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class RegexFactoryTest {
 
     @Test
     void generateRegexesTest() {
+        SyntaxSet.OPERATORS.stream()
+                           .map(LanguageElement::representation)
+                           .map(RegexFactory::regexifySymbols)
+                           .forEach(op -> {
+                               if (!RegexFactory.OPERATOR_REGEX.contains("(" + op + ")")) {
+                                   fail("Operator not in Regex: " + op + "\n" + RegexFactory.OPERATOR_REGEX);
+                               }
+                           });
 
-        String opRegex = RegexFactory.OPERATOR_REGEX;
-        System.out.println(opRegex);
+        SyntaxSet.KEYWORDS.stream()
+                          .map(LanguageElement::representation)
+                          .forEach(keyword -> {
+                              if (!RegexFactory.KEYWORD_REGEX.contains("(" + keyword + ")")) {
+                                  fail("Keyword not in Regex: " + keyword + "\n" + RegexFactory.KEYWORD_REGEX);
+                              }
+                          });
 
-
-        for (String op : SyntaxSet.OPERATORS) {
-
-            String regexifiedOp = RegexFactory.regexifySymbols(op);
-
-            if (!(opRegex.contains("|(" + regexifiedOp + (")")) || opRegex.contains("(" + regexifiedOp + (")|")))) {
-                System.err.println(opRegex);
-                fail("Operator not in Regex");
-            }
-        }
-
-
-        String keywordRegex = RegexFactory.KEYWORD_REGEX;
-        System.out.println(keywordRegex);
-
-        for (String keyword : SyntaxSet.KEYWORDS) {
-            if (!(keywordRegex.contains(keyword + "|") || (keywordRegex.contains("|" + keyword)))) {
-                System.err.println(keywordRegex);
-                fail("Keyword not in Regex");
-            }
-
-        }
-
-        String separatorRegex = RegexFactory.SEPARATOR_REGEX;
-        System.out.println(separatorRegex);
-
-        for (String separator : SyntaxSet.SEPARATORS) {
-
-            String regexifiedSeparator = RegexFactory.regexifySymbols(separator);
-
-            if (!(separatorRegex.contains("|(" + regexifiedSeparator + (")")) || separatorRegex.contains("(" + regexifiedSeparator + (")|")))) {
-                System.err.println(separatorRegex);
-                fail("Separator not in Regex");
-            }
-        }
-        assertTrue(true);
-
+        SyntaxSet.SEPARATORS.stream()
+                            .map(LanguageElement::representation)
+                            .map(RegexFactory::regexifySymbols)
+                            .forEach(separator -> {
+                                if (!(RegexFactory.SEPARATOR_REGEX.contains("(" + separator + ")"))) {
+                                    fail("Separator not in Regex: " + separator + "\n" + RegexFactory.SEPARATOR_REGEX);
+                                }
+                            });
     }
-
 
     @Test
     void regexifyOperator() {
-
         assertEquals("\\<\\>", RegexFactory.regexifySymbols("<>"));
         assertEquals("\\<", RegexFactory.regexifySymbols("<"));
         assertEquals("\\+", RegexFactory.regexifySymbols("+"));

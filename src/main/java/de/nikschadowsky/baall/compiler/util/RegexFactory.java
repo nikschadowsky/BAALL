@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class RegexFactory {
 
@@ -21,7 +22,8 @@ public class RegexFactory {
 
     public static final String STRING_PRIMITIVE_REGEX = "\".*?(?<!\\\\)\"";
 
-    public static final String NUMBER_PRIMITIVE_REGEX = "(0((b[01]+)|(x[0-9A-Fa-f]+))|(\\d*\\.)?\\d+)" + END_OF_WORD_REGEX;
+    public static final String NUMBER_PRIMITIVE_REGEX =
+            "(0((b[01]+)|(x[0-9A-Fa-f]+))|(\\d*\\.)?\\d+)" + END_OF_WORD_REGEX;
 
     public static final String OPERATOR_REGEX = generateOperatorRegex();
 
@@ -40,11 +42,11 @@ public class RegexFactory {
      * @return Regular Expression String for Keywords
      */
     private static String generateKeywordRegex() {
-        return (SyntaxSet.KEYWORDS.stream().reduce("(", (akk, op) -> akk + op + "|") + ")").replaceAll("\\|\\)", ")") + END_OF_WORD_REGEX;
+        return SyntaxSet.KEYWORDS.stream()
+                                 .map(LanguageElement::representation)
+                                 .collect(Collectors.joining(")|(", "(", ")"))
+                                 .replaceAll("\\|\\)", ")") + END_OF_WORD_REGEX;
     }
-
-
-    private static final String REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX = "(?<=\\))\\|\\)"; // ...)|) -> ...))
 
     /**
      * Generate a Regular Expression from the defined Operators in {@link SyntaxSet}. Ordered by length descending, so
@@ -56,35 +58,34 @@ public class RegexFactory {
     private static String generateOperatorRegex() {
 
 
-        return (SyntaxSet.OPERATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
-                .reduce("(", (akk, op) -> akk
-                        + "(" +
-                        regexifySymbols(op)
-                        + ")|")
-                + ")").replaceAll(REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX, ")");
+        return SyntaxSet.OPERATORS.stream()
+                                  .sorted(Comparator.<LanguageElement>comparingInt(le -> le.representation().length())
+                                                    .reversed())
+                                  .map(LanguageElement::representation)
+                                  .map(RegexFactory::regexifySymbols)
+                                  .collect(Collectors.joining(")|(", "(", ")"));
     }
 
     /**
-     * Generate a Regular Expression from the defined Separators in
-     * {@link SyntaxSet}. Ordered by length descending, so remove need to peek
-     * ahead.
+     * Generate a Regular Expression from the defined Separators in {@link SyntaxSet}. Ordered by length descending, so
+     * remove need to peek ahead.
      *
      * @return Regular Expression String for Separators
      */
     private static String generateSeparatorRegex() {
 
 
-        return (SyntaxSet.SEPARATORS.stream().sorted(Comparator.comparingInt(String::length).reversed()) // longest OP first, so there is no reason to look ahead
-                .reduce("(", (akk, sep) -> akk
-                        + "(" +
-                        regexifySymbols(sep)
-                        + ")|")
-                + ")").replaceAll(REMOVE_LAST_LOGICAL_OR_SYMBOL_REGEX, ")");
+        return SyntaxSet.SEPARATORS.stream()
+                                   .sorted(Comparator.<LanguageElement>comparingInt(le -> le.representation().length())
+                                                     .reversed())
+                                   .map(LanguageElement::representation)
+                                   .map(RegexFactory::regexifySymbols)
+                                   .collect(Collectors.joining(")|(", "(", ")"));
     }
 
     /**
      * Since Operators consist of symbols, some may be interpreted by regular expressions as non literals. To prevent
-     * this, every symbol gets escaped, to interpret it as a literal.
+     * this, every symbol is being escaped.
      *
      * @param op not empty and not null String of symbols
      * @return Operator as regex literal

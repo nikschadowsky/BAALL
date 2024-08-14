@@ -10,6 +10,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlsta
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ReturnStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNode;
+import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 /**
  * @since 11.08.2024
@@ -17,15 +18,15 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallN
 public class ControlStatementParser {
     @CompleteParse
     public static ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get("break").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("break").matches(queue.peek())) {
             queue.poll();
             return ParseResult.successfulParse(astFactory.createBreakStatementNode());
         }
-        if (Parser.TERMINAL_MAP.get("continue").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("continue").matches(queue.peek())) {
             queue.poll();
             return ParseResult.successfulParse(astFactory.createContinueStatementNode());
         }
-        if (Parser.TERMINAL_MAP.get("return").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("return").matches(queue.peek())) {
             queue.poll();
             ReturnStatementNodeImpl node = astFactory.createReturnStatementNode();
 
@@ -43,7 +44,7 @@ public class ControlStatementParser {
                     "Expected an expression!"
             ));
         }
-        if (Parser.TERMINAL_MAP.get("raise").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("raise").matches(queue.peek())) {
             queue.poll();
             RaiseStatementNodeImpl node = astFactory.createRaiseStatementNode();
 

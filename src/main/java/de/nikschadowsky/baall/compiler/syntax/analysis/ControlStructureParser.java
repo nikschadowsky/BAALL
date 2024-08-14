@@ -13,6 +13,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNo
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.ReassignmentNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.exceptionhandling.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -77,13 +78,13 @@ public class ControlStructureParser {
         queue.mergeBranch();
         node.setCondition(parsedExpression.getParseResult());
 
-        if (!Parser.TERMINAL_MAP.get("?").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("?").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected '?'!"));
             isPartiallyParsed = true;
         }
         queue.poll();
 
-        if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.poll())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
             PartialParseResult<StatementsNode> parsedStatements = Parser.parseStatements(queue.branchOff(), astFactory);
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
@@ -98,7 +99,7 @@ public class ControlStructureParser {
                 isPartiallyParsed = true;
             }
 
-            if (!Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                 diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
                 isPartiallyParsed = true;
             }
@@ -122,7 +123,7 @@ public class ControlStructureParser {
         }
 
         if (isPartiallyParsed) {
-            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -133,12 +134,12 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
-        if (!Parser.TERMINAL_MAP.get("|").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("|").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected '|'!"));
         }
         queue.poll();
 
-        if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
 
             ConditionalNodeImpl node = astFactory.createConditionalNode();
@@ -148,13 +149,13 @@ public class ControlStructureParser {
                 queue.mergeBranch();
 
                 node.setThenBlock(parsedStatements.getParseResult());
-                if (Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+                if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                     queue.poll();
                     return PartialParseResult.successfulParse(node);
                 }
                 return PartialParseResult.partialParse(node, new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
             }
-            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, parsedStatements.getDiagnostic());
         }
 
@@ -183,7 +184,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
-        if (!Parser.TERMINAL_MAP.get("for").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("for").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected 'for'!"));
         }
         queue.poll();
@@ -197,7 +198,7 @@ public class ControlStructureParser {
             isPartiallyParsed = true;
         }
 
-        if (Parser.TERMINAL_MAP.get("=").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("=").matches(queue.peek())) {
             queue.poll();
             ParseResult<ExpressionNode> parsedStartIndexExpression =
                     ExpressionParser.parseExpression(queue.branchOff(), astFactory);
@@ -213,7 +214,7 @@ public class ControlStructureParser {
             isPartiallyParsed = true;
         }
 
-        if (Parser.TERMINAL_MAP.get("..").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("..").matches(queue.peek())) {
             queue.poll();
             ParseResult<ExpressionNode> parsedEndIndexExpression =
                     ExpressionParser.parseExpression(queue.branchOff(), astFactory);
@@ -229,7 +230,7 @@ public class ControlStructureParser {
             isPartiallyParsed = true;
         }
 
-        if (Parser.TERMINAL_MAP.get("::").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("::").matches(queue.peek())) {
             queue.poll();
             node.setHasOptionalStepperStatement(true);
             ParseResult<ReassignmentNode> parsedOptionalForStepper =
@@ -243,7 +244,7 @@ public class ControlStructureParser {
             }
         }
 
-        if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
             PartialParseResult<StatementsNode> parsedStatements =
                     Parser.parseStatements(queue.branchOff(), astFactory);
@@ -260,7 +261,7 @@ public class ControlStructureParser {
                 isPartiallyParsed = true;
             }
 
-            if (!Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                 diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
                 isPartiallyParsed = true;
             }
@@ -271,7 +272,7 @@ public class ControlStructureParser {
         }
 
         if (isPartiallyParsed) {
-            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -283,7 +284,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
-        if (!Parser.TERMINAL_MAP.get("while").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("while").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected 'while'!"));
         }
         queue.poll();
@@ -297,7 +298,7 @@ public class ControlStructureParser {
             isPartiallyParsed = true;
         }
 
-        if (Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
             PartialParseResult<StatementsNode> parsedStatements = Parser.parseStatements(queue.branchOff(), astFactory);
             if (parsedStatements.isSuccessful()) {
@@ -313,7 +314,7 @@ public class ControlStructureParser {
                 isPartiallyParsed = true;
 
             }
-            if (!Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                 diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected '}'!"));
                 isPartiallyParsed = true;
             }
@@ -324,7 +325,7 @@ public class ControlStructureParser {
             isPartiallyParsed = true;
         }
         if (isPartiallyParsed) {
-            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
 
@@ -338,7 +339,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!Parser.TERMINAL_MAP.get("try").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("try").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
         queue.poll();
@@ -410,7 +411,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             return PartialParseResult.successfulParse(interceptStatements);
         }
         queue.poll();
@@ -456,7 +457,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!Parser.TERMINAL_MAP.get("intercept").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("intercept").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
         queue.poll();
@@ -475,7 +476,7 @@ public class ControlStructureParser {
             node.setInterceptedExceptions(parsedInterceptedExceptions.getParseResult());
         }
 
-        if (!Parser.TERMINAL_MAP.get(":").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
             isPartial = true;
         } else {
@@ -517,7 +518,7 @@ public class ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!Parser.TERMINAL_MAP.get("ensure").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("ensure").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
         queue.poll();

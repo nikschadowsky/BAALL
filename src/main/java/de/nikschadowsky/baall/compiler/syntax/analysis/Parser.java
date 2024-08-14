@@ -19,16 +19,15 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import javax.annotation.processing.Generated;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Generated("by BAALL-Parser-Gen")
 public class Parser {
-    public static final Map<String, TerminalSymbol> TERMINAL_MAP = generateMapEntries();
 
     private TokenQueue queue;
 
@@ -38,68 +37,6 @@ public class Parser {
 
     public Parser(TokenQueue tokens) {
         this.queue = tokens;
-    }
-
-    // todo combine and unify with SyntaxSet.java
-    private static Map<String, TerminalSymbol> generateMapEntries() {
-        return Map.ofEntries(
-                Map.entry("use", new TerminalSymbol(TerminalType.ANY, "use")),
-                Map.entry("_STRING", new TerminalSymbol(TerminalType.STRING, "_STRING")),
-                Map.entry(";", new TerminalSymbol(TerminalType.ANY, ";")),
-                Map.entry(":", new TerminalSymbol(TerminalType.ANY, ":")),
-                Map.entry("=", new TerminalSymbol(TerminalType.ANY, "=")),
-                Map.entry(":=", new TerminalSymbol(TerminalType.ANY, ":=")),
-                Map.entry("(", new TerminalSymbol(TerminalType.ANY, "(")),
-                Map.entry(")", new TerminalSymbol(TerminalType.ANY, ")")),
-                Map.entry("[", new TerminalSymbol(TerminalType.ANY, "[")),
-                Map.entry("]", new TerminalSymbol(TerminalType.ANY, "]")),
-                Map.entry(",", new TerminalSymbol(TerminalType.ANY, ",")),
-                Map.entry("none", new TerminalSymbol(TerminalType.ANY, "none")),
-                Map.entry("{", new TerminalSymbol(TerminalType.ANY, "{")),
-                Map.entry("}", new TerminalSymbol(TerminalType.ANY, "}")),
-                Map.entry("?", new TerminalSymbol(TerminalType.ANY, "?")),
-                Map.entry("|", new TerminalSymbol(TerminalType.ANY, "|")),
-                Map.entry("for", new TerminalSymbol(TerminalType.ANY, "for")),
-                Map.entry("..", new TerminalSymbol(TerminalType.ANY, "..")),
-                Map.entry("::", new TerminalSymbol(TerminalType.ANY, "::")),
-                Map.entry("while", new TerminalSymbol(TerminalType.ANY, "while")),
-                Map.entry("break", new TerminalSymbol(TerminalType.ANY, "break")),
-                Map.entry("continue", new TerminalSymbol(TerminalType.ANY, "continue")),
-                Map.entry("return", new TerminalSymbol(TerminalType.ANY, "return")),
-                Map.entry("+", new TerminalSymbol(TerminalType.ANY, "+")),
-                Map.entry("-", new TerminalSymbol(TerminalType.ANY, "-")),
-                Map.entry("*", new TerminalSymbol(TerminalType.ANY, "*")),
-                Map.entry("/", new TerminalSymbol(TerminalType.ANY, "/")),
-                Map.entry("%", new TerminalSymbol(TerminalType.ANY, "%")),
-                Map.entry("&", new TerminalSymbol(TerminalType.ANY, "&")),
-                Map.entry("^", new TerminalSymbol(TerminalType.ANY, "^")),
-                Map.entry("<<", new TerminalSymbol(TerminalType.ANY, "<<")),
-                Map.entry(">>", new TerminalSymbol(TerminalType.ANY, ">>")),
-                Map.entry("==", new TerminalSymbol(TerminalType.ANY, "==")),
-                Map.entry("<", new TerminalSymbol(TerminalType.ANY, "<")),
-                Map.entry(">", new TerminalSymbol(TerminalType.ANY, ">")),
-                Map.entry("&&", new TerminalSymbol(TerminalType.ANY, "&&")),
-                Map.entry("||", new TerminalSymbol(TerminalType.ANY, "||")),
-                Map.entry("++", new TerminalSymbol(TerminalType.ANY, "++")),
-                Map.entry("--", new TerminalSymbol(TerminalType.ANY, "--")),
-                Map.entry("+=", new TerminalSymbol(TerminalType.ANY, "+=")),
-                Map.entry("-=", new TerminalSymbol(TerminalType.ANY, "-=")),
-                Map.entry("*=", new TerminalSymbol(TerminalType.ANY, "*=")),
-                Map.entry("/=", new TerminalSymbol(TerminalType.ANY, "/=")),
-                Map.entry("&=", new TerminalSymbol(TerminalType.ANY, "&=")),
-                Map.entry("|=", new TerminalSymbol(TerminalType.ANY, "|=")),
-                Map.entry("^=", new TerminalSymbol(TerminalType.ANY, "^=")),
-                Map.entry("!", new TerminalSymbol(TerminalType.ANY, "!")),
-                Map.entry("_NUMBER", new TerminalSymbol(TerminalType.NUMBER, "_NUMBER")),
-                Map.entry("_BOOLEAN", new TerminalSymbol(TerminalType.BOOLEAN, "_BOOLEAN")),
-                Map.entry("string", new TerminalSymbol(TerminalType.ANY, "string")),
-                Map.entry("number", new TerminalSymbol(TerminalType.ANY, "number")),
-                Map.entry("boolean", new TerminalSymbol(TerminalType.ANY, "boolean")),
-                Map.entry("struct", new TerminalSymbol(TerminalType.ANY, "struct")),
-                Map.entry("function", new TerminalSymbol(TerminalType.ANY, "function")),
-                Map.entry("_IDENTIFIER", new TerminalSymbol(TerminalType.IDENTIFIER, "_IDENTIFIER")),
-                Map.entry("export", new TerminalSymbol(TerminalType.ANY, "export"))
-        );
     }
 
     @PartialParse
@@ -157,21 +94,21 @@ public class Parser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!TERMINAL_MAP.get("use").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("use").matches(queue.peek())) {
             return PartialParseResult.successfulParse(new LinkedList<>());
         }
         queue.poll();
 
-        if (!TERMINAL_MAP.get("_STRING").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("_STRING").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a string!"));
             isPartial = true;
         }
         imports.add(queue.poll());
 
-        if (!TERMINAL_MAP.get(";").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
             isPartial = true;
-            queue.skipOver(TERMINAL_MAP.get(";"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
         }
         queue.poll();
 
@@ -267,7 +204,7 @@ public class Parser {
             isPartial = true;
         }
 
-        if (!TERMINAL_MAP.get(";").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
             isPartial = true;
         }
@@ -372,7 +309,7 @@ public class Parser {
         queue.mergeBranch();
         node.setType(parsedType.getParseResult());
 
-        if (!TERMINAL_MAP.get(":").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
             isPartial = true;
         }
@@ -386,7 +323,7 @@ public class Parser {
         queue.mergeBranch();
         node.setIdentifier(parsedIdentifier.getParseResult());
 
-        if (TERMINAL_MAP.get("=").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("=").matches(queue.peek())) {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression =
@@ -418,7 +355,7 @@ public class Parser {
         queue.mergeBranch();
         node.setType(parsedType.getParseResult());
 
-        if (!TERMINAL_MAP.get(":").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
             isPartial = true;
         }
@@ -432,7 +369,7 @@ public class Parser {
         queue.mergeBranch();
         node.setIdentifier(parsedIdentifier.getParseResult());
 
-        if (!TERMINAL_MAP.get(":=").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":=").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':='!"));
             isPartial = true;
         } else {
@@ -525,14 +462,14 @@ public class Parser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!TERMINAL_MAP.get("export").symbolMatches(queue.poll())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("export").matches(queue.poll())) {
             return PartialParseResult.successfulParse(node);
         }
 
-        if (TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
 
-            if (TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+            if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                 return PartialParseResult.successfulParse(node);
             } else {
                 ParseResult<IdentifierAccessNode> parsedElement =
@@ -565,7 +502,7 @@ public class Parser {
                     isPartial = true;
                 }
 
-                if (!TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+                if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
                     isPartial = true;
                 }
@@ -579,35 +516,4 @@ public class Parser {
         }
         return PartialParseResult.successfulParse(node);
     }
-
-    @Generated("by BAALL-Parser-Gen")
-    public static class TerminalSymbol {
-        private final String value;
-
-        private final TerminalType type;
-
-        public TerminalSymbol(TerminalType type, String value) {
-            this.type = type;
-            this.value = value;
-        }
-
-        public boolean symbolMatches(Token symbol) {
-            if (!TerminalType.ANY.equals(type)) {
-                return value.equals(symbol.value());
-            }
-            if (type.equals(symbol.type())) {
-                return !type.hasExactValueMatching() || value.equals(symbol.type());
-            }
-            return false;
-        }
-
-        public TerminalType getType() {
-            return type;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
 }

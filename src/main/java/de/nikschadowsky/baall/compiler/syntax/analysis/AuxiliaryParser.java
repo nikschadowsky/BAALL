@@ -14,6 +14,8 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNodeImpl;
+import de.nikschadowsky.baall.compiler.util.LanguageElement;
+import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
             ParseResult<Map.Entry<TypeNode, Token>> parsedFieldDeclaration = parseFieldDeclaration(queue.branchOff(), astFactory);
             if (parsedFieldDeclaration.isSuccessful()) {
@@ -53,7 +55,7 @@ public class AuxiliaryParser {
         ParseResult<TypeNode> parsedTypeNode = parseType(queue.branchOff(), astFactory);
         if (parsedTypeNode.isSuccessful()) {
             queue.mergeBranch();
-            if (Parser.TERMINAL_MAP.get(":").symbolMatches(queue.peek())) {
+            if (SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
                 queue.poll();
                 ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff(), astFactory);
                 if (parsedIdentifier.isSuccessful()) {
@@ -72,7 +74,7 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<List<ExpressionNode>> parseArgumentList(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
             ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
             if (parsedExpression.isSuccessful()) {
@@ -95,13 +97,13 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<Token> parseBinaryOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        // todo use syntax set
-        Set<Parser.TerminalSymbol> validBinaryOperators =
+        // todo syntax set should differentiate between unary and binary operators
+        Set<LanguageElement> validBinaryOperators =
                 Stream.of("+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "==", "<", ">", "&&", "||")
-                      .map(Parser.TERMINAL_MAP::get)
+                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
-        if (validBinaryOperators.stream().anyMatch(e -> e.symbolMatches(queue.peek()))) {
+        if (validBinaryOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected an operator!"));
@@ -109,12 +111,12 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<Token> parseUnaryOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<Parser.TerminalSymbol> validShorthandOperators =
+        Set<LanguageElement> validShorthandOperators =
                 Stream.of("++", "--")
-                      .map(Parser.TERMINAL_MAP::get)
+                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
-        if (validShorthandOperators.stream().anyMatch(e -> e.symbolMatches(queue.peek()))) {
+        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a unary operator!"));
@@ -122,12 +124,12 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<Token> parseShorthandOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<Parser.TerminalSymbol> validShorthandOperators =
+        Set<LanguageElement> validShorthandOperators =
                 Stream.of("=", ":=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
-                      .map(Parser.TERMINAL_MAP::get)
+                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
-        if (validShorthandOperators.stream().anyMatch(e -> e.symbolMatches(queue.peek()))) {
+        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
@@ -144,7 +146,7 @@ public class AuxiliaryParser {
      */
     @CompleteParse
     public static ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get("_IDENTIFIER").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("_IDENTIFIER").matches(queue.peek())) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));
@@ -173,12 +175,12 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<Token> parseSimpleType(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<Parser.TerminalSymbol> validSimpleTypes = Stream.of("string", "number", "boolean", "struct", "function")
-                                                            .map(Parser.TERMINAL_MAP::get)
-                                                            .collect(Collectors.toSet());
+        Set<LanguageElement> validSimpleTypes = Stream.of("string", "number", "boolean", "struct", "function")
+                                                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
+                                                      .collect(Collectors.toSet());
         Token nextToken = queue.peek();
 
-        if (validSimpleTypes.stream().anyMatch(e -> e.symbolMatches(nextToken))) {
+        if (validSimpleTypes.stream().anyMatch(e -> e.matches(nextToken))) {
             return ParseResult.successfulParse(queue.poll());
         } else {
             // check if type is identifier
@@ -201,7 +203,7 @@ public class AuxiliaryParser {
     public static ParseResult<List<ExpressionNode>> parseArrayTypeDefinitions(TokenQueue queue, ASTNodeFactory astFactory) {
         List<ExpressionNode> arrayDimensions = new LinkedList<>();
 
-        if (!Parser.TERMINAL_MAP.get("[").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
             return ParseResult.successfulParse(new LinkedList<>());
         }
         queue.poll();
@@ -209,7 +211,7 @@ public class AuxiliaryParser {
         ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
-            if (Parser.TERMINAL_MAP.get("]").symbolMatches(queue.peek())) {
+            if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
                 queue.poll();
                 ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
                         parseArrayTypeDefinitions(queue.branchOff(), astFactory);
@@ -226,7 +228,7 @@ public class AuxiliaryParser {
             }
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'!"));
         }
-        queue.skipOver(Parser.TERMINAL_MAP.get("]"));
+        queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
         return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
     }
 
@@ -261,14 +263,14 @@ public class AuxiliaryParser {
      */
     @CompleteParse
     public static ParseResult<List<ExpressionNode>> parseOptionalArrayIndex(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get("[").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
             if (parsedExpression.isSuccessful()) {
                 queue.mergeBranch();
 
-                if (Parser.TERMINAL_MAP.get("]").symbolMatches(queue.peek())) {
+                if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
                     queue.poll();
                     ParseResult<List<ExpressionNode>> parsedOptionalArrayIndex =
                             parseOptionalArrayIndex(queue.branchOff(), astFactory);
@@ -285,7 +287,7 @@ public class AuxiliaryParser {
                 }
                 return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'"));
             }
-            queue.skipOver(Parser.TERMINAL_MAP.get("]"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
             return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
         // epsilon
@@ -301,7 +303,7 @@ public class AuxiliaryParser {
     @PartialParse
     public static PartialParseResult<List<IdentifierAccessNode>> parseIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory) {
         boolean isPartial = false;
-        if (Parser.TERMINAL_MAP.get(",").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
             ParseResult<IdentifierAccessNode> parsedIdentifierAccess = parseIdentifierAccess(queue.branchOff(), astFactory);
             if (parsedIdentifierAccess.isSuccessful()) {
@@ -334,7 +336,7 @@ public class AuxiliaryParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!Parser.TERMINAL_MAP.get("{").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
         }
         queue.poll();
@@ -350,10 +352,10 @@ public class AuxiliaryParser {
             queue.mergeBranch();
         }
 
-        if (!Parser.TERMINAL_MAP.get("}").symbolMatches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
             isPartial = true;
-            queue.skipOver(Parser.TERMINAL_MAP.get("}"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
         }
 
         if(isPartial) {

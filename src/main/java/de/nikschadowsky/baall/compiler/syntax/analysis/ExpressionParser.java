@@ -13,6 +13,8 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNo
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
+import de.nikschadowsky.baall.compiler.util.LanguageElement;
+import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -27,7 +29,7 @@ import java.util.stream.Stream;
 public class ExpressionParser {
     @CompleteParse
     public static ParseResult<ExpressionNode> parseExpression(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (Parser.TERMINAL_MAP.get("(").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             queue.poll();
 
             ParenthesizedExpressionNodeImpl node = astFactory.createParenthesizedExpressionNode();
@@ -35,13 +37,13 @@ public class ExpressionParser {
             if (parsedExpression.isSuccessful()) {
                 queue.mergeBranch();
 
-                if (Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
+                if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
                     node.setInnerExpression(parsedExpression.getParseResult());
                     return ParseResult.successfulParse(node);
                 }
                 return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
             }
-            queue.skipOver(Parser.TERMINAL_MAP.get(")"));
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
 
@@ -131,9 +133,9 @@ public class ExpressionParser {
         queue.mergeBranch();
         node.setFunctionIdentifier(parsedIdentifierValueAccess.getParseResult());
 
-        if (Parser.TERMINAL_MAP.get("(").symbolMatches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             queue.poll();
-            if (Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
+            if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
                 queue.poll();
                 node.setArguments(new LinkedList<>());
                 return PartialParseResult.successfulParse(node);
@@ -161,10 +163,10 @@ public class ExpressionParser {
                 isPartial = true;
             }
 
-            if (!Parser.TERMINAL_MAP.get(")").symbolMatches(queue.peek())) {
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
                 diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
                 isPartial = true;
-                queue.skipOver(Parser.TERMINAL_MAP.get(")"));
+                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             }
 
         } else {
@@ -222,12 +224,12 @@ public class ExpressionParser {
 
     @CompleteParse
     public static ParseResult<Token> parsePrefixOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<Parser.TerminalSymbol> validShorthandOperators =
+        Set<LanguageElement> validShorthandOperators =
                 Stream.of("+", "-", "!")
-                      .map(Parser.TERMINAL_MAP::get)
+                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
-        if (validShorthandOperators.stream().anyMatch(e -> e.symbolMatches(queue.peek()))) {
+        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a prefix operator!"));

@@ -146,7 +146,7 @@ public class AuxiliaryParser {
      */
     @CompleteParse
     public static ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("_IDENTIFIER").matches(queue.peek())) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("identifier_primitive").matches(queue.peek())) {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));

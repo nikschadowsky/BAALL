@@ -5,6 +5,7 @@ import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,7 +13,7 @@ import java.util.List;
  */
 public class TokenQueueTestBuilder {
 
-    private List<Token> tokens;
+    private final List<Token> tokens = new ArrayList<>();
 
     public TokenQueueTestBuilder() {
     }

@@ -32,6 +32,11 @@ public enum TokenType {
         return hasExactTokenMatching;
     }
 
+    @Override
+    public String toString() {
+        return "[name=%s, hasExactTokenMatching=%s]".formatted(super.toString(), hasExactTokenMatching);
+    }
+
     /**
      * Finds a TokenType to the provided description String. It matches case-insensitive.
      *

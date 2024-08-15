@@ -161,7 +161,7 @@ public class AuxiliaryParser {
 
             node.setType(parsedSimpleType.getParseResult());
             ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayTypeDefinitions(queue.branchOff(), astFactory);
+                    parseArrayIndexInformation(queue.branchOff(), astFactory);
             if (parsedArrayTypeDefinitions.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -175,12 +175,9 @@ public class AuxiliaryParser {
 
     @CompleteParse
     public static ParseResult<Token> parseSimpleType(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<LanguageElement> validSimpleTypes = Stream.of("string", "number", "boolean", "struct", "function")
-                                                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
-                                                      .collect(Collectors.toSet());
-        Token nextToken = queue.peek();
+       Token nextToken = queue.peek();
 
-        if (validSimpleTypes.stream().anyMatch(e -> e.matches(nextToken))) {
+        if (SyntaxSet.SIMPLE_TYPES.stream().anyMatch(e -> e.matches(nextToken))) {
             return ParseResult.successfulParse(queue.poll());
         } else {
             // check if type is identifier
@@ -200,7 +197,7 @@ public class AuxiliaryParser {
      * @return
      */
     @CompleteParse
-    public static ParseResult<List<ExpressionNode>> parseArrayTypeDefinitions(TokenQueue queue, ASTNodeFactory astFactory) {
+    public static ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue, ASTNodeFactory astFactory) {
         List<ExpressionNode> arrayDimensions = new LinkedList<>();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
@@ -214,7 +211,7 @@ public class AuxiliaryParser {
             if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
                 queue.poll();
                 ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                        parseArrayTypeDefinitions(queue.branchOff(), astFactory);
+                        parseArrayIndexInformation(queue.branchOff(), astFactory);
                 if (parsedArrayTypeDefinitions.isSuccessful()) {
                     queue.mergeBranch();
 
@@ -246,7 +243,7 @@ public class AuxiliaryParser {
             queue.mergeBranch();
             node.setIdentifier(parsedIdentifier.getParseResult());
             ParseResult<List<ExpressionNode>> parsedOptionalArrayIndices =
-                    parseOptionalArrayIndex(queue.branchOff(), astFactory);
+                    parseArrayIndexInformation(queue.branchOff(), astFactory);
             if (parsedOptionalArrayIndices.isSuccessful()) {
                 queue.mergeBranch();
                 node.setArrayIndexes(parsedOptionalArrayIndices.getParseResult());
@@ -257,42 +254,6 @@ public class AuxiliaryParser {
         return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
     }
 
-    /**
-     * @param queue
-     * @return
-     */
-    @CompleteParse
-    public static ParseResult<List<ExpressionNode>> parseOptionalArrayIndex(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
-            queue.poll();
-
-            ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
-            if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
-
-                if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
-                    queue.poll();
-                    ParseResult<List<ExpressionNode>> parsedOptionalArrayIndex =
-                            parseOptionalArrayIndex(queue.branchOff(), astFactory);
-
-                    if (parsedOptionalArrayIndex.isSuccessful()) {
-                        queue.mergeBranch();
-
-                        List<ExpressionNode> arrayIndices = new LinkedList<>();
-                        arrayIndices.add(parsedExpression.getParseResult());
-                        arrayIndices.addAll(parsedOptionalArrayIndex.getParseResult());
-                        return ParseResult.successfulParse(arrayIndices);
-                    }
-                    return ParseResult.unsuccessfulParse(parsedOptionalArrayIndex.getDiagnostic());
-                }
-                return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'"));
-            }
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
-            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
-        }
-        // epsilon
-        return ParseResult.successfulParse(new LinkedList<>());
-    }
 
     /**
      * Parses 2..n exported elements and writes them into the passed node
@@ -302,27 +263,25 @@ public class AuxiliaryParser {
      */
     @PartialParse
     public static PartialParseResult<List<IdentifierAccessNode>> parseIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory) {
-        boolean isPartial = false;
         if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
             ParseResult<IdentifierAccessNode> parsedIdentifierAccess = parseIdentifierAccess(queue.branchOff(), astFactory);
             if (parsedIdentifierAccess.isSuccessful()) {
                 queue.mergeBranch();
-                PartialParseResult<List<IdentifierAccessNode>> parsedAdditionalExports =
+                PartialParseResult<List<IdentifierAccessNode>> parsedIdentifierAccesses =
                         parseIdentifierAccesses(queue.branchOff(), astFactory);
-                if (parsedAdditionalExports.isSuccessful()) {
+                if (parsedIdentifierAccesses.isSuccessful()) {
                     queue.mergeBranch();
-
 
                     List<IdentifierAccessNode> exports = new LinkedList<>();
                     exports.add(parsedIdentifierAccess.getParseResult());
-                    exports.addAll(parsedAdditionalExports.getParseResult());
+                    exports.addAll(parsedIdentifierAccesses.getParseResult());
 
                     return PartialParseResult.successfulParse(exports);
-                } else if (parsedAdditionalExports.isPartial()) {
-                    return PartialParseResult.partialParse(new LinkedList<>(), parsedAdditionalExports.getDiagnostic());
+                } else if (parsedIdentifierAccesses.isPartial()) {
+                    return PartialParseResult.partialParse(new LinkedList<>(), parsedIdentifierAccesses.getDiagnostic());
                 }
-                return PartialParseResult.unsuccessfulParse(parsedAdditionalExports.getDiagnostic());
+                return PartialParseResult.unsuccessfulParse(parsedIdentifierAccesses.getDiagnostic());
             }
 
             return PartialParseResult.unsuccessfulParse(parsedIdentifierAccess.getDiagnostic());

@@ -8,10 +8,7 @@ public record Token(TokenType type, String value, int line, int index) {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "type=" + type.getDescription() +
-                ", value='" + value + '\'' +
-                '}';
+        return "Token{type=%s, value='%s', at:%s:%s}".formatted(type, value, line, index);
     }
 
     @Override

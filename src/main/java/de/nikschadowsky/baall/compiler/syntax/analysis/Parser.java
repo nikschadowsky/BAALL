@@ -78,6 +78,11 @@ public class Parser {
             isPartial = true;
         }
 
+        if(!queue.hasReachedEndOfFile()) {
+            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Illegal token"));
+            isPartial = true;
+        }
+
         node.setDiagnostics(diagnostics);
 
         if (isPartial) {

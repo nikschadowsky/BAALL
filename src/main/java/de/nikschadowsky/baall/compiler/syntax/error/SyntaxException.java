@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.parser;
+package de.nikschadowsky.baall.compiler.syntax.error;
 
 public class SyntaxException extends RuntimeException {
     public SyntaxException(String msg){

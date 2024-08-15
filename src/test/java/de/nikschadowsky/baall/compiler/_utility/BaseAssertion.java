@@ -1,0 +1,65 @@
+package de.nikschadowsky.baall.compiler._utility;
+
+
+import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
+import de.nikschadowsky.baall.compiler.util.LanguageElement;
+import org.assertj.core.api.AbstractAssert;
+
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+/**
+ * @since 15.08.2024
+ */
+public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, OBJECT>
+        extends AbstractAssert<ASSERTION, OBJECT> {
+
+    protected BaseAssertion(OBJECT actual, Class<?> selfType) {
+        super(actual, selfType);
+    }
+
+    protected <V> ASSERTION baseAssert(String attributeName, Function<OBJECT, V> valueGetter, V expected) {
+        isNotNull();
+
+        final V actualValue = valueGetter.apply(this.actual);
+        if (!Objects.equals(actualValue, expected)) {
+            failWithMessage(
+                    "\nExpected %s of:\n <%s>\n to be:\n <%s>\n but was:\n <%s>",
+                    attributeName,
+                    actual,
+                    expected,
+                    actualValue
+            );
+        }
+
+        return myself;
+    }
+
+    protected ASSERTION truthnessAssert(Supplier<String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
+        isNotNull();
+
+        if (!valueGetter.apply(this.actual)) {
+            failWithMessage(failMessageProvider.get());
+        }
+        return myself;
+    }
+
+    protected ASSERTION falsenessAssert(Supplier<String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
+        isNotNull();
+
+        if (valueGetter.apply(this.actual)) {
+            failWithMessage(failMessageProvider.get());
+        }
+        return myself;
+    }
+
+    public static LanguageElementAssertion assertThat(LanguageElement actual) {
+        return new LanguageElementAssertion(actual);
+    }
+
+    public static <T> ParseResultAssertion<T> assertThat(ParseResult<T> actual) {
+        return new ParseResultAssertion<>(actual);
+    }
+
+}

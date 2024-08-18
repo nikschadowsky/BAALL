@@ -19,7 +19,10 @@ public record LanguageElement(String representation, TokenType type, String matc
         );
     }
 
-    public boolean matches(@NotNull Token token) {
+    public boolean matches(Token token) {
+        if (token == null) {
+            return false;
+        }
         if (type != token.type()) {
             return false;
         }

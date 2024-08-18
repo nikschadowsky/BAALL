@@ -46,7 +46,7 @@ public class TokenQueue {
      * Checks if end of file was reached and if so throws an {@link EndOfFileException}.
      */
     private void checkEOF() {
-        if (queue.isEmpty()) {
+        if (hasReachedEndOfFile()) {
             throw new EndOfFileException();
         }
     }
@@ -81,7 +81,7 @@ public class TokenQueue {
     }
 
     public boolean hasReachedEndOfFile() {
-        return pointer == queue.size() - 1;
+        return pointer >= queue.size();
     }
 
     public void mergeBranch() {

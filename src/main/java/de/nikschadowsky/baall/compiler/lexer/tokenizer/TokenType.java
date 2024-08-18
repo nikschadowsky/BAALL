@@ -13,6 +13,7 @@ public enum TokenType {
     IDENTIFIER("Identifier", false),
     OPERATOR("Operator", true),
     SEPARATOR("Separator", true),
+    @Deprecated
     ANY("Any", true);
 
     private final String description;

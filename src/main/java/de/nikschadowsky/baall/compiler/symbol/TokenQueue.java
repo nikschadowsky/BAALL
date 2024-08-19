@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.symbol;
 
 import de.nikschadowsky.baall.compiler.util.LanguageElement;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,13 +29,17 @@ public class TokenQueue {
         this.pointer = initialPosition;
     }
 
-    public Token poll() {
-        checkEOF();
+    public @Nullable Token poll() {
+        if (hasReachedEndOfFile()) {
+            return null;
+        }
         return queue.get(pointer++);
     }
 
-    public Token peek() {
-        checkEOF();
+    public @Nullable Token peek() {
+        if (hasReachedEndOfFile()) {
+            return null;
+        }
         return queue.get(pointer);
     }
 

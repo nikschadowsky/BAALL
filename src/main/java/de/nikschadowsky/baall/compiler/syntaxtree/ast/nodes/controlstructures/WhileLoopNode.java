@@ -4,7 +4,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.Expressio
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public interface WhileLoopNode extends ControlStructureNode {
 

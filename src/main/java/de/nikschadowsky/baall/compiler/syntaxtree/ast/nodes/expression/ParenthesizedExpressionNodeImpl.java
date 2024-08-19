@@ -6,7 +6,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public class ParenthesizedExpressionNodeImpl extends AbstractNode implements ParenthesizedExpressionNode {
 

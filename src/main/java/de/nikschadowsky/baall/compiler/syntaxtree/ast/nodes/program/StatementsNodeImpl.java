@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * File created on 14.04.2024
+ * @since 14.04.2024
  */
 public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
 

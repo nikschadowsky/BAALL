@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Root interface for all AST node types File created on 29.07.2024
+ * Root interface for all AST node types @since 29.07.2024
  */
 public interface Node {
 

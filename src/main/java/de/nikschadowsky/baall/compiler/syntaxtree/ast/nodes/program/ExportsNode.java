@@ -7,7 +7,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.List;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public interface ExportsNode extends Node {
 

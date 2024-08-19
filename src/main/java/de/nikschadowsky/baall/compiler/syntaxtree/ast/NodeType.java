@@ -1,7 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntaxtree.ast;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public enum NodeType {
     PROGRAM,

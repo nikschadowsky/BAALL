@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.stream.IntStream;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public class ArrayUtility {
 

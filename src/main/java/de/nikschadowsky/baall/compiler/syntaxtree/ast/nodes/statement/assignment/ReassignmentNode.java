@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementN
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public interface ReassignmentNode extends StatementNode {
 

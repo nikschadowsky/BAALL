@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntax.error;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 
 /**
- * File created on 07.04.2024
+ * @since 07.04.2024
  */
 public class SyntaxDiagnostic {
 

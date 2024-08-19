@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public interface ReturnStatementNode extends ControlStatementNode{
 

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public class ArrayUtilityTest {
 

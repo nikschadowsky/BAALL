@@ -6,7 +6,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.Expressio
 import java.util.List;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public interface IdentifierAccessNode extends ValueNode {
 

@@ -29,7 +29,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 
 /**
- * File created on 08.04.2024
+ * @since 08.04.2024
  */
 public class ASTNodeFactory {
 

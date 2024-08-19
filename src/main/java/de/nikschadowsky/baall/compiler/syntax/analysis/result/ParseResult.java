@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.NoSuchElementException;
 
 /**
- * File created on 11.07.2024
+ * @since 11.07.2024
  */
 public class ParseResult<T> {
 

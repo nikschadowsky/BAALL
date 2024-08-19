@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.function.BiPredicate;
 
 /**
- * File created on 15.02.2024
+ * @since 15.02.2024
  */
 public class CollectionUtility {
 

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * File created on 14.04.2024
+ * @since 14.04.2024
  */
 public class ProgramNodeImpl extends AbstractNode implements ProgramNode {
 

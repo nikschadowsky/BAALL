@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * File created on 16.01.2024
+ * @since 16.01.2024
  */
 public class SyntaxTreeFormatter {
 

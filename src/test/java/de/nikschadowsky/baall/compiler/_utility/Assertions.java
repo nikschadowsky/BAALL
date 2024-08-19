@@ -6,7 +6,7 @@ import java.util.Objects;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * File created on 09.02.2024
+ * @since 09.02.2024
  */
 public class Assertions {
 

@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 import de.nikschadowsky.baall.compiler.lexer.tokens.Token;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public non-sealed class ConcreteSyntaxTreeLeafNode extends ConcreteSyntaxTreeNode<Token> implements ConcreteSyntaxTreeLeaf {
 

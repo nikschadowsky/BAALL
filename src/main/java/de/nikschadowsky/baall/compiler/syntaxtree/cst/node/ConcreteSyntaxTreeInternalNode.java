@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public non-sealed class ConcreteSyntaxTreeInternalNode extends ConcreteSyntaxTreeNode<Object> {
 

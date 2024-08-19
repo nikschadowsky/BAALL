@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * File created on 24.07.2024
+ * @since 24.07.2024
  */
 public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode {
 

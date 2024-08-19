@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignmen
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public interface VariableReassignmentNode extends ReassignmentNode {
 

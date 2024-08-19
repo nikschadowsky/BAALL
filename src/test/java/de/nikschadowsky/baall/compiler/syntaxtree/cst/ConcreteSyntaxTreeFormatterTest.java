@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * File created on 19.01.2024
+ * @since 19.01.2024
  */
 class ConcreteSyntaxTreeFormatterTest {
 

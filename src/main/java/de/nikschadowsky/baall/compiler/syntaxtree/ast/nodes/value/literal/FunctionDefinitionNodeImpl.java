@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * File created on 28.07.2024
+ * @since 28.07.2024
  */
 public class FunctionDefinitionNodeImpl extends AbstractNode implements FunctionDefinitionNode {
 

@@ -4,7 +4,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.cst.node;
 import java.util.Objects;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public sealed abstract class ConcreteSyntaxTreeNode<T> permits ConcreteSyntaxTreeLeafNode, ConcreteSyntaxTreeInternalNode {
 

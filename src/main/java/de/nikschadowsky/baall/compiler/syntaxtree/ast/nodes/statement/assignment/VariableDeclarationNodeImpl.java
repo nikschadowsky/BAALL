@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public class VariableDeclarationNodeImpl extends AbstractNode implements VariableDeclarationNode {
 

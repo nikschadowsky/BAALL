@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * File created on 07.04.2024
+ * @since 07.04.2024
  */
 public class SyntaxDiagnosticCollector {
 

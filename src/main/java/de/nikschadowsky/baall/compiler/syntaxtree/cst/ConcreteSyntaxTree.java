@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.cst.node.ConcreteSyntaxTreeInt
 import java.util.Objects;
 
 /**
- * File created on 14.01.2024
+ * @since 14.01.2024
  */
 public class ConcreteSyntaxTree {
 

@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNode {
 

@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * File created on 21.04.2024
+ * @since 21.04.2024
  */
 public class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
 

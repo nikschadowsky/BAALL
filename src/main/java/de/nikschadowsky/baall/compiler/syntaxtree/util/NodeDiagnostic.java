@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.util;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 
 /**
- * File created on 14.04.2024
+ * @since 14.04.2024
  */
 public record NodeDiagnostic(String message, Token source, ReportingLevel reportingLevel) {
 

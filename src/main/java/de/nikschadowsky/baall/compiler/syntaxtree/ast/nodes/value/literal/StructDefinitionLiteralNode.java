@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * File created on 29.07.2024
+ * @since 29.07.2024
  */
 public interface StructDefinitionLiteralNode extends LiteralNode {
 

@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
 import java.nio.file.Path;
 
 /**
- * File created on 19.01.2024
+ * @since 19.01.2024
  */
 public class Program {
 

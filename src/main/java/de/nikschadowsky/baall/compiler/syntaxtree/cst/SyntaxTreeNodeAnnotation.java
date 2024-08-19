@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * File created on 20.01.2024
+ * @since 20.01.2024
  */
 public class SyntaxTreeNodeAnnotation {
 

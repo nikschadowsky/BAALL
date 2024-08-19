@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * File created on 11.07.2024
+ * @since 11.07.2024
  */
 public class IdentifierAccessNodeImpl extends AbstractNode implements IdentifierAccessNode {
 

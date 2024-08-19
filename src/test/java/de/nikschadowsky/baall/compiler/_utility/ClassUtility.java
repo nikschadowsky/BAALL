@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * File created on 13.01.2024
+ * @since 13.01.2024
  */
 public class ClassUtility {
 

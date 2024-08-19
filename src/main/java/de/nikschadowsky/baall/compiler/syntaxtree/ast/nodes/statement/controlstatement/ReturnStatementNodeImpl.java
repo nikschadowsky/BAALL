@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * File created on 30.07.2024
+ * @since 30.07.2024
  */
 public class ReturnStatementNodeImpl extends AbstractNode implements ReturnStatementNode {
 

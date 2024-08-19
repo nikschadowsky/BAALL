@@ -14,10 +14,16 @@ public class LanguageElementAssertion extends BaseAssertion<LanguageElementAsser
     }
 
     public LanguageElementAssertion matches(Token expected) {
-        return truthnessAssert(() -> "\n<%s>\n does not match\n<%s>".formatted(actual, expected), (le) -> le.matches(expected));
+        return truthinessAssert(
+                le -> "\n<%s>\n does not match\n<%s>".formatted(actual, expected),
+                le -> le.matches(expected)
+        );
     }
 
     public LanguageElementAssertion doesNotMatch(Token expected) {
-        return falsenessAssert(() -> "\n<%s>\n does match\n<%s>".formatted(actual, expected), (le) -> le.matches(expected));
+        return falsenessAssert(
+                le -> "\n<%s>\n does match\n<%s>".formatted(actual, expected),
+                le -> le.matches(expected)
+        );
     }
 }

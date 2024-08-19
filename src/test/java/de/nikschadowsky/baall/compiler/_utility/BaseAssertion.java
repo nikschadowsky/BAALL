@@ -7,7 +7,6 @@ import org.assertj.core.api.AbstractAssert;
 
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @since 15.08.2024
@@ -36,20 +35,20 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
         return myself;
     }
 
-    protected ASSERTION truthnessAssert(Supplier<String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
+    protected ASSERTION truthinessAssert(Function<OBJECT, String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
         isNotNull();
 
         if (!valueGetter.apply(this.actual)) {
-            failWithMessage(failMessageProvider.get());
+            failWithMessage(failMessageProvider.apply(actual));
         }
         return myself;
     }
 
-    protected ASSERTION falsenessAssert(Supplier<String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
+    protected ASSERTION falsenessAssert(Function<OBJECT, String> failMessageProvider, Function<OBJECT, Boolean> valueGetter) {
         isNotNull();
 
         if (valueGetter.apply(this.actual)) {
-            failWithMessage(failMessageProvider.get());
+            failWithMessage(failMessageProvider.apply(actual));
         }
         return myself;
     }

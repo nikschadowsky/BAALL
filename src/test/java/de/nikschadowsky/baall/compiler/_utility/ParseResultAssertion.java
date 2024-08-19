@@ -16,15 +16,15 @@ public class ParseResultAssertion<T> extends BaseAssertion<ParseResultAssertion<
     }
 
     public ParseResultAssertion<T> isSuccessful() {
-        return truthnessAssert(() -> "ParseResult is not successful!", ParseResult::isSuccessful);
+        return truthinessAssert(pr -> "ParseResult is not successful!\n syntax diagnostic: " + pr.getDiagnostic().getMessage(), ParseResult::isSuccessful);
     }
 
     public ParseResultAssertion<T> isUnsuccessful() {
-        return truthnessAssert(() -> "ParseResult is successful!", ParseResult::isUnsuccessful);
+        return truthinessAssert(pr -> "ParseResult is successful!", ParseResult::isUnsuccessful);
     }
 
     public ParseResultAssertion<T> resultMatches(Predicate<T> predicate) {
-        return truthnessAssert(() -> "Result does not match predicate!", pr -> {
+        return truthinessAssert(pr -> "Result does not match predicate!", pr -> {
             try {
                 return predicate.test(pr.getParseResult());
             } catch (NoSuchElementException e) {
@@ -35,11 +35,10 @@ public class ParseResultAssertion<T> extends BaseAssertion<ParseResultAssertion<
     }
 
     public ParseResultAssertion<T> syntaxDiagnosticContains(String expected) {
-        return truthnessAssert(() -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
-                actual.getDiagnostic()
-                      .getMessage(),
+        return truthinessAssert(pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
+                pr.getDiagnostic().getMessage(),
                 expected
-        ), (pr) -> {
+        ), pr -> {
             try {
                 return pr.getDiagnostic().getMessage().contains(expected);
             } catch (NoSuchElementException e) {

@@ -1,4 +1,4 @@
-use math.ba; // import
+use "math.ba"; // import
 
 struct: myStructure := (number: field1, string: field2, structure2: field3);
 

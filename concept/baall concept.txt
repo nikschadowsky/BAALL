@@ -11,12 +11,12 @@ number: b = 3;
 char: c = 'A';
 myStructure: grr := (a,b,c);
 number[9]: arr = [1,2,3,4,5];
-number[9]: arr2 = []; // array of numbers with size 9
-
-// string{?}: myset = &{1,3,4,5,1};
+number[9]: arr2 = []; // array of numbers with size 9, all elements initialized to the default value for numbers '0'
 
 string: konstante1 := a + b;
-number: konstante2 := b + a;
+number: konstante2 := b + arr2[2];
+boolean: isTrue := true;
+boolean isFalse = false;
 
 string: function1 := number: a, bool: b, char: c {
 	isTrue? {
@@ -39,7 +39,7 @@ for i=0..10::i++{
 }
 // equivalent versions
 for i=0..10{
-
+    continue;
 }
 
 char: no = none;

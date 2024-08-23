@@ -491,7 +491,7 @@ public class Parser {
                 }
 
                 PartialParseResult<List<IdentifierAccessNode>> parsedElements =
-                        AuxiliaryParser.parseIdentifierAccesses(queue.branchOff(), astFactory);
+                        AuxiliaryParser.parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
                 if (parsedElements.isSuccessful()) {
                     queue.mergeBranch();
                     elements.addAll(parsedElements.getParseResult());

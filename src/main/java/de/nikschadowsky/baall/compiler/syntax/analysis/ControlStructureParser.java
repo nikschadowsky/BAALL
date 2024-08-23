@@ -454,6 +454,7 @@ public class ControlStructureParser {
     @PartialParse
     public static PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue, ASTNodeFactory astFactory) {
         InterceptStatementNodeImpl node = astFactory.createInterceptStatementNode();
+        List<IdentifierAccessNode> interceptedExceptions = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
@@ -461,20 +462,30 @@ public class ControlStructureParser {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
         queue.poll();
-
-        PartialParseResult<List<IdentifierAccessNode>> parsedInterceptedExceptions =
-                AuxiliaryParser.parseIdentifierAccesses(queue.branchOff(), astFactory);
-        if (parsedInterceptedExceptions.isUnsuccessful()) {
-            diagnostics.add(parsedInterceptedExceptions.getDiagnostic());
+        ParseResult<IdentifierAccessNode> parsedInterceptedException =
+                AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+        if (parsedInterceptedException.isUnsuccessful()) {
+            diagnostics.add(parsedInterceptedException.getDiagnostic());
             isPartial = true;
         } else {
-            if (parsedInterceptedExceptions.isPartial()) {
-                diagnostics.add(parsedInterceptedExceptions.getDiagnostic());
+            queue.mergeBranch();
+            interceptedExceptions.add(parsedInterceptedException.getParseResult());
+        }
+
+        PartialParseResult<List<IdentifierAccessNode>> parsedAdditionalInterceptedExceptions =
+                AuxiliaryParser.parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
+        if (parsedAdditionalInterceptedExceptions.isUnsuccessful()) {
+            diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
+            isPartial = true;
+        } else {
+            if (parsedAdditionalInterceptedExceptions.isPartial()) {
+                diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
                 isPartial = true;
             }
             queue.mergeBranch();
-            node.setInterceptedExceptions(parsedInterceptedExceptions.getParseResult());
+            interceptedExceptions.addAll(parsedAdditionalInterceptedExceptions.getParseResult());
         }
+        node.setInterceptedExceptions(interceptedExceptions);
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));

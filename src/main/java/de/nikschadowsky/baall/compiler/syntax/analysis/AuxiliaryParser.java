@@ -163,7 +163,7 @@ public class AuxiliaryParser {
 
             node.setType(parsedSimpleType.getParseResult());
             ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayIndexTypeDefinition(queue.branchOff(), astFactory);
+                    parseArrayTypeDefinition(queue.branchOff(), astFactory);
             if (parsedArrayTypeDefinitions.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -193,7 +193,7 @@ public class AuxiliaryParser {
     }
 
     @CompleteParse
-    public static ParseResult<List<ExpressionNode>> parseArrayIndexTypeDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
+    public static ParseResult<List<ExpressionNode>> parseArrayTypeDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
             return ParseResult.successfulParse(new LinkedList<>());
         }
@@ -212,7 +212,7 @@ public class AuxiliaryParser {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
             queue.poll();
             ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayIndexTypeDefinition(queue.branchOff(), astFactory);
+                    parseArrayTypeDefinition(queue.branchOff(), astFactory);
             if (parsedArrayTypeDefinitions.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -224,7 +224,7 @@ public class AuxiliaryParser {
             }
             return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Illegal token!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'!"));
     }
 
     /**
@@ -299,8 +299,7 @@ public class AuxiliaryParser {
      * @return
      */
     @PartialParse
-    public static PartialParseResult<List<IdentifierAccessNode>> parseIdentifierAccesses(TokenQueue
-                                                                                                 queue, ASTNodeFactory astFactory) {
+    public static PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
             ParseResult<IdentifierAccessNode> parsedIdentifierAccess =
@@ -308,7 +307,7 @@ public class AuxiliaryParser {
             if (parsedIdentifierAccess.isSuccessful()) {
                 queue.mergeBranch();
                 PartialParseResult<List<IdentifierAccessNode>> parsedIdentifierAccesses =
-                        parseIdentifierAccesses(queue.branchOff(), astFactory);
+                        parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
                 if (parsedIdentifierAccesses.isSuccessful()) {
                     queue.mergeBranch();
 

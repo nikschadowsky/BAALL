@@ -20,46 +20,156 @@ import java.util.Map;
  * @since 25.08.2024
  */
 public interface AuxiliaryParser {
+    /**
+     * Parses a list of {@link #parseFieldDeclaration(TokenQueue, ASTNodeFactory)  field declarations} with a
+     * <b>leading</b> comma. A parse of field declaration is optional if the first symbol in the queue is not a comma.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed field declarations
+     */
     @CompleteParse
     ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a single field declaration in the format of 'TYPE : IDENTIFIER'.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed field declaration
+     */
     @CompleteParse
     ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a list of arguments in the form of
+     * {@link ExpressionParser#parseExpression(TokenQueue, ASTNodeFactory) expressions}. The list returned can be
+     * empty.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed expressions
+     */
     @CompleteParse
     ParseResult<List<ExpressionNode>> parseArgumentList(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a binary operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed binary operator
+     */
     @CompleteParse
     ParseResult<Token> parseBinaryOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a unary operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed unary operator
+     */
     @CompleteParse
     ParseResult<Token> parseUnaryOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a shorthand operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed shorthand operator
+     */
     @CompleteParse
     ParseResult<Token> parseShorthandOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses an identifier.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed identifier
+     */
     @CompleteParse
     ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a type declaration consisting of a {@link #parseSimpleType(TokenQueue, ASTNodeFactory) simple type} and
+     * optional {@link #parseArrayTypeDefinition(TokenQueue, ASTNodeFactory) array type definitions}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the parsed type
+     */
     @CompleteParse
     ParseResult<TypeNode> parseType(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a simple type specified by the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the simple type
+     */
     @CompleteParse
     ParseResult<Token> parseSimpleType(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a list of array type definitions. Each type definition is represented either an
+     * {@link ExpressionParser#parseExpression(TokenQueue, ASTNodeFactory) expression} node specifying its size or
+     * {@code null} to indicate an unknown or inferred size. The list returned can be empty.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the array type definitions
+     */
     @CompleteParse
     ParseResult<List<ExpressionNode>> parseArrayTypeDefinition(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a list of array index information. Each index information is represented by an
+     * {@link ExpressionParser#parseExpression(TokenQueue, ASTNodeFactory) expression} specifying a concrete index. The
+     * list returned can be empty.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the array index information
+     */
     @CompleteParse
     ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses access to a value referenced by an {@link #parseIdentifier(TokenQueue, ASTNodeFactory) identifier} and
+     * optional {@link #parseArrayIndexInformation(TokenQueue, ASTNodeFactory) array index information}.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return complete parse result of the identifier access
+     */
     @CompleteParse
     ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue, ASTNodeFactory
             astFactory);
 
+    /**
+     * Parses a list of accesses to values referenced by
+     * {@link #parseIdentifierAccess(TokenQueue, ASTNodeFactory) identifier accesses}. The list returned can be empty.
+     * The result may be partial.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return partial parse result of the list of identifier accesses
+     */
     @PartialParse
     PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory);
 
+    /**
+     * Parses a block of {@link StatementParser#parseStatements(TokenQueue, ASTNodeFactory) statements} surrounded by
+     * '{' curly braces '}'. The result may be partial.
+     *
+     * @param queue      queue of the tokens
+     * @param astFactory factory to create ast nodes
+     * @return partial parse result of the codeblock
+     */
     @PartialParse
     PartialParseResult<StatementsNode> parseCodeBlock(TokenQueue queue, ASTNodeFactory astFactory);
 }

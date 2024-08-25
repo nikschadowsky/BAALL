@@ -1,373 +1,65 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
+
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
-import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNodeImpl;
-import de.nikschadowsky.baall.compiler.util.LanguageElement;
-import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Map;
 
 /**
- * @since 11.08.2024
+ * @since 25.08.2024
  */
-public class AuxiliaryParser {
-
-    private final ProgramParser programParser;
-
-    public AuxiliaryParser(ProgramParser programParser) {
-        this.programParser = programParser;
-    }
+public interface AuxiliaryParser {
+    @CompleteParse
+    ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
-            queue.poll();
-            ParseResult<Map.Entry<TypeNode, Token>> parsedFieldDeclaration =
-                    parseFieldDeclaration(queue.branchOff(), astFactory);
-            if (parsedFieldDeclaration.isSuccessful()) {
-                queue.mergeBranch();
-                ParseResult<List<Map.Entry<TypeNode, Token>>> parsedFunctionParameterList =
-                        parseFieldDeclarations(queue.branchOff(), astFactory);
-                if (parsedFunctionParameterList.isSuccessful()) {
-                    queue.mergeBranch();
-
-                    List<Map.Entry<TypeNode, Token>> parameterFields = new LinkedList<>();
-                    parameterFields.add(parsedFieldDeclaration.getParseResult());
-                    parameterFields.addAll(parsedFunctionParameterList.getParseResult());
-                    return ParseResult.successfulParse(parameterFields);
-                }
-                return ParseResult.unsuccessfulParse(parsedFieldDeclaration.getDiagnostic());
-            }
-            return ParseResult.unsuccessfulParse(parsedFieldDeclaration.getDiagnostic());
-        }
-        return ParseResult.successfulParse(new LinkedList<>());
-    }
+    ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
-        ParseResult<TypeNode> parsedTypeNode = parseType(queue.branchOff(), astFactory);
-        if (parsedTypeNode.isSuccessful()) {
-            queue.mergeBranch();
-            if (SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
-                queue.poll();
-                ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff(), astFactory);
-                if (parsedIdentifier.isSuccessful()) {
-                    queue.mergeBranch();
-                    return ParseResult.successfulParse(Map.entry(
-                            parsedTypeNode.getParseResult(),
-                            parsedIdentifier.getParseResult()
-                    ));
-                }
-                return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
-            }
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
-        }
-        return ParseResult.unsuccessfulParse(parsedTypeNode.getDiagnostic());
-    }
+    ParseResult<List<ExpressionNode>> parseArgumentList(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<List<ExpressionNode>> parseArgumentList(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
-            queue.poll();
-            ParseResult<ExpressionNode> parsedExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
-            if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
-                ParseResult<List<ExpressionNode>> parsedArguments = parseArgumentList(queue.branchOff(), astFactory);
-                if (parsedArguments.isSuccessful()) {
-                    queue.mergeBranch();
-
-                    List<ExpressionNode> arguments = new LinkedList<>();
-                    arguments.add(parsedExpression.getParseResult());
-                    arguments.addAll(parsedArguments.getParseResult());
-                    return ParseResult.successfulParse(arguments);
-                }
-                return ParseResult.unsuccessfulParse(parsedArguments.getDiagnostic());
-            }
-            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
-        }
-        return ParseResult.successfulParse(new LinkedList<>());
-    }
+    ParseResult<Token> parseBinaryOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<Token> parseBinaryOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        // todo syntax set should differentiate between unary and binary operators
-        Set<LanguageElement> validBinaryOperators =
-                Stream.of("+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "==", "<", ">", "&&", "||")
-                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
-                      .collect(Collectors.toSet());
-
-        if (validBinaryOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected an operator!"));
-    }
+    ParseResult<Token> parseUnaryOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<Token> parseUnaryOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<LanguageElement> validShorthandOperators =
-                Stream.of("++", "--")
-                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
-                      .collect(Collectors.toSet());
-
-        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a unary operator!"));
-    }
+    ParseResult<Token> parseShorthandOperator(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<Token> parseShorthandOperator(TokenQueue queue, ASTNodeFactory astFactory) {
-        Set<LanguageElement> validShorthandOperators =
-                Stream.of("=", ":=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
-                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
-                      .collect(Collectors.toSet());
-
-        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.peek(),
-                "Expected a assignment operator!"
-        ));
-    }
-
-    /**
-     * Parses an identifier token and writes its value into the passed node.
-     *
-     * @param queue
-     * @return a parse result containing the filled passed node on success, or an unsuccessful parse on failure.
-     */
-    @CompleteParse
-    public ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("identifier_primitive").matches(queue.peek())) {
-            return ParseResult.successfulParse(queue.poll());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));
-    }
+    ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<TypeNode> parseType(TokenQueue queue, ASTNodeFactory astFactory) {
-        TypeNodeImpl node = astFactory.createTypeNode();
-        ParseResult<Token> parsedSimpleType = parseSimpleType(queue.branchOff(), astFactory);
-        if (parsedSimpleType.isSuccessful()) {
-            queue.mergeBranch();
-
-            node.setType(parsedSimpleType.getParseResult());
-            ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayTypeDefinition(queue.branchOff(), astFactory);
-            if (parsedArrayTypeDefinitions.isSuccessful()) {
-                queue.mergeBranch();
-
-                node.setArrayDimensionDefinitions(parsedArrayTypeDefinitions.getParseResult());
-                return ParseResult.successfulParse(node);
-            }
-            return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a type!"));
-    }
+    ParseResult<TypeNode> parseType(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<Token> parseSimpleType(TokenQueue queue, ASTNodeFactory astFactory) {
-        Token nextToken = queue.peek();
-
-        if (SyntaxSet.SIMPLE_TYPES.stream().anyMatch(e -> e.matches(nextToken))) {
-            return ParseResult.successfulParse(queue.poll());
-        } else {
-            // check if type is identifier
-            ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff(), astFactory);
-            if (parsedIdentifier.isSuccessful()) {
-                queue.mergeBranch();
-                return ParseResult.successfulParse(parsedIdentifier.getParseResult());
-            }
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a type!"));
-    }
+    ParseResult<Token> parseSimpleType(TokenQueue queue, ASTNodeFactory astFactory);
 
     @CompleteParse
-    public ParseResult<List<ExpressionNode>> parseArrayTypeDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
-            return ParseResult.successfulParse(new LinkedList<>());
-        }
-        queue.poll();
+    ParseResult<List<ExpressionNode>> parseArrayTypeDefinition(TokenQueue queue, ASTNodeFactory astFactory);
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
-
-        ExpressionNode expressionNode = null;
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
-            if (parsedExpression.isUnsuccessful()) {
-                return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
-            }
-            queue.mergeBranch();
-            expressionNode = parsedExpression.getParseResult();
-        }
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
-            queue.poll();
-            ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayTypeDefinition(queue.branchOff(), astFactory);
-            if (parsedArrayTypeDefinitions.isSuccessful()) {
-                queue.mergeBranch();
-
-                List<ExpressionNode> arrayTypeDefinitions = new LinkedList<>();
-                arrayTypeDefinitions.add(expressionNode);
-                arrayTypeDefinitions.addAll(parsedArrayTypeDefinitions.getParseResult());
-
-                return ParseResult.successfulParse(arrayTypeDefinitions);
-            }
-            return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'!"));
-    }
-
-    /**
-     * Parses optional array type definition on types
-     *
-     * @param queue
-     * @return
-     */
     @CompleteParse
-    public ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
-            return ParseResult.successfulParse(new LinkedList<>());
-        }
-        queue.poll();
+    ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue, ASTNodeFactory astFactory);
 
-        ParseResult<ExpressionNode> parsedExpression =
-                programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
-        if (parsedExpression.isSuccessful()) {
-            queue.mergeBranch();
-            if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
-                queue.poll();
-                ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                        parseArrayIndexInformation(queue.branchOff(), astFactory);
-                if (parsedArrayTypeDefinitions.isSuccessful()) {
-                    queue.mergeBranch();
-
-                    List<ExpressionNode> arrayDimensions = new LinkedList<>();
-                    arrayDimensions.add(parsedExpression.getParseResult());
-                    arrayDimensions.addAll(parsedArrayTypeDefinitions.getParseResult());
-
-                    return ParseResult.successfulParse(arrayDimensions);
-                }
-                return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic());
-            }
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'!"));
-        }
-        queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
-        return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
-    }
-
-    /**
-     * Parses access of a value through an identifier with optional array indexing.
-     *
-     * @param queue
-     * @return
-     */
     @CompleteParse
-    public ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue, ASTNodeFactory
-            astFactory) {
-        IdentifierAccessNodeImpl node = astFactory.createIdentifierAccessNode();
-        ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff(), astFactory);
-        if (parsedIdentifier.isSuccessful()) {
-            queue.mergeBranch();
-            node.setIdentifier(parsedIdentifier.getParseResult());
-            ParseResult<List<ExpressionNode>> parsedOptionalArrayIndices =
-                    parseArrayIndexInformation(queue.branchOff(), astFactory);
-            if (parsedOptionalArrayIndices.isSuccessful()) {
-                queue.mergeBranch();
-                node.setArrayIndexes(parsedOptionalArrayIndices.getParseResult());
-                return ParseResult.successfulParse(node);
-            }
-            return ParseResult.unsuccessfulParse(parsedOptionalArrayIndices.getDiagnostic());
-        }
-        return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
-    }
-
-
-    /**
-     * Parses 2..n exported elements and writes them into the passed node
-     *
-     * @param queue
-     * @return
-     */
-    @PartialParse
-    public PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
-            queue.poll();
-            ParseResult<IdentifierAccessNode> parsedIdentifierAccess =
-                    parseIdentifierAccess(queue.branchOff(), astFactory);
-            if (parsedIdentifierAccess.isSuccessful()) {
-                queue.mergeBranch();
-                PartialParseResult<List<IdentifierAccessNode>> parsedIdentifierAccesses =
-                        parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
-                if (parsedIdentifierAccesses.isSuccessful()) {
-                    queue.mergeBranch();
-
-                    List<IdentifierAccessNode> identifierAccessNodes = new LinkedList<>();
-                    identifierAccessNodes.add(parsedIdentifierAccess.getParseResult());
-                    identifierAccessNodes.addAll(parsedIdentifierAccesses.getParseResult());
-
-                    return PartialParseResult.successfulParse(identifierAccessNodes);
-                } else if (parsedIdentifierAccesses.isPartial()) {
-                    return PartialParseResult.partialParse(
-                            new LinkedList<>(),
-                            parsedIdentifierAccesses.getDiagnostic()
-                    );
-                }
-                return PartialParseResult.unsuccessfulParse(parsedIdentifierAccesses.getDiagnostic());
-            }
-
-            return PartialParseResult.unsuccessfulParse(parsedIdentifierAccess.getDiagnostic());
-        }
-        // epsilon
-        return PartialParseResult.successfulParse(new LinkedList<>());
-    }
+    ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue, ASTNodeFactory
+            astFactory);
 
     @PartialParse
-    public PartialParseResult<StatementsNode> parseCodeBlock(TokenQueue queue, ASTNodeFactory astFactory) {
-        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
-        boolean isPartial = false;
+    PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory);
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
-        }
-        queue.poll();
-
-        PartialParseResult<StatementsNode> parsedStatements = programParser.getProgramParser().parseStatements(queue.branchOff(), astFactory);
-        if (parsedStatements.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
-        } else {
-            if (parsedStatements.isPartial()) {
-                diagnostics.add(parsedStatements.getDiagnostic());
-                isPartial = true;
-            }
-            queue.mergeBranch();
-        }
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-            isPartial = true;
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-        }
-
-        if (isPartial) {
-            return PartialParseResult.partialParse(parsedStatements.getParseResult(), diagnostics.get(0));
-        }
-
-        return PartialParseResult.successfulParse(parsedStatements.getParseResult());
-    }
+    @PartialParse
+    PartialParseResult<StatementsNode> parseCodeBlock(TokenQueue queue, ASTNodeFactory astFactory);
 }

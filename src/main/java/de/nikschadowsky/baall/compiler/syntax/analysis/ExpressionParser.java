@@ -27,8 +27,15 @@ import java.util.stream.Stream;
  * @since 11.08.2024
  */
 public class ExpressionParser {
+
+    private final ProgramParser programParser;
+
+    public ExpressionParser(ProgramParser programParser) {
+        this.programParser = programParser;
+    }
+
     @CompleteParse
-    public static ParseResult<ExpressionNode> parseExpression(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ExpressionNode> parseExpression(TokenQueue queue, ASTNodeFactory astFactory) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             queue.poll();
 
@@ -68,7 +75,7 @@ public class ExpressionParser {
         if (parsedValue.isSuccessful()) {
             queue.mergeBranch();
 
-            ParseResult<Token> parsedBinaryOperator = AuxiliaryParser.parseBinaryOperator(queue.branchOff(), astFactory);
+            ParseResult<Token> parsedBinaryOperator = programParser.getAuxiliaryParser().parseBinaryOperator(queue.branchOff(), astFactory);
             if (parsedBinaryOperator.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -90,16 +97,16 @@ public class ExpressionParser {
     }
 
     @CompleteParse
-    public static ParseResult<ValueNode> parseValue(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ValueNode> parseValue(TokenQueue queue, ASTNodeFactory astFactory) {
         ParseResult<? extends ValueNode> parseResult;
 
-        parseResult = LiteralParser.parseLiteral(queue.branchOff(), astFactory);
+        parseResult = programParser.getLiteralParser().parseLiteral(queue.branchOff(), astFactory);
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parseResult.getParseResult());
         }
 
-        parseResult = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+        parseResult = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parseResult.getParseResult());
@@ -121,12 +128,12 @@ public class ExpressionParser {
     }
 
     @PartialParse
-    public static PartialParseResult<FunctionCallNode> parseFunctionCall(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<FunctionCallNode> parseFunctionCall(TokenQueue queue, ASTNodeFactory astFactory) {
         FunctionCallNodeImpl node = astFactory.createFunctionCallNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parsedIdentifierValueAccess.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
@@ -146,7 +153,7 @@ public class ExpressionParser {
                 queue.mergeBranch();
 
                 ParseResult<List<ExpressionNode>> parsedFunctionArguments =
-                        AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+                        programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff(), astFactory);
                 if (parsedFunctionArguments.isSuccessful()) {
                     queue.mergeBranch();
 
@@ -181,19 +188,19 @@ public class ExpressionParser {
     }
 
     @CompleteParse
-    public static ParseResult<UnaryExpressionNode> parseUnaryExpression(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<UnaryExpressionNode> parseUnaryExpression(TokenQueue queue, ASTNodeFactory astFactory) {
         ParseResult<Token> parsedUnaryOperator;
         ParseResult<IdentifierAccessNode> parsedIdentifier;
         UnaryExpressionNodeImpl node;
 
-        parsedUnaryOperator = AuxiliaryParser.parseUnaryOperator(queue.branchOff(), astFactory);
+        parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff(), astFactory);
         if (parsedUnaryOperator.isSuccessful()) {
             queue.mergeBranch();
 
             node = astFactory.createUnaryExpressionNode();
             node.setIsPrefix(true);
             node.setOperator(parsedUnaryOperator.getParseResult());
-            parsedIdentifier = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+            parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
             if (parsedIdentifier.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -203,13 +210,13 @@ public class ExpressionParser {
             return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
         }
 
-        parsedIdentifier = AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+        parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch();
 
             node = astFactory.createUnaryExpressionNode();
             node.setIdentifierAccess(parsedIdentifier.getParseResult());
-            parsedUnaryOperator = AuxiliaryParser.parseUnaryOperator(queue.branchOff(), astFactory);
+            parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff(), astFactory);
             if (parsedUnaryOperator.isSuccessful()) {
                 queue.mergeBranch();
                 node.setOperator(parsedUnaryOperator.getParseResult());
@@ -223,7 +230,7 @@ public class ExpressionParser {
     }
 
     @CompleteParse
-    public static ParseResult<Token> parsePrefixOperator(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<Token> parsePrefixOperator(TokenQueue queue, ASTNodeFactory astFactory) {
         Set<LanguageElement> validShorthandOperators =
                 Stream.of("+", "-", "!")
                       .map(SyntaxSet.LANGUAGE_ELEMENTS::get)

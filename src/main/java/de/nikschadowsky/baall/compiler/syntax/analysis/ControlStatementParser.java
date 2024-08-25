@@ -16,8 +16,15 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
  * @since 11.08.2024
  */
 public class ControlStatementParser {
+
+    private final ProgramParser programParser;
+
+    public ControlStatementParser(ProgramParser programParser) {
+        this.programParser = programParser;
+    }
+
     @CompleteParse
-    public static ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue, ASTNodeFactory astFactory) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("break").matches(queue.peek())) {
             queue.poll();
             return ParseResult.successfulParse(astFactory.createBreakStatementNode());
@@ -31,7 +38,7 @@ public class ControlStatementParser {
             ReturnStatementNodeImpl node = astFactory.createReturnStatementNode();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
             if (parsedExpression.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -49,7 +56,7 @@ public class ControlStatementParser {
             RaiseStatementNodeImpl node = astFactory.createRaiseStatementNode();
 
             ParseResult<ExceptionCallNode> parsedExceptionCall =
-                    LiteralParser.parseExceptionCall(queue.branchOff(), astFactory);
+                    programParser.getLiteralParser().parseExceptionCall(queue.branchOff(), astFactory);
             if (parsedExceptionCall.isSuccessful()) {
                 queue.mergeBranch();
                 node.setException(parsedExceptionCall.getParseResult());

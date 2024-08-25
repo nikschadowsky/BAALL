@@ -25,8 +25,15 @@ import java.util.Map;
  * @since 11.08.2024
  */
 public class LiteralParser {
+
+    private final ProgramParser programParser;
+
+    public LiteralParser(ProgramParser programParser) {
+        this.programParser = programParser;
+    }
+
     @CompleteParse
-    public static ParseResult<ArrayLiteralNode> parseArrayLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ArrayLiteralNode> parseArrayLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
         ArrayLiteralNodeImpl node = astFactory.createArrayLiteralNode();
         List<ExpressionNode> elements = new LinkedList<>();
 
@@ -40,7 +47,7 @@ public class LiteralParser {
             node.setElements(elements);
             return ParseResult.successfulParse(node);
         }
-        ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
         if (parsedExpression.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
             return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
@@ -49,7 +56,7 @@ public class LiteralParser {
         elements.add(parsedExpression.getParseResult());
 
         ParseResult<List<ExpressionNode>> parsedArrayElements =
-                AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff(), astFactory);
         if (parsedArrayElements.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("]"));
             return ParseResult.unsuccessfulParse(parsedArrayElements.getDiagnostic());
@@ -65,7 +72,7 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<StructDefinitionLiteralNode> parseStructDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<StructDefinitionLiteralNode> parseStructDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
         StructDefinitionLiteralNodeImpl node =
                 astFactory.createStructDefinitionLiteralNode();
 
@@ -75,7 +82,7 @@ public class LiteralParser {
         queue.poll();
 
         ParseResult<Map.Entry<TypeNode, Token>> parsedStructField =
-                AuxiliaryParser.parseFieldDeclaration(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff(), astFactory);
         if (parsedStructField.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedStructField.getDiagnostic());
@@ -83,7 +90,7 @@ public class LiteralParser {
         queue.mergeBranch();
 
         ParseResult<List<Map.Entry<TypeNode, Token>>> parsedStructFields =
-                AuxiliaryParser.parseFieldDeclarations(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseFieldDeclarations(queue.branchOff(), astFactory);
         if (parsedStructFields.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedStructFields.getDiagnostic());
@@ -103,7 +110,7 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<StructInitializationLiteralNode> parseStructInitialization(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<StructInitializationLiteralNode> parseStructInitialization(TokenQueue queue, ASTNodeFactory astFactory) {
         StructInitializationLiteralNodeImpl node = astFactory.createStructInitializationLiteralNode();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
@@ -111,11 +118,11 @@ public class LiteralParser {
         }
         queue.poll();
 
-        ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
             ParseResult<List<ExpressionNode>> parsedArguments =
-                    AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+                    programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff(), astFactory);
             if (parsedArguments.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -138,14 +145,14 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue, ASTNodeFactory astFactory) {
         FunctionDefinitionNodeImpl node = astFactory.createFunctionDefinitionNode();
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
             node.setParameters(new LinkedList<>());
 
-            ParseResult<StatementsNode> parsedStatements = Parser.parseStatements(queue.branchOff(), astFactory);
+            ParseResult<StatementsNode> parsedStatements = programParser.getProgramParser().parseStatements(queue.branchOff(), astFactory);
             if (!parsedStatements.isSuccessful()) {
                 queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
                 return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
@@ -160,11 +167,11 @@ public class LiteralParser {
 
         }
         ParseResult<Map.Entry<TypeNode, Token>> parsedFunctionParameter =
-                AuxiliaryParser.parseFieldDeclaration(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff(), astFactory);
         if (parsedFunctionParameter.isSuccessful()) {
             queue.mergeBranch();
             ParseResult<List<Map.Entry<TypeNode, Token>>> parsedFunctionParameters =
-                    AuxiliaryParser.parseFieldDeclarations(queue.branchOff(), astFactory);
+                    programParser.getAuxiliaryParser().parseFieldDeclarations(queue.branchOff(), astFactory);
             if (parsedFunctionParameters.isUnsuccessful()) {
                 return ParseResult.unsuccessfulParse(parsedFunctionParameters.getDiagnostic());
             }
@@ -173,7 +180,8 @@ public class LiteralParser {
             parameters.add(parsedFunctionParameter.getParseResult());
             node.setParameters(parameters);
             if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
-                ParseResult<StatementsNode> parsedStatements = Parser.parseStatements(queue.branchOff(), astFactory);
+                ParseResult<StatementsNode> parsedStatements =
+                        programParser.getProgramParser().parseStatements(queue.branchOff(), astFactory);
                 if (parsedStatements.isUnsuccessful()) {
                     return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
                 }
@@ -194,7 +202,7 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<LiteralNode> parseLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<LiteralNode> parseLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
         ParseResult<PrimitiveLiteralNode> parsedPrimitiveLiteral =
                 parsePrimitiveLiteral(queue.branchOff(), astFactory);
         if (parsedPrimitiveLiteral.isSuccessful()) {
@@ -234,7 +242,7 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue, ASTNodeFactory astFactory) {
         Token nextToken = queue.peek();
 
         if (SyntaxSet.PRIMITIVES.stream().anyMatch(e -> e.matches(nextToken))) {
@@ -248,11 +256,11 @@ public class LiteralParser {
     }
 
     @CompleteParse
-    public static ParseResult<ExceptionCallNode> parseExceptionCall(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ExceptionCallNode> parseExceptionCall(TokenQueue queue, ASTNodeFactory astFactory) {
         ExceptionCallNodeImpl node = astFactory.createExceptionCallNode();
 
         ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
-                AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parsedIdentifierValueAccess.isSuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
@@ -271,7 +279,7 @@ public class LiteralParser {
             return PartialParseResult.successfulParse(node);
         }
 
-        ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
         if (!parsedExpression.isSuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
@@ -279,7 +287,7 @@ public class LiteralParser {
         queue.mergeBranch();
 
         ParseResult<List<ExpressionNode>> parsedFunctionArguments =
-                AuxiliaryParser.parseArgumentList(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff(), astFactory);
         if (!parsedFunctionArguments.isSuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedFunctionArguments.getDiagnostic());

@@ -11,7 +11,8 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.controlstructures.ControlStructureNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.UnaryExpressionNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.*;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ControlStatementNode;
@@ -26,8 +27,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Generated("by BAALL-Parser-Gen")
-public class Parser {
+@Generated("by BAALL-StatementParser-Gen")
+public class StatementParser {
 
     private TokenQueue queue;
 
@@ -35,110 +36,15 @@ public class Parser {
 
     private final SyntaxDiagnosticCollector syntaxDiagnosticCollector = new SyntaxDiagnosticCollector();
 
-    public Parser(TokenQueue tokens) {
-        this.queue = tokens;
+    private final ProgramParser programParser;
+
+    public StatementParser(ProgramParser programParser) {
+        this.programParser = programParser;
     }
 
-    @PartialParse
-    public static PartialParseResult<ProgramNode> parseProgram(TokenQueue queue, ASTNodeFactory astFactory) {
-        ProgramNodeImpl node = astFactory.createProgramNode();
-        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
-        boolean isPartial = false;
-
-        PartialParseResult<List<Token>> parsedImports = parseImports(queue.branchOff(), astFactory);
-        if (parsedImports.isSuccessful() || parsedImports.isPartial()) {
-            queue.mergeBranch();
-            ImportsNodeImpl imports = astFactory.createImportNode();
-            imports.setImports(parsedImports.getParseResult());
-            node.setImports(imports);
-        }
-        if (!parsedImports.isSuccessful()) {
-            diagnostics.add(parsedImports.getDiagnostic());
-            isPartial = true;
-        }
-
-
-        PartialParseResult<StatementsNode> parsedStatements = parseStatements(queue.branchOff(), astFactory);
-        if (parsedStatements.isSuccessful() || parsedStatements.isPartial()) {
-            queue.mergeBranch();
-            node.setStatements(parsedStatements.getParseResult());
-        }
-        if (!parsedStatements.isSuccessful()) {
-            diagnostics.add(parsedStatements.getDiagnostic());
-            isPartial = true;
-        }
-
-        PartialParseResult<ExportsNode> parsedExports = parseExports(queue.branchOff(), astFactory);
-        if (parsedExports.isSuccessful() || parsedExports.isPartial()) {
-            queue.mergeBranch();
-            node.setExports(parsedExports.getParseResult());
-        }
-        if (!parsedExports.isSuccessful()) {
-            diagnostics.add(parsedExports.getDiagnostic());
-            isPartial = true;
-        }
-
-        if(!queue.hasReachedEndOfFile()) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Illegal token"));
-            isPartial = true;
-        }
-
-        node.setDiagnostics(diagnostics);
-
-        if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
-        }
-
-        return PartialParseResult.successfulParse(node);
-    }
 
     @PartialParse
-    public static PartialParseResult<List<Token>> parseImports(TokenQueue queue, ASTNodeFactory astFactory) {
-        ImportsNodeImpl node = astFactory.createImportNode();
-        List<Token> imports = new LinkedList<>();
-        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
-        boolean isPartial = false;
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("use").matches(queue.peek())) {
-            return PartialParseResult.successfulParse(new LinkedList<>());
-        }
-        queue.poll();
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("_STRING").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a string!"));
-            isPartial = true;
-        }
-        imports.add(queue.poll());
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
-            isPartial = true;
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
-        }
-        queue.poll();
-
-        PartialParseResult<List<Token>> parsedImports = parseImports(queue.branchOff(), astFactory);
-        if (parsedImports.isUnsuccessful()) {
-            diagnostics.add(parsedImports.getDiagnostic());
-            isPartial = true;
-        } else {
-            if (parsedImports.isPartial()) {
-                diagnostics.add(parsedImports.getDiagnostic());
-                isPartial = true;
-            }
-            queue.mergeBranch();
-            imports.addAll(parsedImports.getParseResult());
-        }
-        node.setImports(imports);
-
-        if (isPartial) {
-            return PartialParseResult.partialParse(imports, diagnostics.get(0));
-        }
-        return PartialParseResult.successfulParse(imports);
-    }
-
-    @PartialParse
-    public static PartialParseResult<StatementsNode> parseStatements(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<StatementsNode> parseStatements(TokenQueue queue, ASTNodeFactory astFactory) {
         StatementsNodeImpl node = astFactory.createStatementsNode();
         List<StatementNode> statements = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
@@ -178,7 +84,7 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<StatementNode> parseStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue, ASTNodeFactory astFactory) {
         PartialParseResult<? extends StatementNode> parseResult;
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
@@ -187,7 +93,7 @@ public class Parser {
 
         // control structures
         PartialParseResult<ControlStructureNode> parsedControlStructure =
-                ControlStructureParser.parseControlStructure(queue.branchOff(), astFactory);
+                programParser.getControlStructureParser().parseControlStructure(queue.branchOff(), astFactory);
         if (parsedControlStructure.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedControlStructure.getParseResult());
@@ -221,7 +127,7 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<StatementNode> parseRawStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<StatementNode> parseRawStatement(TokenQueue queue, ASTNodeFactory astFactory) {
         PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff(), astFactory);
 
         if (parsedDeclaration.isSuccessful()) {
@@ -236,14 +142,14 @@ public class Parser {
         }
 
         PartialParseResult<FunctionCallNode> parsedFunctionCall =
-                ExpressionParser.parseFunctionCall(queue.branchOff(), astFactory);
+                programParser.getExpressionParser().parseFunctionCall(queue.branchOff(), astFactory);
         if (parsedFunctionCall.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedFunctionCall.getParseResult());
         }
 
         ParseResult<ControlStatementNode> parsedControlStatement =
-                ControlStatementParser.parseControlStatement(queue.branchOff(), astFactory);
+                programParser.getControlStatementParser().parseControlStatement(queue.branchOff(), astFactory);
         if (parsedControlStatement.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedControlStatement.getParseResult());
@@ -274,7 +180,7 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<DeclarationNode> parseDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<DeclarationNode> parseDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
         PartialParseResult<ConstantDeclarationNode> parsedConstantDeclaration =
                 parseConstantDeclaration(queue.branchOff(), astFactory);
 
@@ -302,12 +208,12 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<VariableDeclarationNode> parseVariableDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<VariableDeclarationNode> parseVariableDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
         VariableDeclarationNodeImpl node = astFactory.createVariableDeclarationNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<TypeNode> parsedType = AuxiliaryParser.parseType(queue.branchOff(), astFactory);
+        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff(), astFactory);
         if (parsedType.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -320,7 +226,8 @@ public class Parser {
         }
         queue.poll();
 
-        ParseResult<Token> parsedIdentifier = AuxiliaryParser.parseIdentifier(queue.branchOff(), astFactory);
+        ParseResult<Token> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -332,7 +239,7 @@ public class Parser {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
             if (parsedExpression.isUnsuccessful()) {
                 diagnostics.add(parsedExpression.getDiagnostic());
                 isPartial = true;
@@ -348,12 +255,12 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<ConstantDeclarationNode> parseConstantDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ConstantDeclarationNode> parseConstantDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
         ConstantDeclarationNodeImpl node = astFactory.createConstantDeclarationNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<TypeNode> parsedType = AuxiliaryParser.parseType(queue.branchOff(), astFactory);
+        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff(), astFactory);
         if (parsedType.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -366,7 +273,8 @@ public class Parser {
         }
         queue.poll();
 
-        ParseResult<Token> parsedIdentifier = AuxiliaryParser.parseIdentifier(queue.branchOff(), astFactory);
+        ParseResult<Token> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -381,7 +289,7 @@ public class Parser {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
             if (parsedExpression.isUnsuccessful()) {
                 diagnostics.add(parsedExpression.getDiagnostic());
                 isPartial = true;
@@ -397,9 +305,9 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<ReassignmentNode> parseReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ReassignmentNode> parseReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
         ParseResult<UnaryExpressionNode> parsedUnaryExpression =
-                ExpressionParser.parseUnaryExpression(queue.branchOff(), astFactory);
+                programParser.getExpressionParser().parseUnaryExpression(queue.branchOff(), astFactory);
         if (parsedUnaryExpression.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedUnaryExpression.getParseResult());
@@ -422,13 +330,13 @@ public class Parser {
     }
 
     @PartialParse
-    public static PartialParseResult<VariableReassignmentNode> parseVariableReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<VariableReassignmentNode> parseVariableReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
         VariableReassignmentNodeImpl node = astFactory.createVariableReassignmentNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
         ParseResult<IdentifierAccessNode> parsedIdentifier =
-                AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
         if (parsedIdentifier.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -436,7 +344,7 @@ public class Parser {
         node.setIdentifier(parsedIdentifier.getParseResult());
 
         ParseResult<Token> parsedShorthandOperator =
-                AuxiliaryParser.parseShorthandOperator(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseShorthandOperator(queue.branchOff(), astFactory);
         if (parsedShorthandOperator.isSuccessful()) {
             queue.mergeBranch();
             node.setOperator(parsedShorthandOperator.getParseResult());
@@ -445,7 +353,8 @@ public class Parser {
             isPartial = true;
         }
 
-        ParseResult<ExpressionNode> parsedExpression = ExpressionParser.parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression =
+                programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
             node.setValueExpression(parsedExpression.getParseResult());
@@ -456,68 +365,6 @@ public class Parser {
 
         if (isPartial) {
             return PartialParseResult.partialParse(node, diagnostics.get(0));
-        }
-        return PartialParseResult.successfulParse(node);
-    }
-
-    @PartialParse
-    public static PartialParseResult<ExportsNode> parseExports(TokenQueue queue, ASTNodeFactory astFactory) {
-        ExportsNodeImpl node = astFactory.createExportNode();
-        node.setExports(new LinkedList<>());
-        List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
-        boolean isPartial = false;
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("export").matches(queue.poll())) {
-            return PartialParseResult.successfulParse(node);
-        }
-
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.poll();
-
-            if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                return PartialParseResult.successfulParse(node);
-            } else {
-                ParseResult<IdentifierAccessNode> parsedElement =
-                        AuxiliaryParser.parseIdentifierAccess(queue.branchOff(), astFactory);
-                List<IdentifierAccessNode> elements = new LinkedList<>();
-
-                if (parsedElement.isSuccessful()) {
-                    queue.mergeBranch();
-                    elements.add(parsedElement.getParseResult());
-                    node.setExports(elements);
-                } else {
-                    diagnostics.add(parsedElement.getDiagnostic());
-                    isPartial = true;
-                }
-
-                PartialParseResult<List<IdentifierAccessNode>> parsedElements =
-                        AuxiliaryParser.parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
-                if (parsedElements.isSuccessful()) {
-                    queue.mergeBranch();
-                    elements.addAll(parsedElements.getParseResult());
-                    node.setExports(elements);
-                }
-                if (parsedElements.isPartial()) {
-                    elements.addAll(parsedElements.getParseResult());
-                    node.setExports(elements);
-                    diagnostics.add(parsedElements.getDiagnostic());
-                    isPartial = true;
-                } else {
-                    diagnostics.add(parsedElements.getDiagnostic());
-                    isPartial = true;
-                }
-
-                if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                    diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-                    isPartial = true;
-                }
-                queue.poll();
-
-                if (isPartial) {
-                    return PartialParseResult.partialParse(node, diagnostics.get(0));
-                }
-                return PartialParseResult.successfulParse(node);
-            }
         }
         return PartialParseResult.successfulParse(node);
     }

@@ -303,17 +303,16 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                 queue.mergeBranch();
                 PartialParseResult<List<IdentifierAccessNode>> parsedIdentifierAccesses =
                         parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
+                List<IdentifierAccessNode> identifierAccessNodes = new LinkedList<>();
+                identifierAccessNodes.add(parsedIdentifierAccess.getParseResult());
+
                 if (parsedIdentifierAccesses.isSuccessful()) {
                     queue.mergeBranch();
-
-                    List<IdentifierAccessNode> identifierAccessNodes = new LinkedList<>();
-                    identifierAccessNodes.add(parsedIdentifierAccess.getParseResult());
                     identifierAccessNodes.addAll(parsedIdentifierAccesses.getParseResult());
-
                     return PartialParseResult.successfulParse(identifierAccessNodes);
                 } else if (parsedIdentifierAccesses.isPartial()) {
                     return PartialParseResult.partialParse(
-                            new LinkedList<>(),
+                            identifierAccessNodes,
                             parsedIdentifierAccesses.getDiagnostic()
                     );
                 }

@@ -45,7 +45,6 @@ public class ParserMocker {
             ProgramParser programParserMock,
             Function<ExpressionParser, ParseResult<T>> mockedMethod,
             T expectedResult,
-            boolean usePartialParseResult,
             String... returnUnsuccessfulOn) {
         ExpressionParser expressionParserMock = mock(ExpressionParser.class);
 
@@ -53,7 +52,7 @@ public class ParserMocker {
         when(mockedMethod.apply(expressionParserMock)).thenAnswer(getAnswer(
                 expectedResult,
                 returnUnsuccessfulOn,
-                usePartialParseResult
+                false
         ));
     }
 

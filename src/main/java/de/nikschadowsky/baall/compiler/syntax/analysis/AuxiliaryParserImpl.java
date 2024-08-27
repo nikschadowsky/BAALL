@@ -152,12 +152,6 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         ));
     }
 
-    /**
-     * Parses an identifier token and writes its value into the passed node.
-     *
-     * @param queue
-     * @return a parse result containing the filled passed node on success, or an unsuccessful parse on failure.
-     */
     @CompleteParse
     @Override
     public ParseResult<Token> parseIdentifier(TokenQueue queue, ASTNodeFactory astFactory) {
@@ -215,7 +209,8 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         }
         queue.poll();
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression =
+                programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
 
         ExpressionNode expressionNode = null;
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
@@ -243,12 +238,6 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ']'!"));
     }
 
-    /**
-     * Parses optional array type definition on types
-     *
-     * @param queue
-     * @return
-     */
     @CompleteParse
     @Override
     public ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue, ASTNodeFactory astFactory) {
@@ -282,12 +271,6 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
     }
 
-    /**
-     * Parses access of a value through an identifier with optional array indexing.
-     *
-     * @param queue
-     * @return
-     */
     @CompleteParse
     @Override
     public ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue, ASTNodeFactory
@@ -309,13 +292,6 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
     }
 
-
-    /**
-     * Parses 2..n exported elements and writes them into the passed node
-     *
-     * @param queue
-     * @return
-     */
     @PartialParse
     @Override
     public PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue, ASTNodeFactory astFactory) {
@@ -344,7 +320,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                 return PartialParseResult.unsuccessfulParse(parsedIdentifierAccesses.getDiagnostic());
             }
 
-            return PartialParseResult.unsuccessfulParse(parsedIdentifierAccess.getDiagnostic());
+            return PartialParseResult.partialParse(new LinkedList<>(), parsedIdentifierAccess.getDiagnostic());
         }
         // epsilon
         return PartialParseResult.successfulParse(new LinkedList<>());
@@ -361,7 +337,8 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         }
         queue.poll();
 
-        PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedStatements =
+                programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
         if (parsedStatements.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
         } else {

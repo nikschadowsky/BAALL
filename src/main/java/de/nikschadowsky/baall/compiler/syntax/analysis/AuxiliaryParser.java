@@ -22,7 +22,7 @@ import java.util.Map;
 public interface AuxiliaryParser {
     /**
      * Parses a list of {@link #parseFieldDeclaration(TokenQueue, ASTNodeFactory)  field declarations} with a
-     * <b>leading</b> comma. A parse of field declaration is optional if the first symbol in the queue is not a comma.
+     * <b>leading</b> comma. The list may be empty.
      *
      * @param queue      queue of the tokens
      * @param astFactory factory to create ast nodes
@@ -43,7 +43,7 @@ public interface AuxiliaryParser {
 
     /**
      * Parses a list of arguments in the form of
-     * {@link ExpressionParser#parseExpression(TokenQueue, ASTNodeFactory) expressions}. The list returned can be
+     * {@link ExpressionParser#parseExpression(TokenQueue, ASTNodeFactory) expressions} with a leading comma. The list returned can be
      * empty.
      *
      * @param queue      queue of the tokens

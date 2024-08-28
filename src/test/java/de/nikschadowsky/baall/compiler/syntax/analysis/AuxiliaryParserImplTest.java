@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 /**
  * @since 13.08.2024
  */
-class AuxiliaryParserTest {
+class AuxiliaryParserImplTest {
 
     private final ASTNodeFactory astFactory = new ASTNodeFactory(new NodeDiagnosticCollector());
 
@@ -35,7 +35,7 @@ class AuxiliaryParserTest {
     }
 
     @Test
-    void parseFieldDeclarations() {
+    void testParseFieldDeclarations() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
         mockExpressionParserExecution(
                 programParser,

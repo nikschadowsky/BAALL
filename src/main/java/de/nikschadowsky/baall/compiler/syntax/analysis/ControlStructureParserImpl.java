@@ -25,17 +25,19 @@ import java.util.List;
 public class ControlStructureParserImpl implements ControlStructureParser {
 
     private final ProgramParser programParser;
+    private final ASTNodeFactory astFactory;
 
-    public ControlStructureParserImpl(ProgramParser programParser) {
+    public ControlStructureParserImpl(ProgramParser programParser, ASTNodeFactory astFactory) {
         this.programParser = programParser;
+        this.astFactory = astFactory;
     }
 
     @PartialParse
     @Override
-    public PartialParseResult<ControlStructureNode> parseControlStructure(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ControlStructureNode> parseControlStructure(TokenQueue queue) {
         PartialParseResult<? extends ControlStructureNode> parseResult;
 
-        parseResult = parseForLoop(queue.branchOff(), astFactory);
+        parseResult = parseForLoop(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parseResult.getParseResult());
@@ -44,7 +46,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
         }
 
-        parseResult = parseWhileLoop(queue.branchOff(), astFactory);
+        parseResult = parseWhileLoop(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parseResult.getParseResult());
@@ -53,7 +55,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
         }
 
-        parseResult = parseConditional(queue.branchOff(), astFactory);
+        parseResult = parseConditional(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parseResult.getParseResult());
@@ -61,7 +63,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.mergeBranch();
             return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
         }
-        parseResult = parseTryStatement(queue.branchOff(), astFactory);
+        parseResult = parseTryStatement(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parseResult.getParseResult());
@@ -75,12 +77,12 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ConditionalNode> parseConditional(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ConditionalNode> parseConditional(TokenQueue queue) {
         ConditionalNodeImpl node = astFactory.createConditionalNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isUnsuccessful()) {
             return PartialParseResult.partialParse(node, parsedExpression.getDiagnostic());
         }
@@ -94,7 +96,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         queue.poll();
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
+            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
                 node.setThenBlock(parsedStatements.getParseResult());
@@ -117,7 +119,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
             isPartiallyParsed = true;
         }
-        PartialParseResult<ConditionalNode> parsedElseBlock = parseElseBlock(queue.branchOff(), astFactory);
+        PartialParseResult<ConditionalNode> parsedElseBlock = parseElseBlock(queue.branchOff());
         if (parsedElseBlock.isSuccessful()) {
             queue.mergeBranch();
             node.setElseBranch(parsedElseBlock.getParseResult());
@@ -140,7 +142,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ConditionalNode> parseElseBlock(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ConditionalNode> parseElseBlock(TokenQueue queue) {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
@@ -154,7 +156,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
             ConditionalNodeImpl node = astFactory.createConditionalNode();
             node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
+            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -170,7 +172,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
 
 
-        PartialParseResult<ConditionalNode> parsedConditional = parseConditional(queue.branchOff(), astFactory);
+        PartialParseResult<ConditionalNode> parsedConditional = parseConditional(queue.branchOff());
         if (parsedConditional.isSuccessful()) {
             queue.mergeBranch();
             ConditionalNode node = parsedConditional.getParseResult();
@@ -190,7 +192,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ForLoopNode> parseForLoop(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ForLoopNode> parseForLoop(TokenQueue queue) {
         ForLoopNodeImpl node = astFactory.createForLoopNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
@@ -200,7 +202,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
+        ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch();
             node.setIdentifier(parsedIdentifier.getParseResult());
@@ -212,7 +214,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("=").matches(queue.peek())) {
             queue.poll();
             ParseResult<ExpressionNode> parsedStartIndexExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedStartIndexExpression.isSuccessful()) {
                 queue.mergeBranch();
                 node.setStartIndex(parsedStartIndexExpression.getParseResult());
@@ -228,7 +230,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("..").matches(queue.peek())) {
             queue.poll();
             ParseResult<ExpressionNode> parsedEndIndexExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedEndIndexExpression.isSuccessful()) {
                 queue.mergeBranch();
                 node.setEndIndex(parsedEndIndexExpression.getParseResult());
@@ -245,7 +247,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.poll();
             node.setHasOptionalStepperStatement(true);
             ParseResult<ReassignmentNode> parsedOptionalForStepper =
-                    programParser.getStatementParser().parseReassignment(queue.branchOff(), astFactory);
+                    programParser.getStatementParser().parseReassignment(queue.branchOff());
             if (parsedOptionalForStepper.isSuccessful()) {
                 queue.mergeBranch();
                 node.setOptionalStepperStatement(parsedOptionalForStepper.getParseResult());
@@ -258,7 +260,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
             PartialParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
+                    programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
                 node.setBody(parsedStatements.getParseResult());
@@ -291,7 +293,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<WhileLoopNode> parseWhileLoop(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<WhileLoopNode> parseWhileLoop(TokenQueue queue) {
         WhileLoopNodeImpl node = astFactory.createWhileLoopNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
@@ -301,7 +303,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
             node.setCondition(parsedExpression.getParseResult());
@@ -312,7 +314,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff(), astFactory);
+            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
                 node.setBody(parsedStatements.getParseResult());
@@ -346,7 +348,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<TryStatementNode> parseTryStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<TryStatementNode> parseTryStatement(TokenQueue queue) {
         TryStatementNodeImpl node = astFactory.createTryStatementNode();
         List<InterceptStatementNode> interceptStatements = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
@@ -357,7 +359,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
@@ -371,7 +373,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
 
         PartialParseResult<InterceptStatementNode> parsedInterceptStatement =
-                parseInterceptStatement(queue.branchOff(), astFactory);
+                parseInterceptStatement(queue.branchOff());
         if (parsedInterceptStatement.isUnsuccessful()) {
             diagnostics.add(parsedInterceptStatement.getDiagnostic());
             isPartial = true;
@@ -385,7 +387,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
 
         PartialParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
-                parseInterceptStatements(queue.branchOff(), astFactory);
+                parseInterceptStatements(queue.branchOff());
         if (parsedInterceptStatements.isUnsuccessful()) {
             diagnostics.add(parsedInterceptStatements.getDiagnostic());
             isPartial = true;
@@ -400,7 +402,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         node.setInterceptBlocks(interceptStatements);
 
         PartialParseResult<EnsureStatementNode> parsedEnsureStatement =
-                parseEnsureStatement(queue.branchOff(), astFactory);
+                parseEnsureStatement(queue.branchOff());
         if (parsedEnsureStatement.isUnsuccessful()) {
             diagnostics.add(parsedEnsureStatement.getDiagnostic());
             isPartial = true;
@@ -420,7 +422,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<List<InterceptStatementNode>> parseInterceptStatements(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<List<InterceptStatementNode>> parseInterceptStatements(TokenQueue queue) {
         List<InterceptStatementNode> interceptStatements = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
@@ -431,7 +433,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         queue.poll();
 
         PartialParseResult<InterceptStatementNode> parsedInterceptStatement =
-                parseInterceptStatement(queue.branchOff(), astFactory);
+                parseInterceptStatement(queue.branchOff());
 
         if (parsedInterceptStatement.isUnsuccessful()) {
             diagnostics.add(parsedInterceptStatement.getDiagnostic());
@@ -447,7 +449,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
 
         ParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
-                parseInterceptStatements(queue.branchOff(), astFactory);
+                parseInterceptStatements(queue.branchOff());
         if (parsedInterceptStatements.isUnsuccessful()) {
             diagnostics.add(parsedInterceptStatements.getDiagnostic());
             isPartial = true;
@@ -467,7 +469,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue) {
         InterceptStatementNodeImpl node = astFactory.createInterceptStatementNode();
         List<IdentifierAccessNode> interceptedExceptions = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
@@ -478,7 +480,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
         ParseResult<IdentifierAccessNode> parsedInterceptedException =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedInterceptedException.isUnsuccessful()) {
             diagnostics.add(parsedInterceptedException.getDiagnostic());
             isPartial = true;
@@ -488,7 +490,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
 
         PartialParseResult<List<IdentifierAccessNode>> parsedAdditionalInterceptedExceptions =
-                programParser.getAuxiliaryParser().parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseAdditionalIdentifierAccesses(queue.branchOff());
         if (parsedAdditionalInterceptedExceptions.isUnsuccessful()) {
             diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
             isPartial = true;
@@ -509,7 +511,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.poll();
         }
 
-        ParseResult<Token> parsedExceptionIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
+        ParseResult<Token> parsedExceptionIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedExceptionIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
             isPartial = true;
@@ -518,7 +520,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
         }
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
@@ -540,7 +542,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<EnsureStatementNode> parseEnsureStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<EnsureStatementNode> parseEnsureStatement(TokenQueue queue) {
         EnsureStatementNodeImpl node = astFactory.createEnsureStatementNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
@@ -550,7 +552,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;

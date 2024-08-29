@@ -8,6 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.*;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,23 +25,25 @@ public class ProgramParserImpl implements ProgramParser {
     private final ControlStatementParser controlStatementParser;
     private final LiteralParser literalParser;
 
+    private final ASTNodeFactory astFactory = new ASTNodeFactory(new NodeDiagnosticCollector());
+
     public ProgramParserImpl() {
-        this.statementParser = new StatementParserImpl(this);
-        this.auxiliaryParser = new AuxiliaryParserImpl(this);
-        this.expressionParser = new ExpressionParserImpl(this);
-        this.literalParser = new LiteralParserImpl(this);
-        this.controlStatementParser = new ControlStatementParserImpl(this);
-        this.controlStructureParser = new ControlStructureParserImpl(this);
+        this.statementParser = new StatementParserImpl(this, astFactory);
+        this.auxiliaryParser = new AuxiliaryParserImpl(this, astFactory);
+        this.expressionParser = new ExpressionParserImpl(this, astFactory);
+        this.literalParser = new LiteralParserImpl(this,astFactory);
+        this.controlStatementParser = new ControlStatementParserImpl(this,astFactory);
+        this.controlStructureParser = new ControlStructureParserImpl(this,astFactory);
     }
 
     @PartialParse
     @Override
-    public PartialParseResult<ProgramNode> parseProgram(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ProgramNode> parseProgram(TokenQueue queue) {
         ProgramNodeImpl node = astFactory.createProgramNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        PartialParseResult<List<Token>> parsedImports = statementParser.parseImports(queue.branchOff(), astFactory);
+        PartialParseResult<List<Token>> parsedImports = statementParser.parseImports(queue.branchOff());
         if (parsedImports.isSuccessful() || parsedImports.isPartial()) {
             queue.mergeBranch();
             ImportsNodeImpl imports = astFactory.createImportNode();
@@ -53,7 +56,7 @@ public class ProgramParserImpl implements ProgramParser {
         }
 
 
-        PartialParseResult<StatementsNode> parsedStatements = statementParser.parseStatements(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedStatements = statementParser.parseStatements(queue.branchOff());
         if (parsedStatements.isSuccessful() || parsedStatements.isPartial()) {
             queue.mergeBranch();
             node.setStatements(parsedStatements.getParseResult());
@@ -63,7 +66,7 @@ public class ProgramParserImpl implements ProgramParser {
             isPartial = true;
         }
 
-        PartialParseResult<ExportsNode> parsedExports = statementParser.parseExports(queue.branchOff(), astFactory);
+        PartialParseResult<ExportsNode> parsedExports = statementParser.parseExports(queue.branchOff());
         if (parsedExports.isSuccessful() || parsedExports.isPartial()) {
             queue.mergeBranch();
             node.setExports(parsedExports.getParseResult());

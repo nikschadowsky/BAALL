@@ -18,14 +18,16 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 public class ControlStatementParserImpl implements ControlStatementParser {
 
     private final ProgramParser programParser;
+    private final ASTNodeFactory astFactory;
 
-    public ControlStatementParserImpl(ProgramParser programParser) {
+    public ControlStatementParserImpl(ProgramParser programParser, ASTNodeFactory astFactory) {
         this.programParser = programParser;
+        this.astFactory = astFactory;
     }
 
     @CompleteParse
     @Override
-    public ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("break").matches(queue.peek())) {
             queue.poll();
             return ParseResult.successfulParse(astFactory.createBreakStatementNode());
@@ -39,7 +41,7 @@ public class ControlStatementParserImpl implements ControlStatementParser {
             ReturnStatementNodeImpl node = astFactory.createReturnStatementNode();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedExpression.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -57,7 +59,7 @@ public class ControlStatementParserImpl implements ControlStatementParser {
             RaiseStatementNodeImpl node = astFactory.createRaiseStatementNode();
 
             ParseResult<ExceptionCallNode> parsedExceptionCall =
-                    programParser.getLiteralParser().parseExceptionCall(queue.branchOff(), astFactory);
+                    programParser.getLiteralParser().parseExceptionCreation(queue.branchOff());
             if (parsedExceptionCall.isSuccessful()) {
                 queue.mergeBranch();
                 node.setException(parsedExceptionCall.getParseResult());

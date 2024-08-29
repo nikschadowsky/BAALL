@@ -4,7 +4,6 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ProgramNode;
 
 /**
@@ -12,7 +11,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ProgramNode;
  */
 public interface ProgramParser {
     @PartialParse
-    PartialParseResult<ProgramNode> parseProgram(TokenQueue queue, ASTNodeFactory astFactory);
+    PartialParseResult<ProgramNode> parseProgram(TokenQueue queue);
 
     AuxiliaryParser getAuxiliaryParser();
 

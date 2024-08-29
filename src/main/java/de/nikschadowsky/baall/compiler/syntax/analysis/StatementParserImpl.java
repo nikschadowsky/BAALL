@@ -28,14 +28,16 @@ import java.util.List;
 public class StatementParserImpl implements StatementParser {
 
     private final ProgramParser programParser;
+    private final ASTNodeFactory astFactory;
 
-    public StatementParserImpl(ProgramParser programParser) {
+    public StatementParserImpl(ProgramParser programParser, ASTNodeFactory astFactory) {
         this.programParser = programParser;
+        this.astFactory = astFactory;
     }
 
     @PartialParse
     @Override
-    public PartialParseResult<List<Token>> parseImports(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<List<Token>> parseImports(TokenQueue queue) {
         ImportsNodeImpl node = astFactory.createImportNode();
         List<Token> imports = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
@@ -59,7 +61,7 @@ public class StatementParserImpl implements StatementParser {
         }
         queue.poll();
 
-        PartialParseResult<List<Token>> parsedImports = parseImports(queue.branchOff(), astFactory);
+        PartialParseResult<List<Token>> parsedImports = parseImports(queue.branchOff());
         if (parsedImports.isUnsuccessful()) {
             diagnostics.add(parsedImports.getDiagnostic());
             isPartial = true;
@@ -81,13 +83,13 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementsNode> parseStatements(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<StatementsNode> parseStatements(TokenQueue queue) {
         StatementsNodeImpl node = astFactory.createStatementsNode();
         List<StatementNode> statements = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        PartialParseResult<StatementNode> parsedStatement = parseStatement(queue.branchOff(), astFactory);
+        PartialParseResult<StatementNode> parsedStatement = parseStatement(queue.branchOff());
         if (parsedStatement.isUnsuccessful()) {
             node.setStatements(new LinkedList<>());
             return PartialParseResult.successfulParse(node);
@@ -100,7 +102,7 @@ public class StatementParserImpl implements StatementParser {
         queue.mergeBranch();
         statements.add(parsedStatement.getParseResult());
 
-        PartialParseResult<StatementsNode> parsedStatements = parseStatements(queue.branchOff(), astFactory);
+        PartialParseResult<StatementsNode> parsedStatements = parseStatements(queue.branchOff());
         if (parsedStatements.isUnsuccessful()) {
             diagnostics.add(parsedStatements.getDiagnostic());
             isPartial = true;
@@ -122,7 +124,7 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue) {
         PartialParseResult<? extends StatementNode> parseResult;
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
@@ -131,7 +133,7 @@ public class StatementParserImpl implements StatementParser {
 
         // control structures
         PartialParseResult<ControlStructureNode> parsedControlStructure =
-                programParser.getControlStructureParser().parseControlStructure(queue.branchOff(), astFactory);
+                programParser.getControlStructureParser().parseControlStructure(queue.branchOff());
         if (parsedControlStructure.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedControlStructure.getParseResult());
@@ -143,7 +145,7 @@ public class StatementParserImpl implements StatementParser {
             );
         }
 
-        PartialParseResult<StatementNode> parsedRawStatement = parseRawStatement(queue.branchOff(), astFactory);
+        PartialParseResult<StatementNode> parsedRawStatement = parseRawStatement(queue.branchOff());
         if (parsedRawStatement.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedRawStatement.getParseResult());
@@ -166,29 +168,29 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementNode> parseRawStatement(TokenQueue queue, ASTNodeFactory astFactory) {
-        PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff(), astFactory);
+    public PartialParseResult<StatementNode> parseRawStatement(TokenQueue queue) {
+        PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff());
 
         if (parsedDeclaration.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedDeclaration.getParseResult());
         }
 
-        PartialParseResult<ReassignmentNode> parsedReassignment = parseReassignment(queue.branchOff(), astFactory);
+        PartialParseResult<ReassignmentNode> parsedReassignment = parseReassignment(queue.branchOff());
         if (parsedReassignment.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedReassignment.getParseResult());
         }
 
         PartialParseResult<FunctionCallNode> parsedFunctionCall =
-                programParser.getExpressionParser().parseFunctionCall(queue.branchOff(), astFactory);
+                programParser.getExpressionParser().parseFunctionCall(queue.branchOff());
         if (parsedFunctionCall.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedFunctionCall.getParseResult());
         }
 
         ParseResult<ControlStatementNode> parsedControlStatement =
-                programParser.getControlStatementParser().parseControlStatement(queue.branchOff(), astFactory);
+                programParser.getControlStatementParser().parseControlStatement(queue.branchOff());
         if (parsedControlStatement.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedControlStatement.getParseResult());
@@ -220,9 +222,9 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<DeclarationNode> parseDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<DeclarationNode> parseDeclaration(TokenQueue queue) {
         PartialParseResult<ConstantDeclarationNode> parsedConstantDeclaration =
-                parseConstantDeclaration(queue.branchOff(), astFactory);
+                parseConstantDeclaration(queue.branchOff());
 
         if (parsedConstantDeclaration.isSuccessful()) {
             queue.mergeBranch();
@@ -230,7 +232,7 @@ public class StatementParserImpl implements StatementParser {
         }
 
         PartialParseResult<VariableDeclarationNode> parsedVariableDeclaration =
-                parseVariableDeclaration(queue.branchOff(), astFactory);
+                parseVariableDeclaration(queue.branchOff());
         if (parsedVariableDeclaration.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedVariableDeclaration.getParseResult());
@@ -249,12 +251,12 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<VariableDeclarationNode> parseVariableDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<VariableDeclarationNode> parseVariableDeclaration(TokenQueue queue) {
         VariableDeclarationNodeImpl node = astFactory.createVariableDeclarationNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff(), astFactory);
+        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff());
         if (parsedType.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -268,7 +270,7 @@ public class StatementParserImpl implements StatementParser {
         queue.poll();
 
         ParseResult<Token> parsedIdentifier =
-                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -280,7 +282,7 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedExpression.isUnsuccessful()) {
                 diagnostics.add(parsedExpression.getDiagnostic());
                 isPartial = true;
@@ -297,12 +299,12 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ConstantDeclarationNode> parseConstantDeclaration(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ConstantDeclarationNode> parseConstantDeclaration(TokenQueue queue) {
         ConstantDeclarationNodeImpl node = astFactory.createConstantDeclarationNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff(), astFactory);
+        ParseResult<TypeNode> parsedType = programParser.getAuxiliaryParser().parseType(queue.branchOff());
         if (parsedType.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -316,7 +318,7 @@ public class StatementParserImpl implements StatementParser {
         queue.poll();
 
         ParseResult<Token> parsedIdentifier =
-                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -331,7 +333,7 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
 
             ParseResult<ExpressionNode> parsedExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                    programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedExpression.isUnsuccessful()) {
                 diagnostics.add(parsedExpression.getDiagnostic());
                 isPartial = true;
@@ -348,16 +350,16 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ReassignmentNode> parseReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ReassignmentNode> parseReassignment(TokenQueue queue) {
         ParseResult<UnaryExpressionNode> parsedUnaryExpression =
-                programParser.getExpressionParser().parseUnaryExpression(queue.branchOff(), astFactory);
+                programParser.getExpressionParser().parseUnaryExpression(queue.branchOff());
         if (parsedUnaryExpression.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedUnaryExpression.getParseResult());
         }
 
         PartialParseResult<VariableReassignmentNode> parsedVariableReassignment =
-                parseVariableReassignment(queue.branchOff(), astFactory);
+                parseVariableReassignment(queue.branchOff());
         if (parsedVariableReassignment.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedVariableReassignment.getParseResult());
@@ -374,13 +376,13 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<VariableReassignmentNode> parseVariableReassignment(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<VariableReassignmentNode> parseVariableReassignment(TokenQueue queue) {
         VariableReassignmentNodeImpl node = astFactory.createVariableReassignmentNode();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
         ParseResult<IdentifierAccessNode> parsedIdentifier =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
@@ -388,7 +390,7 @@ public class StatementParserImpl implements StatementParser {
         node.setIdentifier(parsedIdentifier.getParseResult());
 
         ParseResult<Token> parsedShorthandOperator =
-                programParser.getAuxiliaryParser().parseShorthandOperator(queue.branchOff(), astFactory);
+                programParser.getAuxiliaryParser().parseShorthandOperator(queue.branchOff());
         if (parsedShorthandOperator.isSuccessful()) {
             queue.mergeBranch();
             node.setOperator(parsedShorthandOperator.getParseResult());
@@ -398,7 +400,7 @@ public class StatementParserImpl implements StatementParser {
         }
 
         ParseResult<ExpressionNode> parsedExpression =
-                programParser.getExpressionParser().parseExpression(queue.branchOff(), astFactory);
+                programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
             node.setValueExpression(parsedExpression.getParseResult());
@@ -415,7 +417,7 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<ExportsNode> parseExports(TokenQueue queue, ASTNodeFactory astFactory) {
+    public PartialParseResult<ExportsNode> parseExports(TokenQueue queue) {
         ExportsNodeImpl node = astFactory.createExportNode();
         node.setExports(new LinkedList<>());
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
@@ -432,7 +434,7 @@ public class StatementParserImpl implements StatementParser {
                 return PartialParseResult.successfulParse(node);
             } else {
                 ParseResult<IdentifierAccessNode> parsedElement =
-                        programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff(), astFactory);
+                        programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
                 List<IdentifierAccessNode> elements = new LinkedList<>();
 
                 if (parsedElement.isSuccessful()) {
@@ -446,7 +448,7 @@ public class StatementParserImpl implements StatementParser {
 
                 PartialParseResult<List<IdentifierAccessNode>> parsedElements =
                         programParser.getAuxiliaryParser()
-                                     .parseAdditionalIdentifierAccesses(queue.branchOff(), astFactory);
+                                     .parseAdditionalIdentifierAccesses(queue.branchOff());
 
                 if (parsedElements.isUnsuccessful()) {
                     diagnostics.add(parsedElements.getDiagnostic());

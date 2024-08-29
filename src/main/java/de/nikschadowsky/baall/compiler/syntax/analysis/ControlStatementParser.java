@@ -4,7 +4,6 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlstatement.ControlStatementNode;
 
 /**
@@ -12,5 +11,5 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlsta
  */
 public interface ControlStatementParser {
     @CompleteParse
-    ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue, ASTNodeFactory astFactory);
+    ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue);
 }

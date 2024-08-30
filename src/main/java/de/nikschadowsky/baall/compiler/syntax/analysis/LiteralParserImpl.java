@@ -187,24 +187,12 @@ public class LiteralParserImpl implements LiteralParser {
         queue.poll();
         node.setParameters(parameterDeclarations);
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
-        }
-        queue.poll();
-
-        ParseResult<StatementsNode> parsedStatements =
-                programParser.getStatementParser().parseStatements(queue.branchOff());
-        if (!parsedStatements.isSuccessful()) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-            return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
+        ParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        if (!parsedBody.isSuccessful()) {
+            return ParseResult.unsuccessfulParse(parsedBody.getDiagnostic());
         }
         queue.mergeBranch();
-        node.setFunctionBody(parsedStatements.getParseResult());
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-        }
+        node.setFunctionBody(parsedBody.getParseResult());
         return ParseResult.successfulParse(node);
     }
 

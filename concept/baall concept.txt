@@ -19,7 +19,7 @@ number: konstante2 := b + arr2[2];
 boolean: isTrue := true;
 boolean isFalse = false;
 
-string: function1 := number: a, bool: b, char: c {
+string: function1 := (number: a, bool: b, char: c) {
 	isTrue? {
 		funktion2(x, y, z);
 		return "Hahaha";

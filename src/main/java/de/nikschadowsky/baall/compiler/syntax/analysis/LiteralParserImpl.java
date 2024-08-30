@@ -155,59 +155,57 @@ public class LiteralParserImpl implements LiteralParser {
     @Override
     public ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue) {
         FunctionDefinitionNodeImpl node = astFactory.createFunctionDefinitionNode();
+        List<Map.Entry<TypeNode, Token>> parameterDeclarations = new LinkedList<>();
 
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.poll();
-            node.setParameters(new LinkedList<>());
-
-            ParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff());
-            if (!parsedStatements.isSuccessful()) {
-                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-                return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
-            }
-            queue.mergeBranch();
-            node.setFunctionBody(parsedStatements.getParseResult());
-
-            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-            }
-            return ParseResult.successfulParse(node);
-
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
         }
-        ParseResult<Map.Entry<TypeNode, Token>> parsedFunctionParameter =
-                programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff());
-        if (parsedFunctionParameter.isSuccessful()) {
+
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
+            ParseResult<Map.Entry<TypeNode, Token>> parsedFunctionParameter =
+                    programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff());
+            if (parsedFunctionParameter.isUnsuccessful()) {
+                return ParseResult.unsuccessfulParse(parsedFunctionParameter.getDiagnostic());
+            }
             queue.mergeBranch();
-            ParseResult<List<Map.Entry<TypeNode, Token>>> parsedFunctionParameters =
+            parameterDeclarations.add(parsedFunctionParameter.getParseResult());
+
+            ParseResult<List<Map.Entry<TypeNode, Token>>> parsedParameterDeclarations =
                     programParser.getAuxiliaryParser().parseFieldDeclarations(queue.branchOff());
-            if (parsedFunctionParameters.isUnsuccessful()) {
-                return ParseResult.unsuccessfulParse(parsedFunctionParameters.getDiagnostic());
+            if (parsedParameterDeclarations.isUnsuccessful()) {
+                return ParseResult.unsuccessfulParse(parsedParameterDeclarations.getDiagnostic());
             }
             queue.mergeBranch();
-            List<Map.Entry<TypeNode, Token>> parameters = new LinkedList<>(parsedFunctionParameters.getParseResult());
-            parameters.add(parsedFunctionParameter.getParseResult());
-            node.setParameters(parameters);
-            if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
-                ParseResult<StatementsNode> parsedStatements =
-                        programParser.getStatementParser().parseStatements(queue.branchOff());
-                if (parsedStatements.isUnsuccessful()) {
-                    return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
-                }
-                queue.mergeBranch();
-                node.setFunctionBody(parsedStatements.getParseResult());
-                if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                    return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-                }
-                queue.poll();
-                return ParseResult.successfulParse(node);
-            }
+            parameterDeclarations.addAll(parsedParameterDeclarations.getParseResult());
+        }
+
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
+        }
+        queue.poll();
+        node.setParameters(parameterDeclarations);
+
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.poll(),
-                "Expected function parameter definition or '{'!"
-        ));
+        queue.poll();
+
+        ParseResult<StatementsNode> parsedStatements =
+                programParser.getStatementParser().parseStatements(queue.branchOff());
+        if (!parsedStatements.isSuccessful()) {
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+            return ParseResult.unsuccessfulParse(parsedStatements.getDiagnostic());
+        }
+        queue.mergeBranch();
+        node.setFunctionBody(parsedStatements.getParseResult());
+
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
+        }
+        return ParseResult.successfulParse(node);
     }
 
     @CompleteParse
@@ -226,6 +224,13 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(parsedArrayLiteral.getParseResult());
         }
 
+        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition =
+                parseFunctionDefinition(queue.branchOff());
+        if (parsedFunctionDefinition.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parsedFunctionDefinition.getParseResult());
+        }
+
         ParseResult<StructDefinitionLiteralNode> parseStructDefinitionLiteral =
                 parseStructDefinition(queue.branchOff());
         if (parseStructDefinitionLiteral.isSuccessful()) {
@@ -239,13 +244,6 @@ public class LiteralParserImpl implements LiteralParser {
         if (parsedStructInitializationLiteral.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult());
-        }
-
-        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition =
-                parseFunctionDefinition(queue.branchOff());
-        if (parsedFunctionDefinition.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parsedFunctionDefinition.getParseResult());
         }
 
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a literal!"));

@@ -22,8 +22,8 @@ public class SyntaxSet {
         Set<LanguageElement> primitives = new LinkedHashSet<>();
 
         primitives.add(new LanguageElement("number_primitive", TokenType.STRING, "_NUMBER"));
-        primitives.add(new LanguageElement("string_primitive", TokenType.NUMBER, "_NUMBER"));
-        // primitives.add(new LanguageElement("char_primitive", TokenType.STRING, "_CHARACTER"));
+        primitives.add(new LanguageElement("string_primitive", TokenType.NUMBER, "_STRING"));
+        primitives.add(new LanguageElement("char_primitive", TokenType.CHAR, "_CHAR"));
         primitives.add(new LanguageElement("boolean_primitive", TokenType.BOOLEAN, "_BOOLEAN"));
 
         System.out.println("Primitives: " + primitives + "\n Number of elements: " + primitives.size());
@@ -58,7 +58,7 @@ public class SyntaxSet {
 
     private static Set<LanguageElement> getSimpleTypes() {
         Set<LanguageElement> simpleTypes = new LinkedHashSet<>();
-        // TODO Undecided, just reserve it for now
+        // TODO undecided language feature, just reserve it for now
         simpleTypes.add(new LanguageElement("char", TokenType.KEYWORD, "char"));
         simpleTypes.add(new LanguageElement("number", TokenType.KEYWORD, "number"));
         simpleTypes.add(new LanguageElement("string", TokenType.KEYWORD, "string"));

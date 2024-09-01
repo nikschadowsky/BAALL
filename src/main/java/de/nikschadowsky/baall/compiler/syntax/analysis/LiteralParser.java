@@ -15,6 +15,18 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 public interface LiteralParser {
 
     /**
+     * Parses a literal. A literal is either a  {@link #parsePrimitiveLiteral primitive value}, an
+     * {@link #parseArrayLiteral array}, a {@link #parseStructDefinition struct definition}, a
+     * {@link #parseStructInitialization struct initialization}, a {@link #parseFunctionDefinition function definition}
+     * or an {@link #parseExceptionCreation exception creation}.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed literal
+     */
+    @CompleteParse
+    ParseResult<LiteralNode> parseLiteral(TokenQueue queue);
+
+    /**
      * Parses a literal representing an array in the format of '[ element1, element2, ... ]'.
      *
      * @param queue queue of the tokens
@@ -53,18 +65,6 @@ public interface LiteralParser {
      */
     @CompleteParse
     ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue);
-
-    /**
-     * Parses a literal. A literal is either a  {@link #parsePrimitiveLiteral primitive value}, an
-     * {@link #parseArrayLiteral array}, a {@link #parseStructDefinition struct definition}, a
-     * {@link #parseStructInitialization struct initialization}, a {@link #parseFunctionDefinition function definition}
-     * or an {@link #parseExceptionCreation exception creation}.
-     *
-     * @param queue queue of the tokens
-     * @return complete parse result of the parsed literal
-     */
-    @CompleteParse
-    ParseResult<LiteralNode> parseLiteral(TokenQueue queue);
 
     /**
      * Parses a literal of a primitive value. A primitive value can be a string, a number, a boolean or a character as

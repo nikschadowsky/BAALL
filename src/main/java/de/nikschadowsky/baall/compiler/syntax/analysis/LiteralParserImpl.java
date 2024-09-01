@@ -36,6 +36,47 @@ public class LiteralParserImpl implements LiteralParser {
 
     @CompleteParse
     @Override
+    public ParseResult<LiteralNode> parseLiteral(TokenQueue queue) {
+        ParseResult<PrimitiveLiteralNode> parsedPrimitiveLiteral =
+                parsePrimitiveLiteral(queue.branchOff());
+        if (parsedPrimitiveLiteral.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parsedPrimitiveLiteral.getParseResult());
+        }
+
+        ParseResult<ArrayLiteralNode> parsedArrayLiteral = parseArrayLiteral(queue.branchOff());
+        if (parsedArrayLiteral.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parsedArrayLiteral.getParseResult());
+        }
+
+        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition =
+                parseFunctionDefinition(queue.branchOff());
+        if (parsedFunctionDefinition.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parsedFunctionDefinition.getParseResult());
+        }
+
+        ParseResult<StructDefinitionLiteralNode> parseStructDefinitionLiteral =
+                parseStructDefinition(queue.branchOff());
+        if (parseStructDefinitionLiteral.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parseStructDefinitionLiteral.getParseResult());
+        }
+
+        ParseResult<StructInitializationLiteralNode>
+                parsedStructInitializationLiteral =
+                parseStructInitialization(queue.branchOff());
+        if (parsedStructInitializationLiteral.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult());
+        }
+
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a literal!"));
+    }
+
+    @CompleteParse
+    @Override
     public ParseResult<ArrayLiteralNode> parseArrayLiteral(TokenQueue queue) {
         ArrayLiteralNodeImpl node = astFactory.createArrayLiteralNode();
         List<ExpressionNode> elements = new LinkedList<>();
@@ -194,47 +235,6 @@ public class LiteralParserImpl implements LiteralParser {
         queue.mergeBranch();
         node.setFunctionBody(parsedBody.getParseResult());
         return ParseResult.successfulParse(node);
-    }
-
-    @CompleteParse
-    @Override
-    public ParseResult<LiteralNode> parseLiteral(TokenQueue queue) {
-        ParseResult<PrimitiveLiteralNode> parsedPrimitiveLiteral =
-                parsePrimitiveLiteral(queue.branchOff());
-        if (parsedPrimitiveLiteral.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parsedPrimitiveLiteral.getParseResult());
-        }
-
-        ParseResult<ArrayLiteralNode> parsedArrayLiteral = parseArrayLiteral(queue.branchOff());
-        if (parsedArrayLiteral.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parsedArrayLiteral.getParseResult());
-        }
-
-        ParseResult<FunctionDefinitionNode> parsedFunctionDefinition =
-                parseFunctionDefinition(queue.branchOff());
-        if (parsedFunctionDefinition.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parsedFunctionDefinition.getParseResult());
-        }
-
-        ParseResult<StructDefinitionLiteralNode> parseStructDefinitionLiteral =
-                parseStructDefinition(queue.branchOff());
-        if (parseStructDefinitionLiteral.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseStructDefinitionLiteral.getParseResult());
-        }
-
-        ParseResult<StructInitializationLiteralNode>
-                parsedStructInitializationLiteral =
-                parseStructInitialization(queue.branchOff());
-        if (parsedStructInitializationLiteral.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult());
-        }
-
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a literal!"));
     }
 
     @CompleteParse

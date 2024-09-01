@@ -42,7 +42,7 @@ public class ExceptionCallNodeImpl extends AbstractNode implements ExceptionCall
 
     @Override
     public @NotNull NodeType getNodeType() {
-        return NodeType.EXCEPTION_CALL;
+        return NodeType.EXCEPTION_CREATION;
     }
 
 }

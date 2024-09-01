@@ -79,7 +79,8 @@ public interface LiteralParser {
     /**
      * Parses the creation of an exception in the format of 'myException(expression_1, ...)'. An exception always
      * consists of an identifier specifying the exception type and 0..n
-     * {@link ExpressionParser#parseExpression(TokenQueue) arguments}.
+     * {@link ExpressionParser#parseExpression(TokenQueue) arguments}. An exception creation is a concrete instantiation
+     * of an exception.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed created exception

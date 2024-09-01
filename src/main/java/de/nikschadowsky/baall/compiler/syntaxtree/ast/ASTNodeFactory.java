@@ -157,10 +157,6 @@ public class ASTNodeFactory {
         return new StructInitializationLiteralNodeImpl(diagnostics);
     }
 
-    public StructInitializationLiteralNode createStructInitializationNone() {
-        return StructInitializationLiteralNodeImpl.createNone(diagnostics);
-    }
-
     public ArrayLiteralNodeImpl createArrayLiteralNode() {
         return new ArrayLiteralNodeImpl(diagnostics);
     }

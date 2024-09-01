@@ -18,14 +18,6 @@ public class StructInitializationLiteralNodeImpl extends AbstractNode implements
 
     private List<ExpressionNode> arguments;
 
-    public static StructInitializationLiteralNode createNone(NodeDiagnosticCollector diagnostics) {
-        StructInitializationLiteralNodeImpl node =
-                new StructInitializationLiteralNodeImpl(diagnostics);
-
-        node.setArguments(new LinkedList<>());
-        return node;
-    }
-
     public StructInitializationLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }

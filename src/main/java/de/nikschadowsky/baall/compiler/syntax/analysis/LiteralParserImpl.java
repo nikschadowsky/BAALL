@@ -202,6 +202,7 @@ public class LiteralParserImpl implements LiteralParser {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
         }
+        queue.poll();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
             ParseResult<Map.Entry<TypeNode, Token>> parsedFunctionParameter =

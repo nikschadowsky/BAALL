@@ -189,7 +189,7 @@ public class LiteralParserImpl implements LiteralParser {
             queue.poll();
             return ParseResult.successfulParse(astFactory.createStructInitializationNone());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected expression or 'none'!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an expression or 'none'!"));
     }
 
     @CompleteParse

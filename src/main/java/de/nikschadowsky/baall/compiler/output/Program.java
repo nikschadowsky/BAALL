@@ -1,7 +1,5 @@
 package de.nikschadowsky.baall.compiler.output;
 
-import de.nikschadowsky.baall.compiler.syntaxtree.cst.ConcreteSyntaxTree;
-
 import java.nio.file.Path;
 
 /**
@@ -14,8 +12,6 @@ public class Program {
     private final String sourceCode;
 
     private String preprocessedCode;
-
-    private ConcreteSyntaxTree concreteSyntaxTree;
 
     private boolean isCompiled;
 

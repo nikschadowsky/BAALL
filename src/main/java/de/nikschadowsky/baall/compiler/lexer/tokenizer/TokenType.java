@@ -7,6 +7,8 @@ import java.util.Arrays;
 public enum TokenType {
 
     STRING("String", false),
+    // unused
+    CHAR("Character", false),
     NUMBER("Number", false),
     BOOLEAN("Boolean", false),
     KEYWORD("Keyword", true),

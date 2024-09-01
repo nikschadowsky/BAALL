@@ -47,7 +47,9 @@ public interface LiteralParser {
 
     /**
      * Parses a struct initializer in the format of '(expression_1, expression_2, ...)'. A struct initialization always
-     * consists of 1..n {@link ExpressionParser#parseExpression(TokenQueue) arguments}.
+     * consists of 1..n {@link ExpressionParser#parseExpression(TokenQueue) arguments}. A struct can also be initialized
+     * to 'none' by using the keyword respectively. A 'none' initialized struct can be identified by an empty list of
+     * {@link ExpressionParser#parseExpression(TokenQueue) arguments}.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the struct initialization

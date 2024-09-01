@@ -160,6 +160,12 @@ public class LiteralParserImpl implements LiteralParser {
     public ParseResult<StructInitializationLiteralNode> parseStructInitialization(TokenQueue queue) {
         StructInitializationLiteralNodeImpl node = astFactory.createStructInitializationLiteralNode();
 
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("none").matches(queue.peek())) {
+            queue.poll();
+            node.setArguments(new LinkedList<>());
+            return ParseResult.successfulParse(node);
+        }
+
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
         }
@@ -185,9 +191,6 @@ public class LiteralParserImpl implements LiteralParser {
                 return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
             }
             return ParseResult.unsuccessfulParse(parsedArguments.getDiagnostic());
-        } else if (SyntaxSet.LANGUAGE_ELEMENTS.get("none").matches(queue.peek())) {
-            queue.poll();
-            return ParseResult.successfulParse(astFactory.createStructInitializationNone());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an expression or 'none'!"));
     }

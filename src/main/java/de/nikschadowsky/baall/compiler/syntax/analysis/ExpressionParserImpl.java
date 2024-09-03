@@ -13,15 +13,11 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNo
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
-import de.nikschadowsky.baall.compiler.util.LanguageElement;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @since 11.08.2024
@@ -57,7 +53,8 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
 
-        ParseResult<Token> parsedPrefixOperator = parsePrefixOperator(queue.branchOff());
+        ParseResult<Token> parsedPrefixOperator = programParser.getAuxiliaryParser()
+                                                               .parsePrefixOperator(queue.branchOff());
         if (parsedPrefixOperator.isSuccessful()) {
             queue.mergeBranch();
 
@@ -78,7 +75,8 @@ public class ExpressionParserImpl implements ExpressionParser {
         if (parsedValue.isSuccessful()) {
             queue.mergeBranch();
 
-            ParseResult<Token> parsedBinaryOperator = programParser.getAuxiliaryParser().parseBinaryOperator(queue.branchOff());
+            ParseResult<Token> parsedBinaryOperator =
+                    programParser.getAuxiliaryParser().parseBinaryOperator(queue.branchOff());
             if (parsedBinaryOperator.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -138,7 +136,8 @@ public class ExpressionParserImpl implements ExpressionParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedIdentifierValueAccess.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
         }
@@ -233,19 +232,5 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.unsuccessfulParse(parsedUnaryOperator.getDiagnostic());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
-    }
-
-    @CompleteParse
-    @Override
-    public ParseResult<Token> parsePrefixOperator(TokenQueue queue) {
-        Set<LanguageElement> validShorthandOperators =
-                Stream.of("+", "-", "!")
-                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
-                      .collect(Collectors.toSet());
-
-        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a prefix operator!"));
     }
 }

@@ -28,6 +28,4 @@ public interface ExpressionParser {
     @CompleteParse
     ParseResult<UnaryExpressionNode> parseUnaryExpression(TokenQueue queue);
 
-    @CompleteParse
-    ParseResult<Token> parsePrefixOperator(TokenQueue queue);
 }

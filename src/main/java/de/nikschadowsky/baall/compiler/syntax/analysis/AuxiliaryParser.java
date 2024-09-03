@@ -39,9 +39,8 @@ public interface AuxiliaryParser {
     ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue);
 
     /**
-     * Parses a list of arguments in the form of
-     * {@link ExpressionParser#parseExpression(TokenQueue) expressions} with a leading comma. The list
-     * returned can be empty.
+     * Parses a list of arguments in the form of {@link ExpressionParser#parseExpression(TokenQueue) expressions} with a
+     * leading comma. The list returned can be empty.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed expressions
@@ -77,6 +76,15 @@ public interface AuxiliaryParser {
     ParseResult<Token> parseShorthandOperator(TokenQueue queue);
 
     /**
+     * Parses a prefix operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed prefix operator
+     */
+    @CompleteParse
+    ParseResult<Token> parsePrefixOperator(TokenQueue queue);
+
+    /**
      * Parses an identifier.
      *
      * @param queue queue of the tokens
@@ -86,8 +94,8 @@ public interface AuxiliaryParser {
     ParseResult<Token> parseIdentifier(TokenQueue queue);
 
     /**
-     * Parses a type declaration consisting of a {@link #parseSimpleType(TokenQueue) simple type} and
-     * optional {@link #parseArrayTypeDefinition(TokenQueue) array type definitions}.
+     * Parses a type declaration consisting of a {@link #parseSimpleType(TokenQueue) simple type} and optional
+     * {@link #parseArrayTypeDefinition(TokenQueue) array type definitions}.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed type
@@ -106,8 +114,8 @@ public interface AuxiliaryParser {
 
     /**
      * Parses a list of array type definitions. Each type definition is represented either an
-     * {@link ExpressionParser#parseExpression(TokenQueue) expression} node specifying its size or
-     * {@code null} to indicate an unknown or inferred size. The list returned can be empty.
+     * {@link ExpressionParser#parseExpression(TokenQueue) expression} node specifying its size or {@code null} to
+     * indicate an unknown or inferred size. The list returned can be empty.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the array type definitions
@@ -117,8 +125,8 @@ public interface AuxiliaryParser {
 
     /**
      * Parses a list of array index information. Each index information is represented by an
-     * {@link ExpressionParser#parseExpression(TokenQueue) expression} specifying a concrete index. The
-     * list returned can be empty.
+     * {@link ExpressionParser#parseExpression(TokenQueue) expression} specifying a concrete index. The list returned
+     * can be empty.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the array index information
@@ -147,8 +155,8 @@ public interface AuxiliaryParser {
     PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue);
 
     /**
-     * Parses a block of {@link StatementParser#parseStatements(TokenQueue) statements} surrounded by
-     * '{' curly braces '}'. The result may be partial.
+     * Parses a block of {@link StatementParser#parseStatements(TokenQueue) statements} surrounded by '{' curly braces
+     * '}'. The result may be partial.
      *
      * @param queue queue of the tokens
      * @return partial parse result of the codeblock

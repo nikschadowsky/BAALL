@@ -156,6 +156,20 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
+    public ParseResult<Token> parsePrefixOperator(TokenQueue queue) {
+        Set<LanguageElement> validShorthandOperators =
+                Stream.of("+", "-", "!")
+                      .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
+                      .collect(Collectors.toSet());
+
+        if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
+            return ParseResult.successfulParse(queue.poll());
+        }
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a prefix operator!"));
+    }
+
+    @CompleteParse
+    @Override
     public ParseResult<Token> parseIdentifier(TokenQueue queue) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("identifier_primitive").matches(queue.peek())) {
             return ParseResult.successfulParse(queue.poll());

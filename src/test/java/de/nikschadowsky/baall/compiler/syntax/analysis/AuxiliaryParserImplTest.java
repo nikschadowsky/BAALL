@@ -271,6 +271,18 @@ class AuxiliaryParserImplTest {
     }
 
     @Test
+    void parsePrefixOperator() {
+        TokenQueue queue = new TokenQueueTestBuilder().operator("+").operator("-").operator("!").build();
+
+        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful().resultMatches(node -> "+".equals(node.value()));
+        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful().resultMatches(node -> "-".equals(node.value()));
+        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful().resultMatches(node -> "!".equals(node.value()));
+
+        queue = new TokenQueueTestBuilder().operator("++").build();
+        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected a prefix operator");
+    }
+
+    @Test
     void parseIdentifier() {
         TokenQueue queue = new TokenQueueTestBuilder().identifier("MyIdentifier").separator(";").build();
 

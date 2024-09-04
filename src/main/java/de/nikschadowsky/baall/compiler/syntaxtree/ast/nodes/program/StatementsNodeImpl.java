@@ -4,10 +4,10 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
 
     @Override
     public @UnmodifiableView List<StatementNode> getStatements() {
-        return Collections.unmodifiableList(statements);
+        return NodeUtility.toUnmodifiableList(statements);
     }
 
     public void setStatements(List<StatementNode> statements) {

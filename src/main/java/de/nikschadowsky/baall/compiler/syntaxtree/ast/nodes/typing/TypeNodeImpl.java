@@ -5,10 +5,10 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
 
     @Override
     public @UnmodifiableView List<ExpressionNode> getArrayDimensionDefinitions() {
-        return Collections.unmodifiableList(arrayDimensionDefinitions);
+        return NodeUtility.toUnmodifiableList(arrayDimensionDefinitions);
     }
 
     public void setArrayDimensionDefinitions(List<ExpressionNode> arrayTypeDefinition) {

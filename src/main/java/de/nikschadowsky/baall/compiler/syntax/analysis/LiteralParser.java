@@ -4,7 +4,6 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
@@ -17,8 +16,8 @@ public interface LiteralParser {
     /**
      * Parses a literal. A literal is either a  {@link #parsePrimitiveLiteral primitive value}, an
      * {@link #parseArrayLiteral array}, a {@link #parseStructDefinition struct definition}, a
-     * {@link #parseStructInitialization struct initialization}, a {@link #parseFunctionDefinition function definition}
-     * or an {@link #parseExceptionCreation exception creation}.
+     * {@link #parseStructInitialization struct initialization}, or a
+     * {@link #parseFunctionDefinition function definition}.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed literal
@@ -78,15 +77,4 @@ public interface LiteralParser {
     @CompleteParse
     ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue);
 
-    /**
-     * Parses the creation of an exception in the format of 'myException(expression_1, ...)'. An exception always
-     * consists of an identifier specifying the exception type and 0..n
-     * {@link ExpressionParser#parseExpression(TokenQueue) arguments}. An exception creation is a concrete instantiation
-     * of an exception.
-     *
-     * @param queue queue of the tokens
-     * @return complete parse result of the parsed created exception
-     */
-    @CompleteParse
-    ParseResult<ExceptionCallNode> parseExceptionCreation(TokenQueue queue);
 }

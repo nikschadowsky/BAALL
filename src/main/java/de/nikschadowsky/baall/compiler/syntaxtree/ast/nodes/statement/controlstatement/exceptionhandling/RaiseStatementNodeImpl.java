@@ -2,7 +2,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlst
 
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.StructInitializationLiteralNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,18 +11,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RaiseStatementNodeImpl extends AbstractNode implements RaiseStatementNode {
 
-    private ExceptionCallNode exception;
+    private StructInitializationLiteralNode exception;
 
     public RaiseStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public ExceptionCallNode getException() {
+    public StructInitializationLiteralNode getException() {
         return exception;
     }
 
-    public void setException(ExceptionCallNode exception) {
+    public void setException(StructInitializationLiteralNode exception) {
         this.exception = exception;
     }
 

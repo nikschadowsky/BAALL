@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
@@ -16,10 +17,21 @@ import java.util.List;
  */
 public class StructInitializationLiteralNodeImpl extends AbstractNode implements StructInitializationLiteralNode {
 
+    private IdentifierAccessNode identifier;
+
     private List<ExpressionNode> arguments;
 
     public StructInitializationLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
+    }
+
+    @Override
+    public IdentifierAccessNode getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(IdentifierAccessNode identifier) {
+        this.identifier = identifier;
     }
 
     @Override

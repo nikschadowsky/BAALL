@@ -10,6 +10,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlsta
  * @since 25.08.2024
  */
 public interface ControlStatementParser {
+
     @CompleteParse
     ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue);
 }

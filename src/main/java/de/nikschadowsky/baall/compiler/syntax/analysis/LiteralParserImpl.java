@@ -3,15 +3,12 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
-import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ExceptionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
@@ -166,6 +163,14 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(node);
         }
 
+        ParseResult<IdentifierAccessNode> parsedStructType =
+                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        if (parsedStructType.isUnsuccessful()) {
+            return ParseResult.unsuccessfulParse(parsedStructType.getDiagnostic());
+        }
+        queue.mergeBranch();
+        node.setIdentifier(parsedStructType.getParseResult());
+
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
         }
@@ -254,58 +259,5 @@ public class LiteralParserImpl implements LiteralParser {
         }
 
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a primitive literal"));
-    }
-
-    @CompleteParse
-    @Override
-    public ParseResult<ExceptionCallNode> parseExceptionCreation(TokenQueue queue) {
-        ExceptionCallNodeImpl node = astFactory.createExceptionCallNode();
-
-        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
-        if (parsedIdentifierValueAccess.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
-        }
-        queue.mergeBranch();
-        node.setExceptionIdentifier(parsedIdentifierValueAccess.getParseResult());
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
-        }
-        queue.poll();
-
-        // early positive return
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-            queue.poll();
-            node.setArguments(new LinkedList<>());
-            return PartialParseResult.successfulParse(node);
-        }
-
-        ParseResult<ExpressionNode> parsedFirstArgument =
-                programParser.getExpressionParser().parseExpression(queue.branchOff());
-        if (!parsedFirstArgument.isSuccessful()) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
-            return ParseResult.unsuccessfulParse(parsedFirstArgument.getDiagnostic());
-        }
-        queue.mergeBranch();
-
-        ParseResult<List<ExpressionNode>> parsedArguments =
-                programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff());
-        if (!parsedArguments.isSuccessful()) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
-            return ParseResult.unsuccessfulParse(parsedArguments.getDiagnostic());
-        }
-        queue.mergeBranch();
-
-        List<ExpressionNode> arguments = new LinkedList<>();
-        arguments.add(parsedFirstArgument.getParseResult());
-        arguments.addAll(parsedArguments.getParseResult());
-        node.setArguments(arguments);
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
-        }
-
-        return PartialParseResult.successfulParse(node);
     }
 }

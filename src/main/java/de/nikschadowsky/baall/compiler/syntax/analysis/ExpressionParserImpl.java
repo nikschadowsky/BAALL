@@ -12,7 +12,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import java.util.ArrayList;
@@ -35,24 +35,6 @@ public class ExpressionParserImpl implements ExpressionParser {
     @CompleteParse
     @Override
     public ParseResult<ExpressionNode> parseExpression(TokenQueue queue) {
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
-            queue.poll();
-
-            ParenthesizedExpressionNodeImpl node = astFactory.createParenthesizedExpressionNode();
-            ParseResult<ExpressionNode> parsedExpression = parseExpression(queue.branchOff());
-            if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
-
-                if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-                    node.setInnerExpression(parsedExpression.getParseResult());
-                    return ParseResult.successfulParse(node);
-                }
-                return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
-            }
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
-            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
-        }
-
         ParseResult<Token> parsedPrefixOperator = programParser.getAuxiliaryParser()
                                                                .parsePrefixOperator(queue.branchOff());
         if (parsedPrefixOperator.isSuccessful()) {
@@ -108,13 +90,19 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.successfulParse(parseResult.getParseResult());
         }
 
-        parseResult = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        parseResult = parseParenthesizedExpression(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parseResult.getParseResult());
         }
 
         parseResult = parseFunctionCall(queue.branchOff());
+        if (parseResult.isSuccessful()) {
+            queue.mergeBranch();
+            return ParseResult.successfulParse(parseResult.getParseResult());
+        }
+
+        parseResult = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch();
             return ParseResult.successfulParse(parseResult.getParseResult());
@@ -127,6 +115,28 @@ public class ExpressionParserImpl implements ExpressionParser {
         }
 
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not an expression!"));
+    }
+
+    @CompleteParse
+    public ParseResult<ParenthesizedExpressionNode> parseParenthesizedExpression(TokenQueue queue) {
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
+            queue.poll();
+
+            ParenthesizedExpressionNodeImpl node = astFactory.createParenthesizedExpressionNode();
+            ParseResult<ExpressionNode> parsedExpression = parseExpression(queue.branchOff());
+            if (parsedExpression.isSuccessful()) {
+                queue.mergeBranch();
+
+                if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
+                    node.setInnerExpression(parsedExpression.getParseResult());
+                    return ParseResult.successfulParse(node);
+                }
+                return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
+            }
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
+            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
+        }
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
     }
 
     @PartialParse

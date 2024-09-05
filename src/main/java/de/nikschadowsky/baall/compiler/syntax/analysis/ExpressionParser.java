@@ -7,6 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ParenthesizedExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.UnaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
@@ -33,8 +34,16 @@ public interface ExpressionParser {
      * @return complete parse result of the parsed value
      */
     @CompleteParse
-    ParseResult<ValueNode> parseValue(TokenQueue queue);
     ParseResult<TermNode> parseTerm(TokenQueue queue);
+
+    /**
+     * Parses an expression wrapped in parentheses in the format of '( expression )'.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed expression wrapped in parentheses
+     */
+    @CompleteParse
+    ParseResult<ParenthesizedExpressionNode> parseParenthesizedExpression(TokenQueue queue);
 
     /**
      * Parses a function call. This parse result can be partial.

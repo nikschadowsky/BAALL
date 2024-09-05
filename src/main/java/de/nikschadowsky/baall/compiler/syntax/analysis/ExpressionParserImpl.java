@@ -71,7 +71,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.unsuccessfulParse(parsedPrefixOperationExpression.getDiagnostic());
         }
 
-        ParseResult<ValueNode> parsedValue = parseValue(queue.branchOff());
+        ParseResult<TermNode> parsedValue = parseTerm(queue.branchOff());
         if (parsedValue.isSuccessful()) {
             queue.mergeBranch();
 
@@ -99,8 +99,8 @@ public class ExpressionParserImpl implements ExpressionParser {
 
     @CompleteParse
     @Override
-    public ParseResult<ValueNode> parseValue(TokenQueue queue) {
-        ParseResult<? extends ValueNode> parseResult;
+    public ParseResult<TermNode> parseTerm(TokenQueue queue) {
+        ParseResult<? extends TermNode> parseResult;
 
         parseResult = programParser.getLiteralParser().parseLiteral(queue.branchOff());
         if (parseResult.isSuccessful()) {

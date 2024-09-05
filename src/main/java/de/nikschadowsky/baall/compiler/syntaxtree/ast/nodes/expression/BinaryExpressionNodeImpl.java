@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpressionNode {
 
-    private ValueNode leftOperand;
+    private TermNode leftOperand;
 
     private Token operator;
 
@@ -22,12 +22,12 @@ public class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpr
         super(diagnostics);
     }
 
-    public void setLeftOperand(ValueNode leftOperand) {
+    public void setLeftOperand(TermNode leftOperand) {
         this.leftOperand = leftOperand;
     }
 
     @Override
-    public ValueNode getLeftOperand() {
+    public TermNode getLeftOperand() {
         return leftOperand;
     }
 

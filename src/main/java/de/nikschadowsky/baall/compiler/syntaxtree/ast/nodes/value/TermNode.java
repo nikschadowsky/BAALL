@@ -5,5 +5,5 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.Expressio
 /**
  * @since 29.07.2024
  */
-public interface ValueNode extends ExpressionNode {
+public interface TermNode extends ExpressionNode {
 }

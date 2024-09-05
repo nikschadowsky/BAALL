@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @since 29.07.2024
  */
-public interface FunctionCallNode extends ValueNode, StatementNode {
+public interface FunctionCallNode extends TermNode, StatementNode {
 
     IdentifierAccessNode getFunctionIdentifier();
 

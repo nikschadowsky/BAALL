@@ -9,7 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.UnaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
 
 /**
  * @since 25.08.2024
@@ -17,8 +17,8 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.ValueNode;
 public interface ExpressionParser {
 
     /**
-     * Parses an expression. An expression can either be a binary expression, a value, a function call or a unary
-     * operation.
+     * Parses an expression. An expression can either be a binary expression, a prefix operation, a
+     * {@link #parseTerm(TokenQueue) value} or another expression wrapped in parentheses.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed expression
@@ -34,6 +34,7 @@ public interface ExpressionParser {
      */
     @CompleteParse
     ParseResult<ValueNode> parseValue(TokenQueue queue);
+    ParseResult<TermNode> parseTerm(TokenQueue queue);
 
     /**
      * Parses a function call. This parse result can be partial.

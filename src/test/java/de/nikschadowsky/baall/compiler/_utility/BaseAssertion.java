@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler._utility;
 
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.util.LanguageElement;
 import org.assertj.core.api.AbstractAssert;
 
@@ -66,4 +67,7 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
         return new PartialParseResultAssertion<>(actual);
     }
 
+    public static NodeAssertion assertThat(Node actual) {
+        return new NodeAssertion(actual);
+    }
 }

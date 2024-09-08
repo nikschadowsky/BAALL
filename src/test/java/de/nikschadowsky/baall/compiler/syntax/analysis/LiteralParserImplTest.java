@@ -4,9 +4,9 @@ import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
 import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,15 +58,31 @@ class LiteralParserImplTest {
 
         TokenQueue queue = new TokenQueueTestBuilder().string("primitive").build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> NodeType.PRIMITIVE.equals(node.getNodeType()));
+                                                     .resultMatches(node -> "primitive"
+                                                             .equals(((PrimitiveLiteralNode) node).getPrimitiveValue()
+                                                                                                  .value()));
 
         queue = new TokenQueueTestBuilder().separator("[").separator("]").build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> NodeType.ARRAY_LITERAL.equals(node.getNodeType()));
+                                                     .resultMatches(node -> ((ArrayLiteralNode) node).getElements()
+                                                                                                     .isEmpty());
 
-        queue = new TokenQueueTestBuilder().separator("(").operator("expression").separator(")").build();
+        queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
+                                           .separator("(")
+                                           .operator("expression")
+                                           .separator(")")
+                                           .build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> NodeType.STRUCT_INITIALIZATION.equals(node.getNodeType()));
+                                                     .resultMatches(node -> "MyIdentifier".equals(((StructInitializationLiteralNode) node).getIdentifier()
+                                                                                                                                          .getIdentifier()
+                                                                                                                                          .value()))
+                                                     .resultMatches(node -> ((StructInitializationLiteralNode) node).getIdentifier()
+                                                                                                                    .getArrayIndices()
+                                                                                                                    .isEmpty())
+                                                     .resultMatches(node -> ((StructInitializationLiteralNode) node).getArguments()
+                                                                                                                    .size() == 1)
+                                                     .resultMatches(node -> ((StructInitializationLiteralNode) node).getArguments()
+                                                                                                                    .get(0) == mockedExpression);
 
         queue = new TokenQueueTestBuilder().separator("(")
                                            .keyword("string")
@@ -75,7 +91,23 @@ class LiteralParserImplTest {
                                            .separator(")")
                                            .build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> NodeType.STRUCT_DEFINITION.equals(node.getNodeType()));
+                                                     .resultMatches(node -> ((StructDefinitionLiteralNode) node).getFields()
+                                                                                                                .size() == 1)
+                                                     .resultMatches(node -> "string".equals(((StructDefinitionLiteralNode) node)
+                                                                                                    .getFields()
+                                                                                                    .get(0)
+                                                                                                    .getKey()
+                                                                                                    .getType()
+                                                                                                    .value()))
+                                                     .resultMatches(node -> ((StructDefinitionLiteralNode) node).getFields()
+                                                                                                                .get(0)
+                                                                                                                .getKey()
+                                                                                                                .getArrayDimensionDefinitions()
+                                                                                                                .isEmpty())
+                                                     .resultMatches(node -> "MyIdentifier".equals(((StructDefinitionLiteralNode) node).getFields()
+                                                                                                                                      .get(0)
+                                                                                                                                      .getValue()
+                                                                                                                                      .value()));
 
         queue = new TokenQueueTestBuilder().separator("(")
                                            .keyword("string")
@@ -87,7 +119,9 @@ class LiteralParserImplTest {
                                            .separator("}")
                                            .build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> NodeType.FUNCTION_DEFINITION.equals(node.getNodeType()));
+                                                     .resultMatches(node -> ((FunctionDefinitionNode) node).getParameters()
+                                                                                                           .size() == 1)
+                                                     .resultMatches(node -> ((FunctionDefinitionNode) node).getFunctionBody() == mockedStatements);
 
         queue = new TokenQueueTestBuilder().separator("[").build();
         assertThat(literalParser.parseLiteral(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected a literal");

@@ -128,6 +128,7 @@ public class ExpressionParserImpl implements ExpressionParser {
                 queue.mergeBranch();
 
                 if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
+                    queue.poll();
                     node.setInnerExpression(parsedExpression.getParseResult());
                     return ParseResult.successfulParse(node);
                 }

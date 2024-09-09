@@ -63,7 +63,7 @@ public class TokenQueue {
      *                gets skipped.
      */
     public void skipOver(LanguageElement skipped) {
-        while (!skipped.matches(peek())) {
+        while (!skipped.matches(peek()) && !hasReachedEndOfFile()) {
             poll();
         }
         // skip over matching token

@@ -85,6 +85,10 @@ public class TokenQueue {
         return pointer;
     }
 
+    public int getSize() {
+        return queue.size();
+    }
+
     public boolean hasReachedEndOfFile() {
         return pointer >= queue.size();
     }

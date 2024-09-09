@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
+import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
@@ -69,5 +70,9 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
 
     public static NodeAssertion assertThat(Node actual) {
         return new NodeAssertion(actual);
+    }
+
+    public static TokenQueueAssertion assertThat(TokenQueue actual) {
+        return new TokenQueueAssertion(actual);
     }
 }

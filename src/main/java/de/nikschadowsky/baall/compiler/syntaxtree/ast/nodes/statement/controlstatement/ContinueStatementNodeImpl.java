@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 30.07.2024
  */
-public class ContinueStatementNodeImpl extends AbstractNode implements LoopControlStatementNode{
+public class ContinueStatementNodeImpl extends AbstractNode implements LoopControlStatementNode {
 
     public ContinueStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);

@@ -49,10 +49,7 @@ public class ControlStatementParserImpl implements ControlStatementParser {
                 return ParseResult.successfulParse(node);
             }
 
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                    queue.peek(),
-                    "Expected an expression!"
-            ));
+            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("raise").matches(queue.peek())) {
             queue.poll();
@@ -68,6 +65,6 @@ public class ControlStatementParserImpl implements ControlStatementParser {
             return ParseResult.unsuccessfulParse(parsedExceptionCall.getDiagnostic());
         }
 
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected control statement!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
     }
 }

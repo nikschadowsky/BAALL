@@ -65,6 +65,6 @@ public class ControlStatementParserImpl implements ControlStatementParser {
             return ParseResult.unsuccessfulParse(parsedExceptionCall.getDiagnostic());
         }
 
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
     }
 }

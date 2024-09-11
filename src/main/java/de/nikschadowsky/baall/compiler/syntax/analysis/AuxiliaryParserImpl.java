@@ -120,7 +120,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         if (validBinaryOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected an operator!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected an operator!"));
     }
 
     @CompleteParse
@@ -134,7 +134,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a unary operator!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a unary operator!"));
     }
 
     @CompleteParse
@@ -149,7 +149,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
             return ParseResult.successfulParse(queue.poll());
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.peek(),
+                queue.poll(),
                 "Expected a assignment operator!"
         ));
     }
@@ -165,7 +165,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a prefix operator!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a prefix operator!"));
     }
 
     @CompleteParse
@@ -196,7 +196,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
             }
             return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a type!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a type!"));
     }
 
     @CompleteParse
@@ -214,7 +214,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                 return ParseResult.successfulParse(parsedIdentifier.getParseResult());
             }
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a type!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a type!"));
     }
 
     @CompleteParse
@@ -368,6 +368,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
             isPartial = true;
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
         }
+        queue.poll();
 
         if (isPartial) {
             return PartialParseResult.partialParse(parsedStatements.getParseResult(), diagnostics.get(0));

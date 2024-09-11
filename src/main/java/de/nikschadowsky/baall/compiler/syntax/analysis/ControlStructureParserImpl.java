@@ -72,7 +72,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
         }
 
-        return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+        return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
     }
 
     @PartialParse
@@ -90,7 +90,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         node.setCondition(parsedExpression.getParseResult());
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("?").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected '?'!"));
+            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '?'!"));
             isPartiallyParsed = true;
         }
         queue.poll();
@@ -147,7 +147,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("|").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected '|'!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '|'!"));
         }
         queue.poll();
 
@@ -185,7 +185,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             );
         }
         return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.peek(),
+                queue.poll(),
                 "Expected '{' or an expression!"
         ));
     }
@@ -198,7 +198,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("for").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected 'for'!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'for'!"));
         }
         queue.poll();
 
@@ -207,7 +207,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.mergeBranch();
             node.setIdentifier(parsedIdentifier.getParseResult());
         } else {
-            diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected an identifier!"));
+            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));
             isPartiallyParsed = true;
         }
 
@@ -219,7 +219,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 queue.mergeBranch();
                 node.setStartIndex(parsedStartIndexExpression.getParseResult());
             } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected an expression!"));
+                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected an expression!"));
                 isPartiallyParsed = true;
             }
         } else {
@@ -299,7 +299,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("while").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected 'while'!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'while'!"));
         }
         queue.poll();
 
@@ -308,6 +308,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.mergeBranch();
             node.setCondition(parsedExpression.getParseResult());
         } else {
+            queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get("{"));
             diagnostics.add(parsedExpression.getDiagnostic());
             isPartiallyParsed = true;
         }
@@ -324,12 +325,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedStatements.getDiagnostic());
                 isPartiallyParsed = true;
             } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected a statement!"));
+                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a statement!"));
                 isPartiallyParsed = true;
 
             }
             if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected '}'!"));
+                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
                 isPartiallyParsed = true;
             }
             queue.poll();
@@ -339,7 +341,6 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             isPartiallyParsed = true;
         }
         if (isPartiallyParsed) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
 
@@ -476,7 +477,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("intercept").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
         queue.poll();
         ParseResult<IdentifierAccessNode> parsedInterceptedException =

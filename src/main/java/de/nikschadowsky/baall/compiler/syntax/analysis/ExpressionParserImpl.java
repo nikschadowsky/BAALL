@@ -150,7 +150,7 @@ public class ExpressionParserImpl implements ExpressionParser {
         ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
                 programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedIdentifierValueAccess.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
         }
         queue.mergeBranch();
         node.setFunctionIdentifier(parsedIdentifierValueAccess.getParseResult());
@@ -242,6 +242,6 @@ public class ExpressionParserImpl implements ExpressionParser {
             }
             return ParseResult.unsuccessfulParse(parsedUnaryOperator.getDiagnostic());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Not a statement!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
     }
 }

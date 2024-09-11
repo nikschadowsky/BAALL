@@ -69,7 +69,7 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult());
         }
 
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a literal!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a literal!"));
     }
 
     @CompleteParse
@@ -120,7 +120,7 @@ public class LiteralParserImpl implements LiteralParser {
                 astFactory.createStructDefinitionLiteralNode();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected '('!"));
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
         }
         queue.poll();
 
@@ -258,6 +258,6 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(node);
         }
 
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.peek(), "Expected a primitive literal"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a primitive literal"));
     }
 }

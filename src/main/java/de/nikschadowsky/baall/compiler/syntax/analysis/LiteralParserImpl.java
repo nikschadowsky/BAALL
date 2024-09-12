@@ -107,6 +107,7 @@ public class LiteralParserImpl implements LiteralParser {
         elements.addAll(parsedArrayElements.getParseResult());
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("]").matches(queue.peek())) {
+            queue.poll();
             node.setElements(elements);
             return ParseResult.successfulParse(node);
         }

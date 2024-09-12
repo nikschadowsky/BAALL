@@ -82,7 +82,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff());
+        ParseResult<ExpressionNode> parsedExpression =
+                programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isUnsuccessful()) {
             return PartialParseResult.partialParse(node, parsedExpression.getDiagnostic());
         }
@@ -96,7 +97,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         queue.poll();
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
+            PartialParseResult<StatementsNode> parsedStatements =
+                    programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
                 node.setThenBlock(parsedStatements.getParseResult());
@@ -156,7 +158,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
             ConditionalNodeImpl node = astFactory.createConditionalNode();
             node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
+            PartialParseResult<StatementsNode> parsedStatements =
+                    programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
 
@@ -303,7 +306,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        ParseResult<ExpressionNode> parsedExpression = programParser.getExpressionParser().parseExpression(queue.branchOff());
+        ParseResult<ExpressionNode> parsedExpression =
+                programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isSuccessful()) {
             queue.mergeBranch();
             node.setCondition(parsedExpression.getParseResult());
@@ -315,7 +319,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
-            PartialParseResult<StatementsNode> parsedStatements = programParser.getStatementParser().parseStatements(queue.branchOff());
+            PartialParseResult<StatementsNode> parsedStatements =
+                    programParser.getStatementParser().parseStatements(queue.branchOff());
             if (parsedStatements.isSuccessful()) {
                 queue.mergeBranch();
                 node.setBody(parsedStatements.getParseResult());
@@ -339,6 +344,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         } else {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
             isPartiallyParsed = true;
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
         }
         if (isPartiallyParsed) {
             return PartialParseResult.partialParse(node, diagnostics.get(0));
@@ -360,7 +366,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        PartialParseResult<StatementsNode> parsedBody =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
@@ -477,7 +484,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("intercept").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'intercept'!"));
         }
         queue.poll();
         ParseResult<IdentifierAccessNode> parsedInterceptedException =
@@ -512,7 +519,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.poll();
         }
 
-        ParseResult<Token> parsedExceptionIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<Token> parsedExceptionIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedExceptionIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
             isPartial = true;
@@ -521,7 +529,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
         }
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        PartialParseResult<StatementsNode> parsedBody =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
@@ -549,14 +558,16 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("ensure").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'ensure'!"));
         }
         queue.poll();
 
-        PartialParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        PartialParseResult<StatementsNode> parsedBody =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
         } else {
             if (parsedBody.isPartial()) {
                 diagnostics.add(parsedBody.getDiagnostic());

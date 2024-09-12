@@ -190,7 +190,7 @@ public class ExpressionParserImpl implements ExpressionParser {
                 isPartial = true;
                 queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             }
-
+            queue.poll();
         } else {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
             isPartial = true;

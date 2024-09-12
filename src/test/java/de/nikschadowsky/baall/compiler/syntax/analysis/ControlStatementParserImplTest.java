@@ -103,6 +103,5 @@ class ControlStatementParserImplTest {
         queue = new TokenQueueTestBuilder().separator(";").build();
         assertThat(controlStatementParser.parseControlStatement(queue)).isUnsuccessful()
                                                                        .syntaxDiagnosticContains("Not a statement");
-        assertThat(queue).hasNextTokenValueMatch(";");
     }
 }

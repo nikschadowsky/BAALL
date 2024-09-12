@@ -57,6 +57,7 @@ class ExpressionParserImplTest {
                                            .number("struct_initializer")
                                            .separator(")")
                                            .separator(")")
+                                           .separator(";")
                                            .build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful().resultMatches(node -> {
             ParenthesizedExpressionNode parenthesizedExpressionNode = ((ParenthesizedExpressionNode) node);
@@ -71,12 +72,14 @@ class ExpressionParserImplTest {
                     (PrimitiveLiteralNode) structInitializationLiteralNode.getArguments().get(0);
             return "struct_initializer".equals(primitiveLiteralNode.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("(")
                                            .separator("(")
                                            .number("value")
                                            .separator(")")
                                            .separator(")")
+                                           .separator(";")
                                            .build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful()
                                                            .resultMatches(node -> node instanceof ParenthesizedExpressionNode)
@@ -85,8 +88,9 @@ class ExpressionParserImplTest {
                                                                        ((ParenthesizedExpressionNode) node).getInnerExpressionNode();
                                                                return innerExpressionNode instanceof ParenthesizedExpressionNode;
                                                            });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().operator("!").number("prefixed").build();
+        queue = new TokenQueueTestBuilder().operator("!").number("prefixed").separator(";").build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful().resultMatches(node -> {
             PrefixOperationNode prefixOperationNode = (PrefixOperationNode) node;
             return "!".equals(prefixOperationNode.getOperator().value());
@@ -95,8 +99,9 @@ class ExpressionParserImplTest {
             PrimitiveLiteralNode primitiveLiteralNode = (PrimitiveLiteralNode) prefixOperationNode.getOperand();
             return "prefixed".equals(primitiveLiteralNode.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().number("operand1").operator("+").number("operand2").build();
+        queue = new TokenQueueTestBuilder().number("operand1").operator("+").number("operand2").separator(";").build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful().resultMatches(node -> {
             BinaryExpressionNode binaryExpressionNode = (BinaryExpressionNode) node;
             PrimitiveLiteralNode leftOperand = (PrimitiveLiteralNode) binaryExpressionNode.getLeftOperand();
@@ -109,8 +114,9 @@ class ExpressionParserImplTest {
             PrimitiveLiteralNode leftOperand = (PrimitiveLiteralNode) binaryExpressionNode.getRightOperand();
             return "operand2".equals(leftOperand.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().number("value").separator("+").build();
+        queue = new TokenQueueTestBuilder().number("value").separator(";").build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful()
                                                            .resultMatches(node -> node instanceof TermNode);
 
@@ -126,6 +132,7 @@ class ExpressionParserImplTest {
                                            .operator("*")
                                            .separator("[")
                                            .separator("]")
+                                           .separator(";")
                                            .build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful()
                                                            .resultMatches(node -> "&".equals(((BinaryExpressionNode) node).getOperator()
@@ -155,7 +162,7 @@ class ExpressionParserImplTest {
                                                                BinaryExpressionNode innerExpression =
                                                                        (BinaryExpressionNode) parenthesizedExpressionNode.getInnerExpressionNode();
                                                                return "operand2".equals(((PrimitiveLiteralNode) innerExpression.getRightOperand()).getPrimitiveValue()
-                                                                                                                                                   .value());
+                                                                                                                                                  .value());
                                                            }).resultMatches(node -> {
                                                                BinaryExpressionNode binaryExpressionNode = (BinaryExpressionNode) node;
                                                                BinaryExpressionNode rightSideExpressionNode =
@@ -183,9 +190,11 @@ class ExpressionParserImplTest {
                                                                        (BinaryExpressionNode) binaryExpressionNode.getRightOperand();
                                                                return ((ArrayLiteralNode) rightSideExpressionNode.getRightOperand()).getElements().isEmpty();
                                                            });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(expressionParser.parseExpression(queue)).isUnsuccessful().syntaxDiagnosticContains("Not an expression");
+        assertThat(expressionParser.parseExpression(queue)).isUnsuccessful()
+                                                           .syntaxDiagnosticContains("Not an expression");
     }
 
     @Test
@@ -194,6 +203,7 @@ class ExpressionParserImplTest {
                                                       .separator("[")
                                                       .number("index")
                                                       .separator("]")
+                                                      .separator(";")
                                                       .build();
         assertThat(expressionParser.parseTerm(queue)).isSuccessful().resultMatches(node -> {
             IdentifierAccessNode identifierNode = (IdentifierAccessNode) node;
@@ -206,9 +216,9 @@ class ExpressionParserImplTest {
             PrimitiveLiteralNode arrayIndexNode = (PrimitiveLiteralNode) identifierNode.getArrayIndices().get(0);
             return "index".equals(arrayIndexNode.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-
-        queue = new TokenQueueTestBuilder().separator("[").number("expression").separator("]").build();
+        queue = new TokenQueueTestBuilder().separator("[").number("expression").separator("]").separator(";").build();
         assertThat(expressionParser.parseTerm(queue)).isSuccessful().resultMatches(node -> {
             ArrayLiteralNode arrayLiteralNode = (ArrayLiteralNode) node;
             return arrayLiteralNode.getElements().size() == 1;
@@ -217,8 +227,13 @@ class ExpressionParserImplTest {
             PrimitiveLiteralNode primitiveLiteralNode = (PrimitiveLiteralNode) arrayLiteralNode.getElements().get(0);
             return "expression".equals(primitiveLiteralNode.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().identifier("MyIdentifier").separator("(").separator(")").build();
+        queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
+                                           .separator("(")
+                                           .separator(")")
+                                           .separator(";")
+                                           .build();
         assertThat(expressionParser.parseTerm(queue)).isSuccessful().resultMatches(node -> {
             FunctionCallNode functionCallNode = ((FunctionCallNode) node);
             return "MyIdentifier".equals(functionCallNode.getFunctionIdentifier().getIdentifier().value());
@@ -229,8 +244,9 @@ class ExpressionParserImplTest {
             FunctionCallNode functionCallNode = ((FunctionCallNode) node);
             return functionCallNode.getArguments().isEmpty();
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().operator("++").identifier("MyIdentifier").build();
+        queue = new TokenQueueTestBuilder().operator("++").identifier("MyIdentifier").separator(";").build();
         assertThat(expressionParser.parseTerm(queue)).isSuccessful().resultMatches(node -> {
             UnaryExpressionNode unaryExpressionNode = (UnaryExpressionNode) node;
             return unaryExpressionNode.isPrefix();
@@ -244,13 +260,16 @@ class ExpressionParserImplTest {
             UnaryExpressionNode unaryExpressionNode = (UnaryExpressionNode) node;
             return unaryExpressionNode.getIdentifierAccess().getArrayIndices().isEmpty();
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().separator("(").number("expression").separator(")").build();
+        queue = new TokenQueueTestBuilder().separator("(").number("expression").separator(")").separator(";").build();
         assertThat(expressionParser.parseTerm(queue)).isSuccessful().resultMatches(node -> {
             ParenthesizedExpressionNode primitiveLiteralNode = (ParenthesizedExpressionNode) node;
-            PrimitiveLiteralNode innerExpressionNode = (PrimitiveLiteralNode) primitiveLiteralNode.getInnerExpressionNode();
+            PrimitiveLiteralNode innerExpressionNode =
+                    (PrimitiveLiteralNode) primitiveLiteralNode.getInnerExpressionNode();
             return "expression".equals(innerExpressionNode.getPrimitiveValue().value());
         });
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
         assertThat(expressionParser.parseTerm(queue)).isUnsuccessful().syntaxDiagnosticContains("Not an expression");
@@ -258,10 +277,12 @@ class ExpressionParserImplTest {
 
     @Test
     void parseParenthesizedExpression() {
-        TokenQueue queue = new TokenQueueTestBuilder().separator("(").number("expression").separator(")").build();
+        TokenQueue queue =
+                new TokenQueueTestBuilder().separator("(").number("expression").separator(")").separator(";").build();
         assertThat(expressionParser.parseParenthesizedExpression(queue)).isSuccessful()
                                                                         .resultMatches(node -> "expression".equals(((PrimitiveLiteralNode) node.getInnerExpressionNode()).getPrimitiveValue()
                                                                                                                                                                          .value()));
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("(").number("expression").separator(";").build();
         assertThat(expressionParser.parseParenthesizedExpression(queue)).isUnsuccessful()
@@ -274,7 +295,11 @@ class ExpressionParserImplTest {
 
     @Test
     void parseFunctionCall() {
-        TokenQueue queue = new TokenQueueTestBuilder().identifier("MyIdentifier").separator("(").separator(")").build();
+        TokenQueue queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
+                                                      .separator("(")
+                                                      .separator(")")
+                                                      .separator(";")
+                                                      .build();
         assertThat(expressionParser.parseFunctionCall(queue)).isSuccessful()
                                                              .resultMatches(node -> node.getArguments().isEmpty())
                                                              .resultMatches(node -> "MyIdentifier".equals(node.getFunctionIdentifier()
@@ -283,6 +308,7 @@ class ExpressionParserImplTest {
                                                              .resultMatches(node -> node.getFunctionIdentifier()
                                                                                         .getArrayIndices()
                                                                                         .isEmpty());
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
                                            .separator("[")
@@ -293,6 +319,7 @@ class ExpressionParserImplTest {
                                            .separator(",")
                                            .identifier("IdentifierAccess")
                                            .separator(")")
+                                           .separator(";")
                                            .build();
         assertThat(expressionParser.parseFunctionCall(queue)).isSuccessful()
                                                              .resultMatches(node -> node.getArguments().size() == 2)
@@ -311,7 +338,7 @@ class ExpressionParserImplTest {
                                                              .resultMatches(node -> ((IdentifierAccessNode) node.getArguments()
                                                                                                                 .get(1)).getArrayIndices()
                                                                                                                         .isEmpty());
-
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
         assertThat(expressionParser.parseFunctionCall(queue)).isUnsuccessful()
@@ -328,6 +355,8 @@ class ExpressionParserImplTest {
                                                                                                               .getIdentifier()
                                                                                                               .value()))
                                                              .resultMatches(node -> node.getArguments() == null);
+        // should consume up until the next closing parenthesis
+        assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
                                            .separator("[")
@@ -339,6 +368,7 @@ class ExpressionParserImplTest {
                                            .build();
         assertThat(expressionParser.parseFunctionCall(queue)).isPartiallyParsed()
                                                              .syntaxDiagnosticContains("Not an expression");
+        assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
                                            .separator("[")
@@ -349,11 +379,12 @@ class ExpressionParserImplTest {
                                            .build();
         assertThat(expressionParser.parseFunctionCall(queue)).isPartiallyParsed()
                                                              .syntaxDiagnosticContains("Expected ')'");
+        assertThat(queue).isAtEnd();
     }
 
     @Test
     void parseUnaryExpression() {
-        TokenQueue queue = new TokenQueueTestBuilder().operator("++").identifier("MyIdentifier").build();
+        TokenQueue queue = new TokenQueueTestBuilder().operator("++").identifier("MyIdentifier").separator(";").build();
         assertThat(expressionParser.parseUnaryExpression(queue)).isSuccessful()
                                                                 .resultMatches(node -> "++".equals(node.getOperator()
                                                                                                        .value()))
@@ -364,8 +395,9 @@ class ExpressionParserImplTest {
                                                                 .resultMatches(node -> node.getIdentifierAccess()
                                                                                            .getArrayIndices()
                                                                                            .isEmpty());
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().identifier("MyIdentifier").operator("--").build();
+        queue = new TokenQueueTestBuilder().identifier("MyIdentifier").operator("--").separator(";").build();
         assertThat(expressionParser.parseUnaryExpression(queue)).isSuccessful()
                                                                 .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
                                                                                                                  .getIdentifier()
@@ -376,6 +408,7 @@ class ExpressionParserImplTest {
                                                                 .resultMatches(node -> "--".equals(node.getOperator()
                                                                                                        .value()))
                                                                 .resultMatches(not(UnaryExpressionNode::isPrefix));
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier").build();
         assertThat(expressionParser.parseUnaryExpression(queue)).isUnsuccessful()

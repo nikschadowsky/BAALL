@@ -411,14 +411,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
         PartialParseResult<EnsureStatementNode> parsedEnsureStatement =
                 parseEnsureStatement(queue.branchOff());
-        if (parsedEnsureStatement.isUnsuccessful()) {
-            diagnostics.add(parsedEnsureStatement.getDiagnostic());
-            isPartial = true;
-        } else {
+        if (!parsedEnsureStatement.isUnsuccessful()) {
             if (parsedEnsureStatement.isPartial()) {
                 diagnostics.add(parsedEnsureStatement.getDiagnostic());
                 isPartial = true;
             }
+            queue.mergeBranch();
+            node.setEnsureBlock(parsedEnsureStatement.getParseResult());
         }
 
         if (isPartial) {
@@ -435,17 +434,11 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
-            return PartialParseResult.successfulParse(interceptStatements);
-        }
-        queue.poll();
-
         PartialParseResult<InterceptStatementNode> parsedInterceptStatement =
                 parseInterceptStatement(queue.branchOff());
 
         if (parsedInterceptStatement.isUnsuccessful()) {
-            diagnostics.add(parsedInterceptStatement.getDiagnostic());
-            isPartial = true;
+            return PartialParseResult.successfulParse(interceptStatements);
         } else {
             if (parsedInterceptStatement.isPartial()) {
                 diagnostics.add(parsedInterceptStatement.getDiagnostic());
@@ -455,14 +448,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             interceptStatements.add(parsedInterceptStatement.getParseResult());
         }
 
-
-        ParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
+        PartialParseResult<List<InterceptStatementNode>> parsedInterceptStatements =
                 parseInterceptStatements(queue.branchOff());
         if (parsedInterceptStatements.isUnsuccessful()) {
             diagnostics.add(parsedInterceptStatements.getDiagnostic());
             isPartial = true;
         } else {
-            if (parsedInterceptStatement.isPartial()) {
+            if (parsedInterceptStatements.isPartial()) {
                 diagnostics.add(parsedInterceptStatements.getDiagnostic());
                 isPartial = true;
             }
@@ -513,20 +505,20 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         node.setInterceptedExceptions(interceptedExceptions);
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
+            diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected ':'!"));
             isPartial = true;
+            queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get("{"));
         } else {
             queue.poll();
-        }
-
-        ParseResult<Token> parsedExceptionIdentifier =
-                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
-        if (parsedExceptionIdentifier.isUnsuccessful()) {
-            diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
-            isPartial = true;
-        } else {
-            queue.mergeBranch();
-            node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
+            ParseResult<Token> parsedExceptionIdentifier =
+                    programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+            if (parsedExceptionIdentifier.isUnsuccessful()) {
+                diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
+                isPartial = true;
+            } else {
+                queue.mergeBranch();
+                node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
+            }
         }
 
         PartialParseResult<StatementsNode> parsedBody =

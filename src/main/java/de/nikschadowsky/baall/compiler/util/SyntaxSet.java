@@ -132,6 +132,7 @@ public class SyntaxSet {
         separators.add(new LanguageElement("[", TokenType.SEPARATOR, "["));
         separators.add(new LanguageElement("]", TokenType.SEPARATOR, "]"));
         separators.add(new LanguageElement(".", TokenType.SEPARATOR, "."));
+        separators.add(new LanguageElement("..", TokenType.SEPARATOR, ".."));
 
         System.out.println("Separators: " + separators + "\n Number of elements: " + separators.size());
         return Collections.unmodifiableSet(separators);

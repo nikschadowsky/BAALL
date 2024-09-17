@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
+import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
 import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
@@ -10,10 +11,9 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
-import static de.nikschadowsky.baall.compiler._utility.ParserMocker.mockExpressionParserExecution;
-import static de.nikschadowsky.baall.compiler._utility.ParserMocker.mockStatementParserExecution;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -29,6 +29,9 @@ class LiteralParserImplTest {
     private ProgramParser programParser;
     private AuxiliaryParser auxiliaryParser;
 
+    @RegisterExtension
+    private ParserMockerExtension parserMockerExtension = new ParserMockerExtension();
+
     @BeforeEach
     void setUp() {
         programParser = mock(ProgramParserImpl.class);
@@ -41,14 +44,14 @@ class LiteralParserImplTest {
     @Test
     void parseLiteral() {
         StatementsNode mockedStatements = mock(StatementsNode.class);
-        mockStatementParserExecution(
+        parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),
                 mockedStatements,
                 "(", ")", "{", "}", ","
         );
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        mockExpressionParserExecution(
+        parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
@@ -135,7 +138,7 @@ class LiteralParserImplTest {
     @Test
     void parseArrayLiteral() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        mockExpressionParserExecution(
+        parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
@@ -179,7 +182,7 @@ class LiteralParserImplTest {
     @Test
     void parseStructDefinition() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        mockExpressionParserExecution(
+        parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
@@ -286,7 +289,7 @@ class LiteralParserImplTest {
     @Test
     void parseStructInitialization() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        mockExpressionParserExecution(
+        parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
@@ -368,7 +371,7 @@ class LiteralParserImplTest {
     @Test
     void parseFunctionDefinition() {
         StatementsNode mockedStatements = mock(StatementsNode.class);
-        mockStatementParserExecution(
+        parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),
                 mockedStatements,

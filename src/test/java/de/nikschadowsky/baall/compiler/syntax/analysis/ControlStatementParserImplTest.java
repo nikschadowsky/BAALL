@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
-import de.nikschadowsky.baall.compiler._utility.ParserMocker;
+import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
@@ -12,6 +12,7 @@ import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.controlsta
 import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +31,9 @@ class ControlStatementParserImplTest {
     private LiteralParser literalParser;
     private ProgramParser programParser;
 
+    @RegisterExtension
+    private ParserMockerExtension parserMockerExtension = new ParserMockerExtension();
+
     @BeforeEach
     void setUp() {
         programParser = mock(ProgramParserImpl.class);
@@ -45,7 +49,7 @@ class ControlStatementParserImplTest {
     @Test
     void parseControlStatement() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        ParserMocker.mockExpressionParserExecution(
+        parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,

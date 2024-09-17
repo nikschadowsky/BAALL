@@ -9,19 +9,25 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.StatementParser;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * @since 24.08.2024
  */
-public class ParserMocker {
+public class ParserMockerExtension implements AfterEachCallback {
+
+    private final Map<Class<?>, Object> mockedParsers = new HashMap<>();
 
     private static <T> Answer<ParseResult<T>> getAnswer(T answer, String[] returnUnsuccessfulOn, boolean returnPartial) {
         return invocationOnMock -> {
@@ -41,30 +47,45 @@ public class ParserMocker {
         };
     }
 
-    public static <T> void mockExpressionParserExecution(
+    public <T> void mockExpressionParserExecution(
             ProgramParser programParserMock,
             Function<ExpressionParser, ParseResult<T>> mockedMethod,
             T expectedResult,
             String... returnUnsuccessfulOn) {
-        ExpressionParser expressionParserMock = mock(ExpressionParser.class);
+        ExpressionParser parserMock = getParser(ExpressionParser.class);
 
-        when(programParserMock.getExpressionParser()).thenReturn(expressionParserMock);
-        when(mockedMethod.apply(expressionParserMock)).thenAnswer(getAnswer(
+        when(programParserMock.getExpressionParser()).thenReturn(parserMock);
+        when(mockedMethod.apply(parserMock)).thenAnswer(getAnswer(
                 expectedResult,
                 returnUnsuccessfulOn,
                 false
         ));
     }
 
-    public static <T> void mockStatementParserExecution(
+    public <T> void mockStatementParserExecution(
             ProgramParser programParserMock,
             Function<StatementParser, ParseResult<T>> mockedMethod,
             T expectedResult,
             String... returnUnsuccessfulOn
     ) {
-        StatementParser statementParser = mock(StatementParser.class);
+        StatementParser parserMock = getParser(StatementParser.class);
 
-        when(programParserMock.getStatementParser()).thenReturn(statementParser);
-        when(mockedMethod.apply(statementParser)).thenAnswer(getAnswer(expectedResult, returnUnsuccessfulOn, true));
+        when(programParserMock.getStatementParser()).thenReturn(parserMock);
+        when(mockedMethod.apply(parserMock)).thenAnswer(getAnswer(expectedResult, returnUnsuccessfulOn, true));
+    }
+
+    private <T> T getParser(Class<T> clazz) {
+        if (mockedParsers.containsKey(clazz)) {
+            return clazz.cast(mockedParsers.get(clazz));
+        }
+
+        T mockObject = Mockito.mock(clazz);
+        mockedParsers.put(clazz, mockObject);
+        return mockObject;
+    }
+
+    @Override
+    public void afterEach(ExtensionContext context) {
+        mockedParsers.clear();
     }
 }

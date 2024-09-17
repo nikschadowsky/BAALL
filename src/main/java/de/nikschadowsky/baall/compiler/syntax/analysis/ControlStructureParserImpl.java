@@ -96,31 +96,21 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.poll())) {
-            PartialParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff());
-            if (parsedStatements.isSuccessful()) {
-                queue.mergeBranch();
-                node.setThenBlock(parsedStatements.getParseResult());
-            } else if (parsedStatements.isPartial()) {
-                queue.mergeBranch();
-                node.setThenBlock(parsedStatements.getParseResult());
-                diagnostics.add(parsedStatements.getDiagnostic());
-                isPartiallyParsed = true;
-            } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a statement!"));
-                isPartiallyParsed = true;
-            }
-
-            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-                isPartiallyParsed = true;
-            }
-            queue.poll();
-        } else {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
+        PartialParseResult<StatementsNode> parsedCodeBlock =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        if (parsedCodeBlock.isUnsuccessful()) {
+            diagnostics.add(parsedCodeBlock.getDiagnostic());
             isPartiallyParsed = true;
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+        } else {
+            if (parsedCodeBlock.isPartial()) {
+                diagnostics.add(parsedCodeBlock.getDiagnostic());
+                isPartiallyParsed = true;
+            }
+            queue.mergeBranch();
+            node.setThenBlock(parsedCodeBlock.getParseResult());
         }
+
         PartialParseResult<ConditionalNode> parsedElseBlock = parseElseBlock(queue.branchOff());
         if (parsedElseBlock.isSuccessful()) {
             queue.mergeBranch();
@@ -136,7 +126,6 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
 
         if (isPartiallyParsed) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -153,39 +142,38 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.poll();
-
+        PartialParseResult<StatementsNode> parsedCodeBlock =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        // if partial or successful we have an else in our hands
+        if (!parsedCodeBlock.isUnsuccessful()) {
             ConditionalNodeImpl node = astFactory.createConditionalNode();
-            node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
-            PartialParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff());
-            if (parsedStatements.isSuccessful()) {
-                queue.mergeBranch();
-
-                node.setThenBlock(parsedStatements.getParseResult());
-                if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                    queue.poll();
-                    return PartialParseResult.successfulParse(node);
-                }
-                return PartialParseResult.partialParse(node, new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
+            if (parsedCodeBlock.isPartial()) {
+                diagnostics.add(parsedCodeBlock.getDiagnostic());
+                isPartiallyParsed = true;
             }
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-            return PartialParseResult.partialParse(node, parsedStatements.getDiagnostic());
-        }
-
-
-        PartialParseResult<ConditionalNode> parsedConditional = parseConditional(queue.branchOff());
-        if (parsedConditional.isSuccessful()) {
             queue.mergeBranch();
-            ConditionalNode node = parsedConditional.getParseResult();
+
+            node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
+            node.setThenBlock(parsedCodeBlock.getParseResult());
+
+            if (isPartiallyParsed) {
+                return PartialParseResult.partialParse(node, diagnostics.get(0));
+            }
             return PartialParseResult.successfulParse(node);
-        } else if (parsedConditional.isPartial()) {
-            queue.mergeBranch();
-            return PartialParseResult.partialParse(
-                    parsedConditional.getParseResult(),
-                    parsedConditional.getDiagnostic()
-            );
+
+        } else {
+            PartialParseResult<ConditionalNode> parsedConditional = parseConditional(queue.branchOff());
+            if (parsedConditional.isSuccessful()) {
+                queue.mergeBranch();
+                ConditionalNode node = parsedConditional.getParseResult();
+                return PartialParseResult.successfulParse(node);
+            } else if (parsedConditional.isPartial()) {
+                queue.mergeBranch();
+                return PartialParseResult.partialParse(
+                        parsedConditional.getParseResult(),
+                        parsedConditional.getDiagnostic()
+                );
+            }
         }
         return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(
                 queue.poll(),
@@ -260,35 +248,22 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             }
         }
 
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.poll();
-            PartialParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff());
-            if (parsedStatements.isSuccessful()) {
-                queue.mergeBranch();
-                node.setBody(parsedStatements.getParseResult());
-            } else if (parsedStatements.isPartial()) {
-                queue.mergeBranch();
-                node.setBody(parsedStatements.getParseResult());
-                diagnostics.add(parsedStatements.getDiagnostic());
-                isPartiallyParsed = true;
-            } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a statement!"));
-                isPartiallyParsed = true;
-            }
-
-            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-                isPartiallyParsed = true;
-            }
-            queue.poll();
-        } else {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
+        PartialParseResult<StatementsNode> parsedCodeBlock =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        if (parsedCodeBlock.isUnsuccessful()) {
+            diagnostics.add(parsedCodeBlock.getDiagnostic());
             isPartiallyParsed = true;
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+        } else {
+            if (parsedCodeBlock.isPartial()) {
+                diagnostics.add(parsedCodeBlock.getDiagnostic());
+                isPartiallyParsed = true;
+            }
+            queue.mergeBranch();
+            node.setBody(parsedCodeBlock.getParseResult());
         }
 
         if (isPartiallyParsed) {
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -316,36 +291,21 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             diagnostics.add(parsedExpression.getDiagnostic());
             isPartiallyParsed = true;
         }
-
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
-            queue.poll();
-            PartialParseResult<StatementsNode> parsedStatements =
-                    programParser.getStatementParser().parseStatements(queue.branchOff());
-            if (parsedStatements.isSuccessful()) {
-                queue.mergeBranch();
-                node.setBody(parsedStatements.getParseResult());
-            } else if (parsedStatements.isPartial()) {
-                queue.mergeBranch();
-                node.setBody(parsedStatements.getParseResult());
-                diagnostics.add(parsedStatements.getDiagnostic());
-                isPartiallyParsed = true;
-            } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a statement!"));
-                isPartiallyParsed = true;
-
-            }
-            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
-                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
-                isPartiallyParsed = true;
-            }
-            queue.poll();
-
-        } else {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '{'!"));
+        PartialParseResult<StatementsNode> parsedCodeBlock =
+                programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
+        if (parsedCodeBlock.isUnsuccessful()) {
+            diagnostics.add(parsedCodeBlock.getDiagnostic());
             isPartiallyParsed = true;
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+        } else {
+            if (parsedCodeBlock.isPartial()) {
+                diagnostics.add(parsedCodeBlock.getDiagnostic());
+                isPartiallyParsed = true;
+            }
+            queue.mergeBranch();
+            node.setBody(parsedCodeBlock.getParseResult());
         }
+
         if (isPartiallyParsed) {
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
@@ -371,6 +331,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         if (parsedBody.isUnsuccessful()) {
             diagnostics.add(parsedBody.getDiagnostic());
             isPartial = true;
+            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
         } else {
             if (parsedBody.isPartial()) {
                 diagnostics.add(parsedBody.getDiagnostic());

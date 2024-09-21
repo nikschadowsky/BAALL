@@ -82,10 +82,12 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartiallyParsed = false;
 
+        node.setConditionBranch(ConditionalNode.ConditionBranch.IF);
+
         ParseResult<ExpressionNode> parsedExpression =
                 programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isUnsuccessful()) {
-            return PartialParseResult.partialParse(node, parsedExpression.getDiagnostic());
+            return PartialParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
         }
         queue.mergeBranch();
         node.setCondition(parsedExpression.getParseResult());
@@ -120,9 +122,6 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             node.setElseBranch(parsedElseBlock.getParseResult());
             diagnostics.add(parsedElseBlock.getDiagnostic());
             isPartiallyParsed = true;
-        } else {
-            diagnostics.add(parsedElseBlock.getDiagnostic());
-            isPartiallyParsed = true;
         }
 
         if (isPartiallyParsed) {
@@ -147,13 +146,14 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         // if partial or successful we have an else in our hands
         if (!parsedCodeBlock.isUnsuccessful()) {
             ConditionalNodeImpl node = astFactory.createConditionalNode();
+            node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
+
             if (parsedCodeBlock.isPartial()) {
                 diagnostics.add(parsedCodeBlock.getDiagnostic());
                 isPartiallyParsed = true;
             }
             queue.mergeBranch();
 
-            node.setConditionBranch(ConditionalNodeImpl.ConditionBranch.ELSE);
             node.setThenBlock(parsedCodeBlock.getParseResult());
 
             if (isPartiallyParsed) {
@@ -175,8 +175,10 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 );
             }
         }
-        return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.poll(),
+        Token current = queue.peek();
+        queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
+        return PartialParseResult.partialParse(astFactory.createConditionalNode(), new SyntaxDiagnostic(
+                current,
                 "Expected '{' or an expression!"
         ));
     }

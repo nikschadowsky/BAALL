@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class PrimitiveLiteralNodeImpl extends AbstractNode implements PrimitiveLiteralNode {
 
     private Token primitiveValue;
+    private PrimitiveType primitiveType;
 
     public PrimitiveLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -24,6 +25,15 @@ public class PrimitiveLiteralNodeImpl extends AbstractNode implements PrimitiveL
 
     public void setPrimitiveValue(Token primitiveValue) {
         this.primitiveValue = primitiveValue;
+    }
+
+    @Override
+    public PrimitiveType getPrimitiveType() {
+        return primitiveType;
+    }
+
+    public void setPrimitiveType(PrimitiveType primitiveType) {
+        this.primitiveType = primitiveType;
     }
 
     @Override

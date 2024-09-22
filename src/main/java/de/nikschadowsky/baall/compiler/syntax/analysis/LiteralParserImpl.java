@@ -256,6 +256,14 @@ public class LiteralParserImpl implements LiteralParser {
             queue.poll();
             PrimitiveLiteralNodeImpl node = astFactory.createPrimitiveLiteralNode();
             node.setPrimitiveValue(nextToken);
+            node.setPrimitiveType(
+                    switch (nextToken.type()) {
+                        case NUMBER -> PrimitiveLiteralNode.PrimitiveType.NUMBER;
+                        case STRING -> PrimitiveLiteralNode.PrimitiveType.STRING;
+                        case BOOLEAN -> PrimitiveLiteralNode.PrimitiveType.BOOLEAN;
+                        default -> throw new IllegalStateException("Unexpected value: " + nextToken.type());
+                    });
+
             return ParseResult.successfulParse(node);
         }
 

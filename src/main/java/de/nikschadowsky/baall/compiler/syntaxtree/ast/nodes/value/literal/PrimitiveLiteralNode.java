@@ -10,4 +10,9 @@ public interface PrimitiveLiteralNode extends LiteralNode {
 
     Token getPrimitiveValue();
 
+    PrimitiveType getPrimitiveType();
+
+    enum PrimitiveType {
+        STRING, NUMBER, BOOLEAN, CHAR
+    }
 }

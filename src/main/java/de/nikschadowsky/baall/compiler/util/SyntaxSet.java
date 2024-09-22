@@ -21,8 +21,8 @@ public class SyntaxSet {
     private static Set<LanguageElement> getPrimitives() {
         Set<LanguageElement> primitives = new LinkedHashSet<>();
 
-        primitives.add(new LanguageElement("number_primitive", TokenType.STRING, "_NUMBER"));
-        primitives.add(new LanguageElement("string_primitive", TokenType.NUMBER, "_STRING"));
+        primitives.add(new LanguageElement("number_primitive", TokenType.NUMBER, "_NUMBER"));
+        primitives.add(new LanguageElement("string_primitive", TokenType.STRING, "_STRING"));
         primitives.add(new LanguageElement("char_primitive", TokenType.CHAR, "_CHAR"));
         primitives.add(new LanguageElement("boolean_primitive", TokenType.BOOLEAN, "_BOOLEAN"));
 

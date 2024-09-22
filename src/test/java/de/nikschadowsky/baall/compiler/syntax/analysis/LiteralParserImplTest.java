@@ -2,7 +2,6 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
@@ -48,7 +47,11 @@ class LiteralParserImplTest {
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),
                 mockedStatements,
-                "(", ")", "{", "}", ","
+                "(",
+                ")",
+                "{",
+                "}",
+                ","
         );
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
         parserMockerExtension.mockExpressionParserExecution(
@@ -56,14 +59,14 @@ class LiteralParserImplTest {
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
                 "[",
-                "]", ","
+                "]",
+                ","
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().string("primitive").build();
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
-                                                     .resultMatches(node -> "primitive"
-                                                             .equals(((PrimitiveLiteralNode) node).getPrimitiveValue()
-                                                                                                  .value()));
+                                                     .resultMatches(node -> "primitive".equals(((PrimitiveLiteralNode) node).getPrimitiveValue()
+                                                                                                                            .value()));
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator("[").separator("]").build();
@@ -99,12 +102,11 @@ class LiteralParserImplTest {
         assertThat(literalParser.parseLiteral(queue)).isSuccessful()
                                                      .resultMatches(node -> ((StructDefinitionLiteralNode) node).getFields()
                                                                                                                 .size() == 1)
-                                                     .resultMatches(node -> "string".equals(((StructDefinitionLiteralNode) node)
-                                                                                                    .getFields()
-                                                                                                    .get(0)
-                                                                                                    .getKey()
-                                                                                                    .getType()
-                                                                                                    .value()))
+                                                     .resultMatches(node -> "string".equals(((StructDefinitionLiteralNode) node).getFields()
+                                                                                                                                .get(0)
+                                                                                                                                .getKey()
+                                                                                                                                .getType()
+                                                                                                                                .value()))
                                                      .resultMatches(node -> ((StructDefinitionLiteralNode) node).getFields()
                                                                                                                 .get(0)
                                                                                                                 .getKey()
@@ -143,7 +145,8 @@ class LiteralParserImplTest {
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
                 "[",
-                "]", ","
+                "]",
+                ","
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().separator("[").separator("]").build();
@@ -187,13 +190,15 @@ class LiteralParserImplTest {
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
                 "[",
-                "]", ","
+                "]",
+                ","
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().separator("(")
                                                       .keyword("number")
                                                       .separator("[")
-                                                      .separator("]").separator(":")
+                                                      .separator("]")
+                                                      .separator(":")
                                                       .identifier("MyIdentifier")
                                                       .separator(")")
                                                       .build();
@@ -294,7 +299,8 @@ class LiteralParserImplTest {
                 exprParser -> exprParser.parseExpression(any()),
                 mockedExpression,
                 "(",
-                ")", ","
+                ")",
+                ","
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -375,7 +381,11 @@ class LiteralParserImplTest {
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),
                 mockedStatements,
-                "(", ")", "{", "}", ","
+                "(",
+                ")",
+                "{",
+                "}",
+                ","
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().separator("(")
@@ -441,30 +451,23 @@ class LiteralParserImplTest {
         TokenQueue queue = new TokenQueueTestBuilder().number("12345").string("StringValue").bool("True").build();
         assertThat(literalParser.parsePrimitiveLiteral(queue)).isSuccessful()
                                                               .resultMatches(primitiveLiteralNode -> "12345".equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .value()))
-                                                              .resultMatches(primitiveLiteralNode -> TokenType.NUMBER.equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .type()));
+                                                                      primitiveLiteralNode.getPrimitiveValue().value()))
+                                                              .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
+                                                                      node.getPrimitiveType()));
         assertThat(literalParser.parsePrimitiveLiteral(queue)).isSuccessful()
                                                               .resultMatches(primitiveLiteralNode -> "StringValue".equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .value()))
-                                                              .resultMatches(primitiveLiteralNode -> TokenType.STRING.equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .type()));
+                                                                      primitiveLiteralNode.getPrimitiveValue().value()))
+                                                              .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.STRING.equals(
+                                                                      node.getPrimitiveType()));
         assertThat(literalParser.parsePrimitiveLiteral(queue)).isSuccessful()
                                                               .resultMatches(primitiveLiteralNode -> "True".equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .value()))
-                                                              .resultMatches(primitiveLiteralNode -> TokenType.BOOLEAN.equals(
-                                                                      primitiveLiteralNode.getPrimitiveValue()
-                                                                                          .type()));
+                                                                      primitiveLiteralNode.getPrimitiveValue().value()))
+                                                              .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.BOOLEAN.equals(
+                                                                      node.getPrimitiveType()));
 
         queue = new TokenQueueTestBuilder().keyword("Keyword").build();
         assertThat(literalParser.parsePrimitiveLiteral(queue)).isUnsuccessful()
-                                                              .syntaxDiagnosticContains(
-                                                                      "Expected a primitive");
+                                                              .syntaxDiagnosticContains("Expected a primitive");
     }
 
 }

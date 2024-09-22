@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-@Generated("by BAALL-StatementParser-Gen")
+@Generated("by BAALL-Parser-Gen")
 public class StatementParserImpl implements StatementParser {
 
     private final ProgramParser programParser;

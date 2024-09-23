@@ -34,14 +34,20 @@ public interface StatementParser {
      * {@link ControlStructureParser#parseControlStructure(TokenQueue) control structure}.
      *
      * @param queue queue of the tokens
-     * @return partial parse result of the parsed statement
+     * @return partial parse result of the parsed delimited statement
      */
     @PartialParse
     PartialParseResult<StatementNode> parseDelimitedStatement(TokenQueue queue);
 
     /**
-     * @param queue
-     * @return
+     * Parses a simple statement. A statement is either a {@link #parseDeclaration(TokenQueue) declaration}, a
+     * {@link #parseReassignment(TokenQueue) reassignment}, a
+     * {@link ExpressionParser#parseFunctionCall(TokenQueue) function call} or a
+     * {@link ControlStatementParser#parseControlStatement(TokenQueue) control statement}. Parsed statements are not
+     * terminated by a statement separating symbol like ';'.
+     *
+     * @param queue queue of the tokens
+     * @return partial parse result of the parsed statement
      */
     @PartialParse
     PartialParseResult<StatementNode> parseStatement(TokenQueue queue);

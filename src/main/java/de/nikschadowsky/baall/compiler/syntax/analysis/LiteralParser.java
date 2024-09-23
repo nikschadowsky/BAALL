@@ -59,7 +59,7 @@ public interface LiteralParser {
     /**
      * Parses a function definition in the format of '( type: field_name, ... ) { statements }'. A function definition
      * always consists of 0..n {@link AuxiliaryParser#parseFieldDeclaration(TokenQueue) parameter declarations} and a
-     * function body consisting of 0..n {@link StatementParser#parseStatement(TokenQueue) statements}.
+     * function body consisting of 0..n {@link StatementParser#parseDelimitedStatement(TokenQueue) statements}.
      *
      * @param queue queue of the tokens
      * @return complete parse of the function definition

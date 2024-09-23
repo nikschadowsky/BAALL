@@ -48,12 +48,12 @@ public class StatementParserImpl implements StatementParser {
         }
         queue.poll();
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("_STRING").matches(queue.peek())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("string_primitive").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected a string!"));
             isPartial = true;
+        } else {
+            imports.add(queue.poll());
         }
-        imports.add(queue.poll());
-
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
             isPartial = true;
@@ -89,7 +89,7 @@ public class StatementParserImpl implements StatementParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        PartialParseResult<StatementNode> parsedStatement = parseStatement(queue.branchOff());
+        PartialParseResult<StatementNode> parsedStatement = parseDelimitedStatement(queue.branchOff());
         if (parsedStatement.isUnsuccessful()) {
             node.setStatements(new LinkedList<>());
             return PartialParseResult.successfulParse(node);
@@ -124,7 +124,7 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue) {
+    public PartialParseResult<StatementNode> parseDelimitedStatement(TokenQueue queue) {
         PartialParseResult<? extends StatementNode> parseResult;
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
@@ -145,7 +145,7 @@ public class StatementParserImpl implements StatementParser {
             );
         }
 
-        PartialParseResult<StatementNode> parsedRawStatement = parseRawStatement(queue.branchOff());
+        PartialParseResult<StatementNode> parsedRawStatement = parseStatement(queue.branchOff());
         if (parsedRawStatement.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedRawStatement.getParseResult());
@@ -168,7 +168,7 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementNode> parseRawStatement(TokenQueue queue) {
+    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue) {
         PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff());
 
         if (parsedDeclaration.isSuccessful()) {
@@ -423,14 +423,21 @@ public class StatementParserImpl implements StatementParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("export").matches(queue.poll())) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("export").matches(queue.peek())) {
             return PartialParseResult.successfulParse(node);
         }
+        queue.poll();
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("{").matches(queue.peek())) {
             queue.poll();
 
             if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
+                queue.poll();
+                if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
+                    diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
+                    isPartial = true;
+                }
+                queue.poll();
                 return PartialParseResult.successfulParse(node);
             } else {
                 ParseResult<IdentifierAccessNode> parsedElement =
@@ -465,6 +472,12 @@ public class StatementParserImpl implements StatementParser {
 
                 if (!SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected '}'!"));
+                    isPartial = true;
+                }
+                queue.poll();
+
+                if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
+                    diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
                     isPartial = true;
                 }
                 queue.poll();

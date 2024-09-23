@@ -390,7 +390,7 @@ public class StatementParserImpl implements StatementParser {
         node.setIdentifier(parsedIdentifier.getParseResult());
 
         ParseResult<Token> parsedShorthandOperator =
-                programParser.getAuxiliaryParser().parseShorthandOperator(queue.branchOff());
+                programParser.getAuxiliaryParser().parseVariableAssignmentOperator(queue.branchOff());
         if (parsedShorthandOperator.isSuccessful()) {
             queue.mergeBranch();
             node.setOperator(parsedShorthandOperator.getParseResult());

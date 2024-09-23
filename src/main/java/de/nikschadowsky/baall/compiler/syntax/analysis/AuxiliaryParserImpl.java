@@ -139,9 +139,9 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parseShorthandOperator(TokenQueue queue) {
+    public ParseResult<Token> parseVariableAssignmentOperator(TokenQueue queue) {
         Set<LanguageElement> validShorthandOperators =
-                Stream.of("=", ":=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
+                Stream.of("=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
                       .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
@@ -150,7 +150,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         }
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
                 queue.poll(),
-                "Expected a assignment operator!"
+                "Expected an assignment operator!"
         ));
     }
 

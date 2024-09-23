@@ -67,13 +67,14 @@ public interface AuxiliaryParser {
     ParseResult<Token> parseUnaryOperator(TokenQueue queue);
 
     /**
-     * Parses a shorthand operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
+     * Parses a variable assignment operator from the
+     * {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed shorthand operator
      */
     @CompleteParse
-    ParseResult<Token> parseShorthandOperator(TokenQueue queue);
+    ParseResult<Token> parseVariableAssignmentOperator(TokenQueue queue);
 
     /**
      * Parses a prefix operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.

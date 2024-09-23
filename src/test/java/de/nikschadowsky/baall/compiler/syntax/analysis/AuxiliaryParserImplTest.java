@@ -203,12 +203,12 @@ class AuxiliaryParserImplTest {
                                                               .resultMatches(token -> TokenType.OPERATOR.equals(
                                                                       token.type()))
                                                               .resultMatches(token -> ">".equals(token.value()));
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected a assignment operator");
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected a assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
     }
 
     @Test
@@ -237,42 +237,42 @@ class AuxiliaryParserImplTest {
     }
 
     @Test
-    void parseShorthandOperator() {
-        TokenQueue queue = new TokenQueueTestBuilder().operator(":=")
-                                                      .operator("=")
+    void parseVariableAssignmentOperator() {
+        TokenQueue queue = new TokenQueueTestBuilder().operator("=")
                                                       .operator("+=")
                                                       .operator("|=")
                                                       .operator("++")
+                                                      // not considered a variable assignment operator
+                                                      .operator(":=")
                                                       .keyword("keyword")
                                                       .string("anyString")
                                                       .build();
 
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isSuccessful()
-                                                                 .resultMatches(token -> TokenType.OPERATOR.equals(
-                                                                         token.type()))
-                                                                 .resultMatches(token -> ":=".equals(token.value()));
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isSuccessful()
-                                                                 .resultMatches(token -> TokenType.OPERATOR.equals(
-                                                                         token.type()))
-                                                                 .resultMatches(token -> "=".equals(token.value()));
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isSuccessful()
-                                                                 .resultMatches(token -> TokenType.OPERATOR.equals(
-                                                                         token.type()))
-                                                                 .resultMatches(token -> "+=".equals(token.value()));
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isSuccessful()
-                                                                 .resultMatches(token -> TokenType.OPERATOR.equals(
-                                                                         token.type()))
-                                                                 .resultMatches(token -> "|=".equals(token.value()));
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
+                                                                          .resultMatches(token -> TokenType.OPERATOR.equals(
+                                                                                  token.type()))
+                                                                          .resultMatches(token -> "=".equals(token.value()));
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
+                                                                          .resultMatches(token -> TokenType.OPERATOR.equals(
+                                                                                  token.type()))
+                                                                          .resultMatches(token -> "+=".equals(token.value()));
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
+                                                                          .resultMatches(token -> TokenType.OPERATOR.equals(
+                                                                                  token.type()))
+                                                                          .resultMatches(token -> "|=".equals(token.value()));
 
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected a assignment operator");
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected a assignment operator");
-        assertThat(auxiliaryParser.parseShorthandOperator(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected a assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
+        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
+                                                                          .syntaxDiagnosticContains(
+                                                                                  "Expected an assignment operator");
     }
 
     @Test

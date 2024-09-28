@@ -145,7 +145,7 @@ public class StatementParserImpl implements StatementParser {
             );
         }
 
-        PartialParseResult<StatementNode> parsedRawStatement = parseStatement(queue.branchOff());
+        PartialParseResult<StatementNode> parsedRawStatement = parseSimpleStatement(queue.branchOff());
         if (parsedRawStatement.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedRawStatement.getParseResult());
@@ -168,7 +168,7 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<StatementNode> parseStatement(TokenQueue queue) {
+    public PartialParseResult<StatementNode> parseSimpleStatement(TokenQueue queue) {
         PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff());
 
         if (parsedDeclaration.isSuccessful()) {
@@ -237,8 +237,8 @@ public class StatementParserImpl implements StatementParser {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedVariableDeclaration.getParseResult());
         }
-        // since const and var declarations are so closely related, checking one for partiality is sufficient and
-        // since var declaration allow for more flexibility a partial declaration is always considered being a variable
+
+        // any partial declaration is considered a variable declaration since we cannot differentiate between them.
         if (parsedVariableDeclaration.isPartial()) {
             queue.mergeBranch();
             return PartialParseResult.partialParse(
@@ -266,8 +266,9 @@ public class StatementParserImpl implements StatementParser {
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
             isPartial = true;
+        } else {
+            queue.poll();
         }
-        queue.poll();
 
         ParseResult<Token> parsedIdentifier =
                 programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
@@ -286,12 +287,14 @@ public class StatementParserImpl implements StatementParser {
             if (parsedExpression.isUnsuccessful()) {
                 diagnostics.add(parsedExpression.getDiagnostic());
                 isPartial = true;
+            } else {
+                queue.mergeBranch();
+                node.setInitializationValue(parsedExpression.getParseResult());
             }
-            queue.mergeBranch();
-            node.setInitializationValue(parsedExpression.getParseResult());
         }
 
         if (isPartial) {
+            queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -314,8 +317,9 @@ public class StatementParserImpl implements StatementParser {
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ':'!"));
             isPartial = true;
+        } else {
+            queue.poll();
         }
-        queue.poll();
 
         ParseResult<Token> parsedIdentifier =
                 programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
@@ -331,18 +335,20 @@ public class StatementParserImpl implements StatementParser {
             isPartial = true;
         } else {
             queue.poll();
-
-            ParseResult<ExpressionNode> parsedExpression =
-                    programParser.getExpressionParser().parseExpression(queue.branchOff());
-            if (parsedExpression.isUnsuccessful()) {
-                diagnostics.add(parsedExpression.getDiagnostic());
-                isPartial = true;
-            }
+        }
+        ParseResult<ExpressionNode> parsedExpression =
+                programParser.getExpressionParser().parseExpression(queue.branchOff());
+        if (parsedExpression.isUnsuccessful()) {
+            diagnostics.add(parsedExpression.getDiagnostic());
+            isPartial = true;
+        } else {
             queue.mergeBranch();
             node.setInitializationValue(parsedExpression.getParseResult());
         }
 
+
         if (isPartial) {
+            queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
             return PartialParseResult.partialParse(node, diagnostics.get(0));
         }
         return PartialParseResult.successfulParse(node);
@@ -397,6 +403,7 @@ public class StatementParserImpl implements StatementParser {
         } else {
             diagnostics.add(parsedShorthandOperator.getDiagnostic());
             isPartial = true;
+            queue.poll();
         }
 
         ParseResult<ExpressionNode> parsedExpression =
@@ -407,6 +414,7 @@ public class StatementParserImpl implements StatementParser {
         } else {
             diagnostics.add(parsedExpression.getDiagnostic());
             isPartial = true;
+            queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
         }
 
         if (isPartial) {

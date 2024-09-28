@@ -4,6 +4,7 @@ package de.nikschadowsky.baall.compiler._utility;
 import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
+import de.nikschadowsky.baall.compiler.symbol.TokenQueueId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +60,7 @@ public class TokenQueueTestBuilder {
     }
 
     public TokenQueue build() {
-        return new TokenQueue(tokens);
+        return new TokenQueue(TokenQueueId.of("root"), tokens);
     }
 
 }

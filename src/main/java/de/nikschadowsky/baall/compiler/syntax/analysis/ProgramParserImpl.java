@@ -45,7 +45,7 @@ public class ProgramParserImpl implements ProgramParser {
 
         PartialParseResult<List<Token>> parsedImports = statementParser.parseImports(queue.branchOff());
         if (parsedImports.isSuccessful() || parsedImports.isPartial()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedImports.getTokenQueueId());
             ImportsNodeImpl imports = astFactory.createImportNode();
             imports.setImports(parsedImports.getParseResult());
             node.setImports(imports);
@@ -58,7 +58,7 @@ public class ProgramParserImpl implements ProgramParser {
 
         PartialParseResult<StatementsNode> parsedStatements = statementParser.parseStatements(queue.branchOff());
         if (parsedStatements.isSuccessful() || parsedStatements.isPartial()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedStatements.getTokenQueueId());
             node.setStatements(parsedStatements.getParseResult());
         }
         if (!parsedStatements.isSuccessful()) {
@@ -68,7 +68,7 @@ public class ProgramParserImpl implements ProgramParser {
 
         PartialParseResult<ExportsNode> parsedExports = statementParser.parseExports(queue.branchOff());
         if (parsedExports.isSuccessful() || parsedExports.isPartial()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedExports.getTokenQueueId());
             node.setExports(parsedExports.getParseResult());
         }
         if (!parsedExports.isSuccessful()) {
@@ -84,10 +84,10 @@ public class ProgramParserImpl implements ProgramParser {
         node.setDiagnostics(diagnostics);
 
         if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
 
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @Override

@@ -31,19 +31,20 @@ public class ParserMockerExtension implements AfterEachCallback {
 
     private static <T> Answer<ParseResult<T>> getAnswer(T answer, String[] returnUnsuccessfulOn, boolean returnPartial) {
         return invocationOnMock -> {
-            Token polled = invocationOnMock.<TokenQueue>getArgument(0).poll();
+            TokenQueue queue = invocationOnMock.<TokenQueue>getArgument(0);
+            Token polled = queue.poll();
             if (Objects.isNull(polled) || Arrays.asList(returnUnsuccessfulOn).contains(polled.value())) {
                 SyntaxDiagnostic diagnostic = new SyntaxDiagnostic(
                         "Parser mock consumed an illegal token '" + polled + "'");
                 if (returnPartial) {
-                    return PartialParseResult.unsuccessfulParse(diagnostic);
+                    return PartialParseResult.unsuccessfulParse(diagnostic,queue.getId());
                 }
-                return ParseResult.unsuccessfulParse(diagnostic);
+                return ParseResult.unsuccessfulParse(diagnostic,queue.getId());
             }
             if (returnPartial) {
-                return PartialParseResult.successfulParse(answer);
+                return PartialParseResult.successfulParse(answer,queue.getId());
             }
-            return ParseResult.successfulParse(answer);
+            return ParseResult.successfulParse(answer, queue.getId());
         };
     }
 

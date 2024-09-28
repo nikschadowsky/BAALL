@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis.result;
 
+import de.nikschadowsky.baall.compiler.symbol.TokenQueueId;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,20 +12,20 @@ public class PartialParseResult<T> extends ParseResult<T> {
 
     private final boolean partial;
 
-    public static <T> PartialParseResult<T> successfulParse(T result) {
-        return new PartialParseResult<>(result, false, null);
+    public static <T> PartialParseResult<T> successfulParse(T result, TokenQueueId tokenQueueId) {
+        return new PartialParseResult<>(result, false, null, tokenQueueId);
     }
 
-    public static <T> PartialParseResult<T> partialParse(T result, SyntaxDiagnostic diagnostic) {
-        return new PartialParseResult<>(result, true, diagnostic);
+    public static <T> PartialParseResult<T> partialParse(T result, SyntaxDiagnostic diagnostic, TokenQueueId tokenQueueId) {
+        return new PartialParseResult<>(result, true, diagnostic, tokenQueueId);
     }
 
-    public static <T> PartialParseResult<T> unsuccessfulParse(SyntaxDiagnostic diagnostic) {
-        return new PartialParseResult<>(null, false, diagnostic);
+    public static <T> PartialParseResult<T> unsuccessfulParse(SyntaxDiagnostic diagnostic, TokenQueueId tokenQueueId) {
+        return new PartialParseResult<>(null, false, diagnostic, tokenQueueId);
     }
 
-    private PartialParseResult(@Nullable T parseResult, boolean partial, @Nullable SyntaxDiagnostic diagnostic) {
-        super(parseResult, diagnostic);
+    private PartialParseResult(@Nullable T parseResult, boolean partial, @Nullable SyntaxDiagnostic diagnostic, TokenQueueId tokenQueueId) {
+        super(parseResult, diagnostic, tokenQueueId);
         this.partial = partial;
     }
 

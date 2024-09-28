@@ -1,6 +1,8 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis.result;
 
+import de.nikschadowsky.baall.compiler.symbol.TokenQueueId;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.NoSuchElementException;
@@ -12,18 +14,20 @@ public class ParseResult<T> {
 
     private final @Nullable T parseResult;
     private final @Nullable SyntaxDiagnostic diagnostic;
+    private final @NotNull TokenQueueId tokenQueueId;
 
-    public static <T> ParseResult<T> successfulParse(T parseResult) {
-        return new ParseResult<>(parseResult, null);
+    public static <T> ParseResult<T> successfulParse(T parseResult, TokenQueueId tokenQueueId) {
+        return new ParseResult<>(parseResult, null, tokenQueueId);
     }
 
-    public static <T> ParseResult<T> unsuccessfulParse(SyntaxDiagnostic diagnostic) {
-        return new ParseResult<>(null, diagnostic);
+    public static <T> ParseResult<T> unsuccessfulParse(SyntaxDiagnostic diagnostic, TokenQueueId tokenQueueId) {
+        return new ParseResult<>(null, diagnostic, tokenQueueId);
     }
 
-    protected ParseResult(@Nullable T parseResult, @Nullable SyntaxDiagnostic diagnostic) {
+    protected ParseResult(@Nullable T parseResult, @Nullable SyntaxDiagnostic diagnostic, @NotNull TokenQueueId tokenQueueId) {
         this.parseResult = parseResult;
         this.diagnostic = diagnostic;
+        this.tokenQueueId = tokenQueueId;
     }
 
     public T getParseResult() {
@@ -40,6 +44,10 @@ public class ParseResult<T> {
         return diagnostic;
     }
 
+    public @NotNull TokenQueueId getTokenQueueId() {
+        return tokenQueueId;
+    }
+
     public boolean isUnsuccessful() {
         return parseResult == null;
     }
@@ -47,5 +55,4 @@ public class ParseResult<T> {
     public boolean isSuccessful() {
         return !isUnsuccessful();
     }
-
 }

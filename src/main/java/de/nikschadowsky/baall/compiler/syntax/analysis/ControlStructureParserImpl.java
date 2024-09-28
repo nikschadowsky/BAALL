@@ -39,40 +39,59 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
         parseResult = parseForLoop(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return PartialParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         } else if (parseResult.isPartial()) {
-            queue.mergeBranch();
-            return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.partialParse(
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
+                    queue.getId()
+            );
         }
 
         parseResult = parseWhileLoop(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return PartialParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         } else if (parseResult.isPartial()) {
-            queue.mergeBranch();
-            return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.partialParse(
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
+                    queue.getId()
+            );
         }
 
         parseResult = parseConditional(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return PartialParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         } else if (parseResult.isPartial()) {
-            queue.mergeBranch();
-            return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.partialParse(
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
+                    queue.getId()
+            );
         }
         parseResult = parseTryStatement(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return PartialParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         } else if (parseResult.isPartial()) {
-            queue.mergeBranch();
-            return PartialParseResult.partialParse(parseResult.getParseResult(), parseResult.getDiagnostic());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return PartialParseResult.partialParse(
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
+                    queue.getId()
+            );
         }
 
-        return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+        return PartialParseResult.unsuccessfulParse(
+                new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
+                queue.getId()
+        );
     }
 
     @PartialParse
@@ -87,9 +106,9 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         ParseResult<ExpressionNode> parsedExpression =
                 programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
+            return PartialParseResult.unsuccessfulParse(parsedExpression.getDiagnostic(), queue.getId());
         }
-        queue.mergeBranch();
+        queue.mergeBranch(parsedExpression.getTokenQueueId());
         node.setCondition(parsedExpression.getParseResult());
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("?").matches(queue.peek())) {
@@ -109,25 +128,25 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedCodeBlock.getDiagnostic());
                 isPartiallyParsed = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedCodeBlock.getTokenQueueId());
             node.setThenBlock(parsedCodeBlock.getParseResult());
         }
 
         PartialParseResult<ConditionalNode> parsedElseBlock = parseElseBlock(queue.branchOff());
         if (parsedElseBlock.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedElseBlock.getTokenQueueId());
             node.setElseBranch(parsedElseBlock.getParseResult());
         } else if (parsedElseBlock.isPartial()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedElseBlock.getTokenQueueId());
             node.setElseBranch(parsedElseBlock.getParseResult());
             diagnostics.add(parsedElseBlock.getDiagnostic());
             isPartiallyParsed = true;
         }
 
         if (isPartiallyParsed) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -137,7 +156,10 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("|").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '|'!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Expected '|'!"),
+                    queue.getId()
+            );
         }
         queue.poll();
 
@@ -152,35 +174,37 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedCodeBlock.getDiagnostic());
                 isPartiallyParsed = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedCodeBlock.getTokenQueueId());
 
             node.setThenBlock(parsedCodeBlock.getParseResult());
 
             if (isPartiallyParsed) {
-                return PartialParseResult.partialParse(node, diagnostics.get(0));
+                return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
             }
-            return PartialParseResult.successfulParse(node);
+            return PartialParseResult.successfulParse(node, queue.getId());
 
         } else {
             PartialParseResult<ConditionalNode> parsedConditional = parseConditional(queue.branchOff());
             if (parsedConditional.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedConditional.getTokenQueueId());
                 ConditionalNode node = parsedConditional.getParseResult();
-                return PartialParseResult.successfulParse(node);
+                return PartialParseResult.successfulParse(node, queue.getId());
             } else if (parsedConditional.isPartial()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedConditional.getTokenQueueId());
                 return PartialParseResult.partialParse(
                         parsedConditional.getParseResult(),
-                        parsedConditional.getDiagnostic()
+                        parsedConditional.getDiagnostic(),
+                        queue.getId()
                 );
             }
         }
         Token current = queue.peek();
         queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
-        return PartialParseResult.partialParse(astFactory.createConditionalNode(), new SyntaxDiagnostic(
-                current,
-                "Expected '{' or an expression!"
-        ));
+        return PartialParseResult.partialParse(
+                astFactory.createConditionalNode(),
+                new SyntaxDiagnostic(current, "Expected '{' or an expression!"),
+                queue.getId()
+        );
     }
 
     @PartialParse
@@ -191,13 +215,16 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("for").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'for'!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Expected 'for'!"),
+                    queue.getId()
+            );
         }
         queue.poll();
 
         ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedIdentifier.getTokenQueueId());
             node.setIdentifier(parsedIdentifier.getParseResult());
         } else {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));
@@ -209,7 +236,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             ParseResult<ExpressionNode> parsedStartIndexExpression =
                     programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedStartIndexExpression.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedStartIndexExpression.getTokenQueueId());
                 node.setStartIndex(parsedStartIndexExpression.getParseResult());
             } else {
                 diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected an expression!"));
@@ -225,7 +252,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             ParseResult<ExpressionNode> parsedEndIndexExpression =
                     programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedEndIndexExpression.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedEndIndexExpression.getTokenQueueId());
                 node.setEndIndex(parsedEndIndexExpression.getParseResult());
             } else {
                 diagnostics.add(new SyntaxDiagnostic(queue.getPointer(), "Expected an expression!"));
@@ -242,7 +269,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             ParseResult<ReassignmentNode> parsedOptionalForStepper =
                     programParser.getStatementParser().parseReassignment(queue.branchOff());
             if (parsedOptionalForStepper.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedOptionalForStepper.getTokenQueueId());
                 node.setOptionalStepperStatement(parsedOptionalForStepper.getParseResult());
             } else {
                 diagnostics.add(new SyntaxDiagnostic("Expected a reassignment statement!"));
@@ -261,14 +288,14 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedCodeBlock.getDiagnostic());
                 isPartiallyParsed = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedCodeBlock.getTokenQueueId());
             node.setBody(parsedCodeBlock.getParseResult());
         }
 
         if (isPartiallyParsed) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -279,14 +306,17 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartiallyParsed = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("while").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'while'!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Expected 'while'!"),
+                    queue.getId()
+            );
         }
         queue.poll();
 
         ParseResult<ExpressionNode> parsedExpression =
                 programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedExpression.getTokenQueueId());
             node.setCondition(parsedExpression.getParseResult());
         } else {
             queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get("{"));
@@ -304,15 +334,15 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedCodeBlock.getDiagnostic());
                 isPartiallyParsed = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedCodeBlock.getTokenQueueId());
             node.setBody(parsedCodeBlock.getParseResult());
         }
 
         if (isPartiallyParsed) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
 
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -324,7 +354,10 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("try").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
+                    queue.getId()
+            );
         }
         queue.poll();
 
@@ -339,7 +372,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedBody.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedBody.getTokenQueueId());
             node.setBody(parsedBody.getParseResult());
         }
 
@@ -353,7 +386,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedInterceptStatement.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedInterceptStatement.getTokenQueueId());
             interceptStatements.add(parsedInterceptStatement.getParseResult());
         }
 
@@ -367,27 +400,26 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedInterceptStatements.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedInterceptStatements.getTokenQueueId());
             interceptStatements.addAll(parsedInterceptStatements.getParseResult());
         }
         node.setInterceptBlocks(interceptStatements);
 
-        PartialParseResult<EnsureStatementNode> parsedEnsureStatement =
-                parseEnsureStatement(queue.branchOff());
+        PartialParseResult<EnsureStatementNode> parsedEnsureStatement = parseEnsureStatement(queue.branchOff());
         if (!parsedEnsureStatement.isUnsuccessful()) {
             if (parsedEnsureStatement.isPartial()) {
                 diagnostics.add(parsedEnsureStatement.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedEnsureStatement.getTokenQueueId());
             node.setEnsureBlock(parsedEnsureStatement.getParseResult());
         }
 
         if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
 
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -401,13 +433,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 parseInterceptStatement(queue.branchOff());
 
         if (parsedInterceptStatement.isUnsuccessful()) {
-            return PartialParseResult.successfulParse(interceptStatements);
+            return PartialParseResult.successfulParse(interceptStatements, queue.getId());
         } else {
             if (parsedInterceptStatement.isPartial()) {
                 diagnostics.add(parsedInterceptStatement.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedInterceptStatement.getTokenQueueId());
             interceptStatements.add(parsedInterceptStatement.getParseResult());
         }
 
@@ -421,13 +453,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedInterceptStatements.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedInterceptStatements.getTokenQueueId());
             interceptStatements.addAll(parsedInterceptStatements.getParseResult());
         }
         if (isPartial) {
-            return PartialParseResult.partialParse(interceptStatements, diagnostics.get(0));
+            return PartialParseResult.partialParse(interceptStatements, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(interceptStatements);
+        return PartialParseResult.successfulParse(interceptStatements, queue.getId());
     }
 
     @PartialParse
@@ -439,7 +471,10 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("intercept").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'intercept'!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Expected 'intercept'!"),
+                    queue.getId()
+            );
         }
         queue.poll();
         ParseResult<IdentifierAccessNode> parsedInterceptedException =
@@ -448,7 +483,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             diagnostics.add(parsedInterceptedException.getDiagnostic());
             isPartial = true;
         } else {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedInterceptedException.getTokenQueueId());
             interceptedExceptions.add(parsedInterceptedException.getParseResult());
         }
 
@@ -462,7 +497,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedAdditionalInterceptedExceptions.getTokenQueueId());
             interceptedExceptions.addAll(parsedAdditionalInterceptedExceptions.getParseResult());
         }
         node.setInterceptedExceptions(interceptedExceptions);
@@ -479,7 +514,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedExceptionIdentifier.getDiagnostic());
                 isPartial = true;
             } else {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedExceptionIdentifier.getTokenQueueId());
                 node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
             }
         }
@@ -494,15 +529,15 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedBody.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedBody.getTokenQueueId());
             node.setBody(parsedBody.getParseResult());
         }
 
         if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
 
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -513,7 +548,10 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("ensure").matches(queue.peek())) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'ensure'!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Expected 'ensure'!"),
+                    queue.getId()
+            );
         }
         queue.poll();
 
@@ -528,13 +566,13 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 diagnostics.add(parsedBody.getDiagnostic());
                 isPartial = true;
             }
-            queue.mergeBranch();
+            queue.mergeBranch(parsedBody.getTokenQueueId());
             node.setBody(parsedBody.getParseResult());
         }
 
         if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 }

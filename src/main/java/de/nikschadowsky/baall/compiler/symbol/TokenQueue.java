@@ -12,19 +12,21 @@ import java.util.List;
  */
 public class TokenQueue {
 
-    private final List<Token> queue;
+    private final TokenQueueId id;
 
+    private final List<Token> queue;
     private int pointer;
 
-    private TokenQueueBranch branch;
+    private final List<TokenQueueBranch> branches = new ArrayList<>();
 
     private boolean branchValid;
 
-    public TokenQueue(List<Token> queue) {
-        this(queue, 0);
+    public TokenQueue(TokenQueueId id, List<Token> queue) {
+        this(id, queue, 0);
     }
 
-    private TokenQueue(List<Token> queue, int initialPosition) {
+    private TokenQueue(TokenQueueId id, List<Token> queue, int initialPosition) {
+        this.id = id;
         this.queue = new ArrayList<>(queue);
         this.pointer = initialPosition;
     }
@@ -56,6 +58,12 @@ public class TokenQueue {
         }
     }
 
+    public void skipTo(LanguageElement skippedTo) {
+        while (!skippedTo.matches(peek()) && !hasReachedEndOfFile()) {
+            poll();
+        }
+    }
+
     /**
      * Skips to and consumes the next token in queue that matches the passed symbol
      *
@@ -63,16 +71,15 @@ public class TokenQueue {
      *                gets skipped.
      */
     public void skipOver(LanguageElement skipped) {
-        while (!skipped.matches(peek()) && !hasReachedEndOfFile()) {
-            poll();
-        }
+        skipTo(skipped);
         // skip over matching token
         poll();
     }
 
     public TokenQueueBranch branchOff() {
-        branchValid = true;
-        branch = new TokenQueueBranch(queue, pointer);
+        TokenQueueBranch branch =
+                new TokenQueueBranch(TokenQueueId.of(id.getId() + "$" + branches.size()), queue, pointer);
+        branches.add(branch);
         return branch;
     }
 
@@ -89,25 +96,40 @@ public class TokenQueue {
         return queue.size();
     }
 
+    public TokenQueueId getId() {
+        return id;
+    }
+
     public boolean hasReachedEndOfFile() {
         return pointer >= queue.size();
     }
 
-    public void mergeBranch() {
-        if (!branchValid) {
-            System.err.println("Cannot advance queue because the branch is not valid!");
-            return;
-        }
+    public void mergeBranch(TokenQueueId branchId) {
+        TokenQueueBranch branch = branches.stream()
+                                          .filter(b -> b.getId().equals(branchId))
+                                          .filter(TokenQueueBranch::isValid)
+                                          .findAny()
+                                          .orElseThrow(() -> new IllegalArgumentException(
+                                                  "No valid branch with the id '%s' is registered on this queue!".formatted(
+                                                          branchId)));
         pointer = branch.getPointer();
-        branch = null;
-        branchValid = false;
+        branch.invalidate();
     }
 
     public static class TokenQueueBranch extends TokenQueue {
 
-        private TokenQueueBranch(List<Token> queue, int initialPosition) {
-            super(queue, initialPosition);
+        private boolean isValid = true;
+
+        private TokenQueueBranch(TokenQueueId id, List<Token> queue, int initialPosition) {
+            super(id, queue, initialPosition);
+        }
+
+        public boolean isValid() {
+            return isValid;
+        }
+
+        public void invalidate() {
+            isValid = false;
         }
     }
-
 }

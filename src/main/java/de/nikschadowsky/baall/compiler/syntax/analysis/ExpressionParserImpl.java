@@ -35,48 +35,48 @@ public class ExpressionParserImpl implements ExpressionParser {
     @CompleteParse
     @Override
     public ParseResult<ExpressionNode> parseExpression(TokenQueue queue) {
-        ParseResult<Token> parsedPrefixOperator = programParser.getAuxiliaryParser()
-                                                               .parsePrefixOperator(queue.branchOff());
+        ParseResult<Token> parsedPrefixOperator =
+                programParser.getAuxiliaryParser().parsePrefixOperator(queue.branchOff());
         if (parsedPrefixOperator.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedPrefixOperator.getTokenQueueId());
 
             PrefixOperationNodeImpl node = astFactory.createPrefixOperationNode();
             node.setOperator(parsedPrefixOperator.getParseResult());
 
             ParseResult<ExpressionNode> parsedPrefixOperationExpression = parseExpression(queue.branchOff());
             if (parsedPrefixOperationExpression.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedPrefixOperationExpression.getTokenQueueId());
 
                 node.setOperand(parsedPrefixOperationExpression.getParseResult());
-                return ParseResult.successfulParse(node);
+                return ParseResult.successfulParse(node, queue.getId());
             }
-            return ParseResult.unsuccessfulParse(parsedPrefixOperationExpression.getDiagnostic());
+            return ParseResult.unsuccessfulParse(parsedPrefixOperationExpression.getDiagnostic(), queue.getId());
         }
 
         ParseResult<TermNode> parsedValue = parseTerm(queue.branchOff());
         if (parsedValue.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedValue.getTokenQueueId());
 
             ParseResult<Token> parsedBinaryOperator =
                     programParser.getAuxiliaryParser().parseBinaryOperator(queue.branchOff());
             if (parsedBinaryOperator.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedBinaryOperator.getTokenQueueId());
 
                 ParseResult<ExpressionNode> parsedBinaryRightExpression = parseExpression(queue.branchOff());
                 if (parsedBinaryRightExpression.isSuccessful()) {
-                    queue.mergeBranch();
+                    queue.mergeBranch(parsedBinaryRightExpression.getTokenQueueId());
 
                     BinaryExpressionNodeImpl node = astFactory.createBinaryExpressionNode();
                     node.setLeftOperand(parsedValue.getParseResult());
                     node.setOperator(parsedBinaryOperator.getParseResult());
                     node.setRightOperand(parsedBinaryRightExpression.getParseResult());
-                    return ParseResult.successfulParse(node);
+                    return ParseResult.successfulParse(node, queue.getId());
                 }
-                return ParseResult.unsuccessfulParse(parsedBinaryRightExpression.getDiagnostic());
+                return ParseResult.unsuccessfulParse(parsedBinaryRightExpression.getDiagnostic(), queue.getId());
             }
-            return ParseResult.successfulParse(parsedValue.getParseResult());
+            return ParseResult.successfulParse(parsedValue.getParseResult(), queue.getId());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not an expression!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not an expression!"), queue.getId());
     }
 
     @CompleteParse
@@ -86,35 +86,35 @@ public class ExpressionParserImpl implements ExpressionParser {
 
         parseResult = programParser.getLiteralParser().parseLiteral(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
         parseResult = parseParenthesizedExpression(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
         parseResult = parseFunctionCall(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
         parseResult = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
         parseResult = parseUnaryExpression(queue.branchOff());
         if (parseResult.isSuccessful()) {
-            queue.mergeBranch();
-            return ParseResult.successfulParse(parseResult.getParseResult());
+            queue.mergeBranch(parseResult.getTokenQueueId());
+            return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not an expression!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not an expression!"), queue.getId());
     }
 
     @CompleteParse
@@ -125,19 +125,22 @@ public class ExpressionParserImpl implements ExpressionParser {
             ParenthesizedExpressionNodeImpl node = astFactory.createParenthesizedExpressionNode();
             ParseResult<ExpressionNode> parsedExpression = parseExpression(queue.branchOff());
             if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedExpression.getTokenQueueId());
 
                 if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
                     queue.poll();
                     node.setInnerExpression(parsedExpression.getParseResult());
-                    return ParseResult.successfulParse(node);
+                    return ParseResult.successfulParse(node, queue.getId());
                 }
-                return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
+                return ParseResult.unsuccessfulParse(
+                        new SyntaxDiagnostic(queue.poll(), "Expected ')'!"),
+                        queue.getId()
+                );
             }
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
-            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic());
+            return ParseResult.unsuccessfulParse(parsedExpression.getDiagnostic(), queue.getId());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"), queue.getId());
     }
 
     @PartialParse
@@ -150,9 +153,12 @@ public class ExpressionParserImpl implements ExpressionParser {
         ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
                 programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedIdentifierValueAccess.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+            return PartialParseResult.unsuccessfulParse(
+                    new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
+                    queue.getId()
+            );
         }
-        queue.mergeBranch();
+        queue.mergeBranch(parsedIdentifierValueAccess.getTokenQueueId());
         node.setFunctionIdentifier(parsedIdentifierValueAccess.getParseResult());
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
@@ -160,17 +166,17 @@ public class ExpressionParserImpl implements ExpressionParser {
             if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
                 queue.poll();
                 node.setArguments(new LinkedList<>());
-                return PartialParseResult.successfulParse(node);
+                return PartialParseResult.successfulParse(node, queue.getId());
             }
 
             ParseResult<ExpressionNode> parsedExpression = parseExpression(queue.branchOff());
             if (parsedExpression.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedExpression.getTokenQueueId());
 
                 ParseResult<List<ExpressionNode>> parsedFunctionArguments =
                         programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff());
                 if (parsedFunctionArguments.isSuccessful()) {
-                    queue.mergeBranch();
+                    queue.mergeBranch(parsedFunctionArguments.getTokenQueueId());
 
                     List<ExpressionNode> functionArguments = new LinkedList<>();
                     functionArguments.add(parsedExpression.getParseResult());
@@ -197,9 +203,9 @@ public class ExpressionParserImpl implements ExpressionParser {
         }
 
         if (isPartial) {
-            return PartialParseResult.partialParse(node, diagnostics.get(0));
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(node);
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @CompleteParse
@@ -211,37 +217,37 @@ public class ExpressionParserImpl implements ExpressionParser {
 
         parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff());
         if (parsedUnaryOperator.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedUnaryOperator.getTokenQueueId());
 
             node = astFactory.createUnaryExpressionNode();
             node.setIsPrefix(true);
             node.setOperator(parsedUnaryOperator.getParseResult());
             parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
             if (parsedIdentifier.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 
                 node.setIdentifierAccess(parsedIdentifier.getParseResult());
-                return ParseResult.successfulParse(node);
+                return ParseResult.successfulParse(node, queue.getId());
             }
-            return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic());
+            return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
         }
 
         parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
-            queue.mergeBranch();
+            queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 
             node = astFactory.createUnaryExpressionNode();
             node.setIdentifierAccess(parsedIdentifier.getParseResult());
             parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff());
             if (parsedUnaryOperator.isSuccessful()) {
-                queue.mergeBranch();
+                queue.mergeBranch(parsedUnaryOperator.getTokenQueueId());
                 node.setOperator(parsedUnaryOperator.getParseResult());
                 node.setIsPrefix(false);
 
-                return ParseResult.successfulParse(node);
+                return ParseResult.successfulParse(node, queue.getId());
             }
-            return ParseResult.unsuccessfulParse(parsedUnaryOperator.getDiagnostic());
+            return ParseResult.unsuccessfulParse(parsedUnaryOperator.getDiagnostic(), queue.getId());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"));
+        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Not a statement!"), queue.getId());
     }
 }

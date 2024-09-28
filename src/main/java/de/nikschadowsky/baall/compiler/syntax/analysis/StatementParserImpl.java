@@ -170,7 +170,6 @@ public class StatementParserImpl implements StatementParser {
     @Override
     public PartialParseResult<StatementNode> parseSimpleStatement(TokenQueue queue) {
         PartialParseResult<DeclarationNode> parsedDeclaration = parseDeclaration(queue.branchOff());
-
         if (parsedDeclaration.isSuccessful()) {
             queue.mergeBranch();
             return PartialParseResult.successfulParse(parsedDeclaration.getParseResult());
@@ -285,7 +284,10 @@ public class StatementParserImpl implements StatementParser {
             ParseResult<ExpressionNode> parsedExpression =
                     programParser.getExpressionParser().parseExpression(queue.branchOff());
             if (parsedExpression.isUnsuccessful()) {
-                diagnostics.add(parsedExpression.getDiagnostic());
+                diagnostics.add(new SyntaxDiagnostic(
+                        parsedExpression.getDiagnostic().getToken(),
+                        "Expected an expression!"
+                ));
                 isPartial = true;
             } else {
                 queue.mergeBranch();
@@ -339,7 +341,10 @@ public class StatementParserImpl implements StatementParser {
         ParseResult<ExpressionNode> parsedExpression =
                 programParser.getExpressionParser().parseExpression(queue.branchOff());
         if (parsedExpression.isUnsuccessful()) {
-            diagnostics.add(parsedExpression.getDiagnostic());
+            diagnostics.add(new SyntaxDiagnostic(
+                    parsedExpression.getDiagnostic().getToken(),
+                    "Expected an expression!"
+            ));
             isPartial = true;
         } else {
             queue.mergeBranch();

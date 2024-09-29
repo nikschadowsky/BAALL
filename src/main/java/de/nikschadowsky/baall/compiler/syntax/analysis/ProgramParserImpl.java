@@ -31,9 +31,9 @@ public class ProgramParserImpl implements ProgramParser {
         this.statementParser = new StatementParserImpl(this, astFactory);
         this.auxiliaryParser = new AuxiliaryParserImpl(this, astFactory);
         this.expressionParser = new ExpressionParserImpl(this, astFactory);
-        this.literalParser = new LiteralParserImpl(this,astFactory);
-        this.controlStatementParser = new ControlStatementParserImpl(this,astFactory);
-        this.controlStructureParser = new ControlStructureParserImpl(this,astFactory);
+        this.literalParser = new LiteralParserImpl(this, astFactory);
+        this.controlStatementParser = new ControlStatementParserImpl(this, astFactory);
+        this.controlStructureParser = new ControlStructureParserImpl(this, astFactory);
     }
 
     @PartialParse

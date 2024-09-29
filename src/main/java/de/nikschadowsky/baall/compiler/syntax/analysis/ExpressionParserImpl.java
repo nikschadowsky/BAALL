@@ -192,9 +192,9 @@ public class ExpressionParserImpl implements ExpressionParser {
             }
 
             if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"));
+                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected ')'!"));
                 isPartial = true;
-                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
+                queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             }
             queue.poll();
         } else {

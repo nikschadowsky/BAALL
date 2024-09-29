@@ -21,8 +21,10 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 import javax.annotation.processing.Generated;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Generated("by BAALL-Parser-Gen")
 public class StatementParserImpl implements StatementParser {
@@ -137,7 +139,36 @@ public class StatementParserImpl implements StatementParser {
         if (parsedControlStructure.isSuccessful()) {
             queue.mergeBranch(parsedControlStructure.getTokenQueueId());
             return PartialParseResult.successfulParse(parsedControlStructure.getParseResult(), queue.getId());
-        } else if (parsedControlStructure.isPartial()) {
+        }
+
+        PartialParseResult<StatementNode> parsedSimpleStatement = parseSimpleStatement(queue.branchOff());
+        if (parsedSimpleStatement.isSuccessful() || parsedSimpleStatement.isPartial()) {
+            if (parsedSimpleStatement.isPartial()) {
+                diagnostics.add(parsedSimpleStatement.getDiagnostic());
+                isPartial = true;
+            }
+            queue.mergeBranch(parsedSimpleStatement.getTokenQueueId());
+            parseResult = parsedSimpleStatement.getParseResult();
+
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
+                diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
+                isPartial = true;
+                queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
+            }
+            queue.poll();
+            if (isPartial) {
+                return PartialParseResult.partialParse(
+                        parseResult,
+                        diagnostics.get(0),
+                        queue.getId()
+                );
+            }
+            return PartialParseResult.successfulParse(
+                    parseResult,
+                    queue.getId()
+            );
+        }
+        if (parsedControlStructure.isPartial()) {
             queue.mergeBranch(parsedControlStructure.getTokenQueueId());
             return PartialParseResult.partialParse(
                     parsedControlStructure.getParseResult(),
@@ -146,34 +177,9 @@ public class StatementParserImpl implements StatementParser {
             );
         }
 
-        PartialParseResult<StatementNode> parsedSimpleStatement = parseSimpleStatement(queue.branchOff());
-        if (parsedSimpleStatement.isUnsuccessful()) {
-            return PartialParseResult.unsuccessfulParse(parsedSimpleStatement.getDiagnostic(), queue.getId());
-        }
-        if (parsedSimpleStatement.isPartial()) {
-            diagnostics.add(parsedSimpleStatement.getDiagnostic());
-            isPartial = true;
-        }
+        return PartialParseResult.unsuccessfulParse(parsedSimpleStatement.getDiagnostic(), queue.getId());
 
-        queue.mergeBranch(parsedSimpleStatement.getTokenQueueId());
-        parseResult = parsedSimpleStatement.getParseResult();
 
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
-            diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
-            isPartial = true;
-            queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(";"));
-        }
-        if (isPartial) {
-            return PartialParseResult.partialParse(
-                    parseResult,
-                    diagnostics.get(0),
-                    queue.getId()
-            );
-        }
-        return PartialParseResult.successfulParse(
-                parseResult,
-                queue.getId()
-        );
     }
 
     @PartialParse
@@ -205,30 +211,21 @@ public class StatementParserImpl implements StatementParser {
             return PartialParseResult.successfulParse(parsedControlStatement.getParseResult(), queue.getId());
         }
 
-        if (parsedDeclaration.isPartial()) {
-            queue.mergeBranch(parsedDeclaration.getTokenQueueId());
+        if (parsedDeclaration.isPartial() || parsedReassignment.isPartial() || parsedFunctionCall.isPartial()) {
+            PartialParseResult<? extends StatementNode> parseResult =
+                    Stream.of(parsedDeclaration, parsedReassignment, parsedFunctionCall)
+                          .max(Comparator.comparingInt(pr -> queue.getAllTokens()
+                                                                  .indexOf(pr.getDiagnostic().getToken())))
+                          .orElseThrow();
+
+            queue.mergeBranch(parseResult.getTokenQueueId());
             return PartialParseResult.partialParse(
-                    parsedDeclaration.getParseResult(),
-                    parsedDeclaration.getDiagnostic(),
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
                     queue.getId()
             );
         }
-        if (parsedReassignment.isPartial()) {
-            queue.mergeBranch(parsedReassignment.getTokenQueueId());
-            return PartialParseResult.partialParse(
-                    parsedReassignment.getParseResult(),
-                    parsedReassignment.getDiagnostic(),
-                    queue.getId()
-            );
-        }
-        if (parsedFunctionCall.isPartial()) {
-            queue.mergeBranch(parsedFunctionCall.getTokenQueueId());
-            return PartialParseResult.partialParse(
-                    parsedFunctionCall.getParseResult(),
-                    parsedFunctionCall.getDiagnostic(),
-                    queue.getId()
-            );
-        }
+
         return PartialParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
                 queue.getId()
@@ -254,11 +251,17 @@ public class StatementParserImpl implements StatementParser {
         }
 
         // any partial declaration is considered a variable declaration since we cannot differentiate between them.
-        if (parsedVariableDeclaration.isPartial()) {
-            queue.mergeBranch(parsedVariableDeclaration.getTokenQueueId());
+        if (parsedVariableDeclaration.isPartial() || parsedConstantDeclaration.isPartial()) {
+            PartialParseResult<? extends DeclarationNode> parseResult =
+                    Stream.of(parsedVariableDeclaration, parsedConstantDeclaration)
+                          .max(Comparator.comparingInt(pr -> queue.getAllTokens()
+                                                                  .indexOf(pr.getDiagnostic().getToken())))
+                          .orElseThrow();
+
+            queue.mergeBranch(parseResult.getTokenQueueId());
             return PartialParseResult.partialParse(
-                    parsedVariableDeclaration.getParseResult(),
-                    parsedVariableDeclaration.getDiagnostic(),
+                    parseResult.getParseResult(),
+                    parseResult.getDiagnostic(),
                     queue.getId()
             );
         }

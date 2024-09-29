@@ -339,6 +339,27 @@ class ExpressionParserImplTest {
                                                                                                                 .get(1)).getArrayIndices()
                                                                                                                         .isEmpty());
         assertThat(queue).hasNextTokenValueMatch(";");
+        queue = new TokenQueueTestBuilder().identifier("MyFunctionCall")
+                                           .separator("(")
+                                           .identifier("MyStruct")
+                                           .separator("(")
+                                           .number("StructArgument1")
+                                           .separator(",")
+                                           .identifier("StructArgument2")
+                                           .separator(")")
+                                           .separator(",")
+                                           .string("Argument2")
+                                           .separator(",")
+                                           .separator("[")
+                                           .identifier("ArrayElement1")
+                                           .separator(",")
+                                           .number("ArrayElement2")
+                                           .separator("]")
+                                           .separator(")")
+                                           .separator(";")
+                                           .build();
+        assertThat(expressionParser.parseFunctionCall(queue)).isSuccessful();
+        assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
         assertThat(expressionParser.parseFunctionCall(queue)).isUnsuccessful()

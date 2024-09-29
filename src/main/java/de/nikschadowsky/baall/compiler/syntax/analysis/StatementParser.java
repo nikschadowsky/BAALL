@@ -58,7 +58,6 @@ public interface StatementParser {
      *
      * @param queue queue of the tokens
      * @return partial parse result of the parsed declaration
-     * @apiNote A partially parsed constant declaration will be interpreted as a partially parsed variable declaration.
      */
     @PartialParse
     PartialParseResult<DeclarationNode> parseDeclaration(TokenQueue queue);

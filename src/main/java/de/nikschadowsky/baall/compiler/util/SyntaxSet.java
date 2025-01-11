@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.util;
 
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collections;

@@ -1,10 +1,10 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueueId;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;

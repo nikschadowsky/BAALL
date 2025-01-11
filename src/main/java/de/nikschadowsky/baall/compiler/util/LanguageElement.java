@@ -1,9 +1,8 @@
 package de.nikschadowsky.baall.compiler.util;
 
 
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.Token;
-import org.jetbrains.annotations.NotNull;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 
 /**
  * @since 14.08.2024

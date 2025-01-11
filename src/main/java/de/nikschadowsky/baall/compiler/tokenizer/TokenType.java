@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.lexer.tokenizer;
+package de.nikschadowsky.baall.compiler.tokenizer;
 
 import de.nikschadowsky.baall.compiler.util.LambdaUtility;
 

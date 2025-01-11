@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.symbol;
 
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 
 import java.util.Objects;
 

@@ -1,7 +1,7 @@
 package de.nikschadowsky.baall.compiler.util;
 
-import de.nikschadowsky.baall.compiler.lexer.tokenizer.TokenType;
 import de.nikschadowsky.baall.compiler.symbol.Token;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 import org.junit.jupiter.api.Test;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;

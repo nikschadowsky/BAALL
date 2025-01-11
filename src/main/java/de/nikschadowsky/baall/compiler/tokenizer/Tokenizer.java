@@ -1,5 +1,7 @@
-package de.nikschadowsky.baall.compiler.lexer.tokenizer;
+package de.nikschadowsky.baall.compiler.tokenizer;
 
+import de.nikschadowsky.baall.compiler.CompileInformation;
+import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
@@ -8,12 +10,18 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Tokenizer {
+public class Tokenizer extends Step<String, List<Token>> {
 
     private String preprocessedCode;
 
     public Tokenizer(String preprocessedCode) {
+        super(null);
         this.preprocessedCode = preprocessedCode;
+    }
+
+    @Override
+    public List<Token> executeStep(String s, CompileInformation compileInformation) {
+        return List.of();
     }
 
     /**
@@ -60,7 +68,8 @@ public class Tokenizer {
             } else {
                 throw new UnrecognizedTokenException(lastCheckedIndex);
             }
-            tokens.add(new Token(type, m.group()));
+            // fixme line number and index information!
+            tokens.add(new Token(type, m.group(), 0 ,0));
             builder.delete(0, m.end());
             lastCheckedIndex += m.end();
 

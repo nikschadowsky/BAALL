@@ -73,25 +73,30 @@ public class RegexFactory {
      * @return Regular Expression String for Separators
      */
     private static String generateSeparatorRegex() {
-
-
         return SyntaxSet.SEPARATORS.stream()
                                    .sorted(Comparator.<LanguageElement>comparingInt(le -> le.representation().length())
                                                      .reversed())
                                    .map(LanguageElement::representation)
                                    .map(RegexFactory::regexifySymbols)
-                                   .collect(Collectors.joining(")|(", "(", ")"));
+                                   .map(s -> "(" + s + ")")
+                                   .collect(Collectors.joining("|"));
     }
 
     /**
-     * Since Operators consist of symbols, some may be interpreted by regular expressions as non literals. To prevent
-     * this, every symbol is being escaped.
+     * Escaped every non-alphanumeric character within the passed string. Alphanumeric characters remain as is.
      *
-     * @param op not empty and not null String of symbols
-     * @return Operator as regex literal
+     * @param op nonnull String of symbols
+     * @return passed string properly escaped for regex
      */
 
     public static String regexifySymbols(@NotNull String op) {
-        return Arrays.stream(op.split("")).map(s -> "\\" + s).reduce("", String::concat);
+        return Arrays.stream(op.split("")).map(s -> {
+            if (Character.isLetterOrDigit(s.charAt(0))) {
+                // do not escape alphanumeric characters
+                return s;
+            }
+            // escape everything else
+            return "\\" + s;
+        }).reduce("", String::concat);
     }
 }

@@ -42,6 +42,7 @@ class RegexFactoryTest {
         assertEquals("\\<", RegexFactory.regexifySymbols("<"));
         assertEquals("\\+", RegexFactory.regexifySymbols("+"));
         assertEquals("\\|\\=", RegexFactory.regexifySymbols("|="));
+        assertEquals("abc\\.\\|\\=def", RegexFactory.regexifySymbols("abc.|=def"));
     }
 
 }

@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
+import de.nikschadowsky.baall.compiler.lexer.LexerRow;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
@@ -74,5 +75,9 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
 
     public static TokenQueueAssertion assertThat(TokenQueue actual) {
         return new TokenQueueAssertion(actual);
+    }
+
+    public static LexerRowAssertion assertThat(LexerRow actual) {
+        return new LexerRowAssertion(actual);
     }
 }

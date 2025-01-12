@@ -2,7 +2,6 @@ package de.nikschadowsky.baall.compiler._utility;
 
 
 import de.nikschadowsky.baall.compiler.CompileInformation;
-import de.nikschadowsky.baall.compiler.output.error.Diagnostic;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,20 +18,5 @@ public class TestCompileInformation implements CompileInformation {
     @Override
     public void addWarning(@NotNull String message) {
         System.out.printf("[WARNING] %s%n", message);
-    }
-
-    @Override
-    public void addError(@NotNull String message) {
-        System.out.printf("[ERROR] %s%n", message);
-    }
-
-    @Override
-    public void addError(@NotNull String message, @NotNull Throwable cause) {
-        System.out.printf("[ERROR] %s%nCause: %s%n", message, cause);
-    }
-
-    @Override
-    public void addError(@NotNull Diagnostic diagnostic) {
-        System.out.printf("[ERROR] %s%n", diagnostic);
     }
 }

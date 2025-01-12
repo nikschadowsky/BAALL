@@ -31,7 +31,7 @@ public class RegexFactory {
 
     public static final String SEPARATOR_REGEX = generateSeparatorRegex();
 
-    public static final String IDENTIFIER_REGEX = "[a-zA-Z]\\w*";
+    public static final String IDENTIFIER_REGEX = "_*[a-zA-Z]\\w*|_";
 
     public static final String GRAMMAR_LINE_TOKENIZING_REGEX = "(?<!\\\\)@|(?<!\\\\)->";
 

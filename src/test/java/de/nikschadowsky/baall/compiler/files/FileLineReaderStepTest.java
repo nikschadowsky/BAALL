@@ -1,5 +1,7 @@
 package de.nikschadowsky.baall.compiler.files;
 
+import de.nikschadowsky.baall.compiler._utility.TestCompileInformation;
+import de.nikschadowsky.baall.compiler.output.error.CompileException;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +26,8 @@ class FileLineReaderStepTest {
     }
 
     @Test
-    void executeStep() {
-        List<String> lines = fileLineReaderStep.executeStep(TEST_PATH, (key, value) -> {
-        });
+    void executeStep() throws CompileException {
+        List<String> lines = fileLineReaderStep.executeStep(TEST_PATH, new TestCompileInformation());
 
         assertThat(lines).isEqualTo(List.of(
                                             "line#1",

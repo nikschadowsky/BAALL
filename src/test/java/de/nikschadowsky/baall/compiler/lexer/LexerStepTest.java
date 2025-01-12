@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.lexer;
 
 import de.nikschadowsky.baall.compiler._utility.BaseAssertion;
+import de.nikschadowsky.baall.compiler._utility.TestCompileInformation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +35,7 @@ public class LexerStepTest {
 
     @Test
     void testPreprocessing() {
-        List<LexerRow> rows = lexerStep.executeStep(TEST_SOURCE_CODE.lines().toList(), (k, v) -> {});
+        List<LexerRow> rows = lexerStep.executeStep(TEST_SOURCE_CODE.lines().toList(), new TestCompileInformation());
 
         assertThat(rows).hasSize(6);
         BaseAssertion.assertThat(rows.get(0)).hasRowIndex(0).hasContent("TestFile 1234");

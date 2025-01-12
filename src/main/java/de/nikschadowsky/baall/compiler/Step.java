@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler;
 
 
+import de.nikschadowsky.baall.compiler.output.error.CompileException;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,7 +18,7 @@ public abstract class Step<INPUT, OUTPUT> {
         this.isOptionsSet = options != null;
     }
 
-    public abstract OUTPUT executeStep(INPUT input, CompileInformation compileInformation);
+    public abstract OUTPUT executeStep(INPUT input, CompileInformation compileInformation) throws CompileException;
 
     public StepOptions getOptions() {
         return options;

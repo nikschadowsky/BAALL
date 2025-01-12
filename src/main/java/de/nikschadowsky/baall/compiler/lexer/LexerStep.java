@@ -6,10 +6,8 @@ import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.StepOptions;
 import de.nikschadowsky.baall.compiler.lexer.error.LexerDiagnostic;
 import de.nikschadowsky.baall.compiler.output.error.CompileErrorFactory;
-import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -42,10 +40,10 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
         unprocessedLines = new ArrayList<>();
         IntStream.range(0, lines.size()).forEach(i -> unprocessedLines.add(new LexerRow(lines.get(i), i)));
 
-        compileInformation.add("Source code", fileContent);
+        compileInformation.addInformation("Source code", fileContent);
 
         preprocessCode();
-        compileInformation.add(
+        compileInformation.addInformation(
                 "Preprocessed code",
                 preprocessedRows.stream()
                                 .sorted(Comparator.comparingInt(LexerRow::rowIndex))
@@ -54,14 +52,6 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
         );
 
         return new ArrayList<>(preprocessedRows);
-    }
-
-    private void readContent(Path path) {
-        fileContent = FileLoader.getFileContent(path);
-        String[] splitLines = fileContent.stripTrailing().split("\\n");
-        unprocessedLines = new ArrayList<>();
-        IntStream.range(0, splitLines.length).forEach(i -> unprocessedLines.add(new LexerRow(splitLines[i], i)));
-        preprocessedRows = new ArrayList<>(unprocessedLines);
     }
 
     private void preprocessCode() {

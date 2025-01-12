@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.tokenizer;
 
 import de.nikschadowsky.baall.compiler.CompileInformation;
 import de.nikschadowsky.baall.compiler.Step;
+import de.nikschadowsky.baall.compiler.output.error.CompileException;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
@@ -14,20 +15,20 @@ public class Tokenizer extends Step<String, List<Token>> {
 
     private String preprocessedCode;
 
-    public Tokenizer(String preprocessedCode) {
+    public Tokenizer() {
         super(null);
-        this.preprocessedCode = preprocessedCode;
     }
 
     @Override
-    public List<Token> executeStep(String s, CompileInformation compileInformation) {
-        return List.of();
+    public List<Token> executeStep(String preprocessedCode, CompileInformation compileInformation) throws CompileException {
+        this.preprocessedCode = preprocessedCode;
+        return run();
     }
 
     /**
      *
      */
-    public List<Token> run() {
+    private List<Token> run() throws UnrecognizedTokenException {
         List<Token> tokens = new LinkedList<>();
 
         String startOfStringRegex = "^";

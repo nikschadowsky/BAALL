@@ -1,5 +1,7 @@
 package de.nikschadowsky.baall.compiler.tokenizer;
 
+import de.nikschadowsky.baall.compiler._utility.TestCompileInformation;
+import de.nikschadowsky.baall.compiler.output.error.CompileException;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -13,24 +15,16 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class TokenizerTest {
 
-    private String fileContent;
-
-
     @BeforeEach
     void setUp() {
-        final String path = "TokenizerTestFile.txt";
 
-        /*LexerStep lexerStep = new LexerStep(FileLoader.getPathFromClasspath(path));
-
-        fileContent = lexerStep.getPreprocessedCode();*/
     }
 
     @Disabled
     @Test
-    void testTokenizer() {
-
-        Tokenizer tokenizer = new Tokenizer(fileContent);
-        List<Token> tokens = tokenizer.run();
+    void testTokenizer() throws CompileException {
+        Tokenizer tokenizer = new Tokenizer();
+        List<Token> tokens = tokenizer.executeStep("", new TestCompileInformation());
 
 
         List<TokenType> types = Arrays.asList(

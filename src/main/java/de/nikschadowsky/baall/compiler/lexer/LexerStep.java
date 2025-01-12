@@ -38,9 +38,7 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
     @Override
     public List<LexerRow> executeStep(List<String> lines, CompileInformation compileInformation) {
         unprocessedLines = new ArrayList<>();
-        IntStream.range(0, lines.size()).forEach(i -> unprocessedLines.add(new LexerRow(lines.get(i), i)));
-
-        compileInformation.addInformation("Source code", fileContent);
+        IntStream.range(0, lines.size()).forEach(i -> unprocessedLines.add(new LexerRow(lines.get(i), i + 1)));
 
         preprocessCode();
         compileInformation.addInformation(
@@ -51,7 +49,7 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
                                 .collect(Collectors.joining("\n"))
         );
 
-        return new ArrayList<>(preprocessedRows);
+        return preprocessedRows;
     }
 
     private void preprocessCode() {
@@ -141,7 +139,7 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
             if (startRow == endRow) {
                 newContent =
                         lastRow.content().substring(0, startIndex) + lastRow.content().substring(endIndex + 1);
-                preprocessedRows.set(startRow, new LexerRow(newContent.trim(), startRow));
+                preprocessedRows.set(startRow, new LexerRow(newContent.trim(), firstRow.rowIndex()));
             } else {
                 newContent = firstRow.content().substring(0, startIndex);
                 preprocessedRows.set(startRow, new LexerRow(newContent.trim(), firstRow.rowIndex()));

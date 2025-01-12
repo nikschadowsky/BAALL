@@ -11,19 +11,16 @@ import java.nio.file.Paths;
 
 public class FileLoader {
 
-    public static String getFileContent(Path path){
-        try {
-            byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes);
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't get content from the specified file '%s'!".formatted(path), e);
-        }
+    public static String getFileContent(Path path) throws IOException {
+        byte[] bytes = Files.readAllBytes(path);
+        return new String(bytes);
     }
 
-    public static String getFileContentFromClasspath(String path){
+    public static String getFileContentFromClasspath(String path) throws IOException {
         return getFileContent(getPathFromClasspath(path));
     }
-    public static String getFileContentFromFileSystem(String path){
+
+    public static String getFileContentFromFileSystem(String path) throws IOException {
         return getFileContent(getPathFromFileSystem(path));
     }
 

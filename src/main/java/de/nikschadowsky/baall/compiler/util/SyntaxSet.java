@@ -52,6 +52,9 @@ public class SyntaxSet {
 
         keywords.add(new LanguageElement("export", TokenType.KEYWORD, "export"));
 
+        // all simple types are keywords
+        keywords.addAll(getSimpleTypes());
+
         System.out.println("Keywords: " + keywords + "\n Number of elements: " + keywords.size());
         return Collections.unmodifiableSet(keywords);
     }

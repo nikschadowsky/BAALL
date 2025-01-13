@@ -26,6 +26,13 @@ public class TokenQueueAssertion extends BaseAssertion<TokenQueueAssertion, Toke
         return baseAssert("token type", queue -> getSafeNextToken(queue).type(), tokenType);
     }
 
+    public TokenQueueAssertion hasNextToken(String value, TokenType tokenType) {
+        baseAssert("token value", queue -> getSafeNextToken(queue).value(), value);
+        baseAssert("token type", queue -> getSafeNextToken(queue).type(), tokenType);
+        actual.poll();
+        return this;
+    }
+
     public TokenQueueAssertion hasNextTokenValueMatch(String value) {
         return baseAssert("token value", queue -> getSafeNextToken(queue).value(), value);
     }

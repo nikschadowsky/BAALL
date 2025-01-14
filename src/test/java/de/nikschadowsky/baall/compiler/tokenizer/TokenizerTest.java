@@ -3,29 +3,33 @@ package de.nikschadowsky.baall.compiler.tokenizer;
 import de.nikschadowsky.baall.compiler._utility.TestCompileInformation;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
 import de.nikschadowsky.baall.compiler.symbol.Token;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TokenizerTest {
 
-    @BeforeEach
-    void setUp() {
+    private static final String TEST_INPUT = """
+            true false
+            "String"
+            := / % @ :: +=
+            0xFFFF,0b10101,
+            1234.1234 .123 123
+            identifier
+            
+            
+            
+            struct
+            string
+            stringIdentifier""";
 
-    }
-
-    @Disabled
     @Test
     void testTokenizer() throws CompileException {
         Tokenizer tokenizer = new Tokenizer();
-        List<Token> tokens = tokenizer.executeStep("", new TestCompileInformation());
-
+        List<Token> tokens = tokenizer.executeStep(TEST_INPUT, new TestCompileInformation());
 
         List<TokenType> types = Arrays.asList(
                 TokenType.BOOLEAN, TokenType.BOOLEAN,
@@ -38,14 +42,10 @@ class TokenizerTest {
                 TokenType.IDENTIFIER,
                 TokenType.KEYWORD,
                 TokenType.KEYWORD,
-                TokenType.IDENTIFIER);
+                TokenType.IDENTIFIER
+        );
 
-
-        assertEquals(types.size(), tokens.size());
-
-        assertIterableEquals(types, tokens.stream().map(Token::type).toList());
-
-        System.out.println(tokens);
+        assertThat(tokens).map(Token::type).isEqualTo(types);
     }
 
 }

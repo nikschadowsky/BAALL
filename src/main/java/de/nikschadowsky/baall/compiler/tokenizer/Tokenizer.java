@@ -31,15 +31,15 @@ public class Tokenizer extends Step<String, List<Token>> {
     private List<Token> run() throws UnrecognizedTokenException {
         List<Token> tokens = new LinkedList<>();
 
-        String startOfStringRegex = "^";
+        String startOfStringRegex = "^(";
 
-        Pattern keywordPattern = Pattern.compile(startOfStringRegex + RegexFactory.KEYWORD_REGEX);
-        Pattern operatorPattern = Pattern.compile(startOfStringRegex + RegexFactory.OPERATOR_REGEX);
-        Pattern separatorPattern = Pattern.compile(startOfStringRegex + RegexFactory.SEPARATOR_REGEX);
-        Pattern stringPattern = Pattern.compile(startOfStringRegex + RegexFactory.STRING_PRIMITIVE_REGEX);
-        Pattern numberPattern = Pattern.compile(startOfStringRegex + RegexFactory.NUMBER_PRIMITIVE_REGEX);
-        Pattern booleanPattern = Pattern.compile(startOfStringRegex + RegexFactory.BOOLEAN_PRIMITIVE_REGEX);
-        Pattern identifierPattern = Pattern.compile(startOfStringRegex + RegexFactory.IDENTIFIER_REGEX);
+        Pattern keywordPattern = Pattern.compile(startOfStringRegex + RegexFactory.KEYWORD_REGEX + ")");
+        Pattern operatorPattern = Pattern.compile(startOfStringRegex + RegexFactory.OPERATOR_REGEX + ")");
+        Pattern separatorPattern = Pattern.compile(startOfStringRegex + RegexFactory.SEPARATOR_REGEX + ")");
+        Pattern stringPattern = Pattern.compile(startOfStringRegex + RegexFactory.STRING_PRIMITIVE_REGEX + ")");
+        Pattern numberPattern = Pattern.compile(startOfStringRegex + RegexFactory.NUMBER_PRIMITIVE_REGEX + ")");
+        Pattern booleanPattern = Pattern.compile(startOfStringRegex + RegexFactory.BOOLEAN_PRIMITIVE_REGEX + ")");
+        Pattern identifierPattern = Pattern.compile(startOfStringRegex + RegexFactory.IDENTIFIER_REGEX + ")");
 
 
         int lastCheckedIndex = 0;

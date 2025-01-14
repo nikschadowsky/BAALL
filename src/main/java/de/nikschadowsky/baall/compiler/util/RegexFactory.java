@@ -42,10 +42,10 @@ public class RegexFactory {
      * @return Regular Expression String for Keywords
      */
     private static String generateKeywordRegex() {
-        return SyntaxSet.KEYWORDS.stream()
+        return "(" + SyntaxSet.KEYWORDS.stream()
                                  .map(LanguageElement::representation)
                                  .collect(Collectors.joining(")|(", "(", ")"))
-                                 .replaceAll("\\|\\)", ")") + END_OF_WORD_REGEX;
+                                 .replaceAll("\\|\\)", ")") + ")" + END_OF_WORD_REGEX;
     }
 
     /**

@@ -255,7 +255,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 queue.mergeBranch(parsedEndIndexExpression.getTokenQueueId());
                 node.setEndIndex(parsedEndIndexExpression.getParseResult());
             } else {
-                diagnostics.add(new SyntaxDiagnostic(queue.getPointer(), "Expected an expression!"));
+                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected an expression!"));
                 isPartiallyParsed = true;
             }
         } else {
@@ -272,7 +272,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 queue.mergeBranch(parsedOptionalForStepper.getTokenQueueId());
                 node.setOptionalStepperStatement(parsedOptionalForStepper.getParseResult());
             } else {
-                diagnostics.add(new SyntaxDiagnostic("Expected a reassignment statement!"));
+                diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected a reassignment statement!"));
                 isPartiallyParsed = true;
             }
         }

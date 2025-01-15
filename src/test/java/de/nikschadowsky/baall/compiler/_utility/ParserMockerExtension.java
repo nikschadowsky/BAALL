@@ -34,7 +34,7 @@ public class ParserMockerExtension implements AfterEachCallback {
             TokenQueue queue = invocationOnMock.<TokenQueue>getArgument(0);
             Token polled = queue.poll();
             if (Objects.isNull(polled) || Arrays.asList(returnUnsuccessfulOn).contains(polled.value())) {
-                SyntaxDiagnostic diagnostic = new SyntaxDiagnostic(
+                SyntaxDiagnostic diagnostic = new SyntaxDiagnostic(polled,
                         "Parser mock consumed an illegal token '" + polled + "'");
                 if (returnPartial) {
                     return PartialParseResult.unsuccessfulParse(diagnostic,queue.getId());

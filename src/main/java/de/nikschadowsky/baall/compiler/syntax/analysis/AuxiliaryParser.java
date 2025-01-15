@@ -5,12 +5,12 @@ import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
 
 import java.util.List;
 import java.util.Map;

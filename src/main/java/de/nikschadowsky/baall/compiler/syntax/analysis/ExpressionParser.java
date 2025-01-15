@@ -4,13 +4,13 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ParenthesizedExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ExpressionNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.ParenthesizedExpressionNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.UnaryExpressionNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
 
 /**
  * @since 25.08.2024

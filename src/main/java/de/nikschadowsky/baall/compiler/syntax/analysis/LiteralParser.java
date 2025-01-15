@@ -3,9 +3,9 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.LiteralNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 /**

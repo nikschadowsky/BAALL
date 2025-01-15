@@ -1,8 +1,8 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.NodeType;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 
 /**
  * @since 08.09.2024

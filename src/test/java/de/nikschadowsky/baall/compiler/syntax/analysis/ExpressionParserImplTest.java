@@ -2,15 +2,15 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.expression.*;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.TermNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.ArrayLiteralNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.PrimitiveLiteralNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.value.literal.StructInitializationLiteralNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.ArrayLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructInitializationLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

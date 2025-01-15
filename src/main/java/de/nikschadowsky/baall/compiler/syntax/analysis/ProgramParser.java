@@ -3,8 +3,8 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ProgramNode;
 
 /**
  * @since 25.08.2024

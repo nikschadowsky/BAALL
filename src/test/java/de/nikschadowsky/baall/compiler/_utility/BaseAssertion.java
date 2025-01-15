@@ -5,7 +5,7 @@ import de.nikschadowsky.baall.compiler.lexer.LexerRow;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.util.LanguageElement;
 import org.assertj.core.api.AbstractAssert;
 

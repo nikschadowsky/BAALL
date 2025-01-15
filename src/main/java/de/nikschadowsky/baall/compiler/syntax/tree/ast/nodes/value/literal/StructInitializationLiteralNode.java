@@ -1,0 +1,18 @@
+package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
+
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
+
+import java.util.List;
+
+/**
+ * @since 29.07.2024
+ */
+public interface StructInitializationLiteralNode extends LiteralNode {
+
+    IdentifierAccessNode getIdentifier();
+
+    List<ExpressionNode> getArguments();
+
+}

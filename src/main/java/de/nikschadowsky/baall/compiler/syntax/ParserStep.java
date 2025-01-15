@@ -10,7 +10,7 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.ProgramParser;
 import de.nikschadowsky.baall.compiler.syntax.analysis.ProgramParserImpl;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxException;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ProgramNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import org.jetbrains.annotations.Nullable;
 
 /**

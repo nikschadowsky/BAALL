@@ -5,10 +5,10 @@ import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.ASTNodeFactory;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.*;
-import de.nikschadowsky.baall.compiler.syntaxtree.util.NodeDiagnosticCollector;
 
 import java.util.ArrayList;
 import java.util.List;

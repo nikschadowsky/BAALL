@@ -4,11 +4,11 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.ExportsNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.StatementNode;
-import de.nikschadowsky.baall.compiler.syntaxtree.ast.nodes.statement.assignment.*;
 
 import java.util.List;
 

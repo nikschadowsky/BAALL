@@ -25,9 +25,6 @@ public class LexerStep extends Step<List<String>, List<LexerRow>> {
                     new InputComponentBlock("//", "\n", false)
             );
 
-
-    private String fileContent;
-
     private List<LexerRow> preprocessedRows;
     private List<LexerRow> unprocessedLines;
 

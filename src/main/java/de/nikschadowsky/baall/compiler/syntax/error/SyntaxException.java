@@ -1,7 +1,10 @@
 package de.nikschadowsky.baall.compiler.syntax.error;
 
-public class SyntaxException extends RuntimeException {
-    public SyntaxException(String msg){
-        super(msg);
+import de.nikschadowsky.baall.compiler.output.error.CompileException;
+
+public class SyntaxException extends CompileException {
+
+    public SyntaxException(SyntaxDiagnostic diagnostic) {
+        super(diagnostic);
     }
 }

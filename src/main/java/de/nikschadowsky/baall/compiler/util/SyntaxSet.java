@@ -51,6 +51,7 @@ public class SyntaxSet {
         keywords.add(new LanguageElement("ensure", TokenType.KEYWORD, "ensure"));
 
         keywords.add(new LanguageElement("export", TokenType.KEYWORD, "export"));
+        keywords.add(new LanguageElement("as", TokenType.KEYWORD, "as"));
 
         // all simple types are keywords
         keywords.addAll(getSimpleTypes());

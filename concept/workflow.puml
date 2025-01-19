@@ -1,0 +1,26 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+start
+:Lexical Analysis;
+:Tokenization;
+:Parsing;
+:Top Level Declaration Analysis;
+if (Exports cannot be resolved) then (true)
+else (false)
+partition Import Resolving {
+repeat
+    :Locate Imports;
+    :Lexical Analysis on each Import;
+    :Tokenization on each Import;
+    :Parsing on each Import;
+    :Top Level Declaration Analysis;
+    repeat while (Exports cannot be resolved)
+}
+endif
+
+:Semantic Analysis;
+:Code Generation;
+stop
+
+@enduml

@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
+import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @since 21.04.2024
@@ -19,6 +21,8 @@ import java.util.List;
 public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
 
     private List<IdentifierAccessNode> exports;
+
+    private Token namespace;
 
     public ExportsNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -48,6 +52,15 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
                        e.getIdentifier(),
                        NodeDiagnostic.ReportingLevel.WARN
                )));
+    }
+
+    @Override
+    public Optional<Token> getNamespace() {
+        return Optional.ofNullable(namespace);
+    }
+
+    public void setNamespace(@NotNull Token namespace) {
+        this.namespace = namespace;
     }
 
     @Override

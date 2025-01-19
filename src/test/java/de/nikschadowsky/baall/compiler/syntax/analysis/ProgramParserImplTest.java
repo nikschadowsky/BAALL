@@ -294,6 +294,8 @@ class ProgramParserImplTest {
                                           .number("Index")
                                           .separator("]")
                                           .separator("}")
+                                          .keyword("as")
+                                          .identifier("MyNamespace")
                                           .separator(";")
                                           .build();
     }

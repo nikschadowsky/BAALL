@@ -648,6 +648,8 @@ class StatementParserImplTest {
                                                       .number("index")
                                                       .separator("]")
                                                       .separator("}")
+                                                      .keyword("as")
+                                                      .identifier("MyNamespace")
                                                       .separator(";")
                                                       .operator("end")
                                                       .build();
@@ -660,7 +662,10 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
                                                                                                         .get(0)
                                                                                                         .getIdentifier()
-                                                                                                        .value()));
+                                                                                                        .value()))
+                                                       .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
+                                                                                                       .orElseThrow()
+                                                                                                       .value()));;
         assertThat(queue).hasNextTokenValueMatch("end");
 
         queue = new TokenQueueTestBuilder().keyword("export")
@@ -669,6 +674,8 @@ class StatementParserImplTest {
                                            .separator(",")
                                            .identifier("MyIdentifier2")
                                            .separator("}")
+                                           .keyword("as")
+                                           .identifier("MyNamespace")
                                            .separator(";")
                                            .build();
         assertThat(statementParser.parseExports(queue)).isSuccessful()
@@ -680,7 +687,10 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> "MyIdentifier2".equals(node.getExportedElements()
                                                                                                          .get(1)
                                                                                                          .getIdentifier()
-                                                                                                         .value()));
+                                                                                                         .value()))
+                                                       .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
+                                                                                                       .orElseThrow()
+                                                                                                       .value()));
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("export").separator("{").separator("}").separator(";").build();
@@ -694,6 +704,8 @@ class StatementParserImplTest {
                                            .separator(";")
                                            .separator("}")
                                            .separator(";")
+                                           .keyword("as")
+                                           .identifier("MyNamespace")
                                            .separator("end")
                                            .build();
         assertThat(statementParser.parseExports(queue)).isPartiallyParsed()
@@ -709,6 +721,8 @@ class StatementParserImplTest {
                                            .separator("{")
                                            .identifier("MyIdentifier")
                                            .separator(",")
+                                           .keyword("as")
+                                           .identifier("MyNamespace")
                                            .build();
         assertThat(statementParser.parseExports(queue)).isPartiallyParsed()
                                                        .resultMatches(node -> node.getExportedElements().size() == 1)

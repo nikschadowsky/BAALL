@@ -482,6 +482,20 @@ public class StatementParserImpl implements StatementParser {
 
             if (SyntaxSet.LANGUAGE_ELEMENTS.get("}").matches(queue.peek())) {
                 queue.poll();
+                if (!SyntaxSet.LANGUAGE_ELEMENTS.get("as").matches(queue.peek())) {
+                    diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected namespace identifier!"));
+                } else {
+                    queue.poll();
+                    ParseResult<Token> parsedNamespaceIdentifier =
+                            programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+                    if (parsedNamespaceIdentifier.isUnsuccessful()) {
+                        diagnostics.add(parsedNamespaceIdentifier.getDiagnostic());
+                        isPartial = true;
+                    } else {
+                        node.setNamespace(parsedNamespaceIdentifier.getParseResult());
+                        queue.mergeBranch(parsedNamespaceIdentifier.getTokenQueueId());
+                    }
+                }
                 if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));
                     isPartial = true;
@@ -523,6 +537,21 @@ public class StatementParserImpl implements StatementParser {
                     isPartial = true;
                 }
                 queue.poll();
+
+                if (!SyntaxSet.LANGUAGE_ELEMENTS.get("as").matches(queue.peek())) {
+                    diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected namespace identifier!"));
+                } else {
+                    queue.poll();
+                    ParseResult<Token> parsedNamespaceIdentifier =
+                            programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+                    if (parsedNamespaceIdentifier.isUnsuccessful()) {
+                        diagnostics.add(parsedNamespaceIdentifier.getDiagnostic());
+                        isPartial = true;
+                    } else {
+                        node.setNamespace(parsedNamespaceIdentifier.getParseResult());
+                        queue.mergeBranch(parsedNamespaceIdentifier.getTokenQueueId());
+                    }
+                }
 
                 if (!SyntaxSet.LANGUAGE_ELEMENTS.get(";").matches(queue.peek())) {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected ';'!"));

@@ -5,21 +5,27 @@ start
 :Lexical Analysis;
 :Tokenization;
 :Parsing;
-:Top Level Declaration Analysis;
-if (Exports cannot be resolved) then (true)
-else (false)
-partition Import Resolving {
-repeat
-    :Locate Imports;
-    :Lexical Analysis on each Import;
-    :Tokenization on each Import;
-    :Parsing on each Import;
-    :Top Level Declaration Analysis;
-    repeat while (Exports cannot be resolved)
+partition Semantic Analysis {
+    :Begin Semantic Analysis;
+    if (undefined element found) then (false)
+    else (true)
+    partition Import Resolution {
+    repeat
+        :Locate Import;
+        :Lexical Analysis on Import;
+        :Tokenization on Import;
+        :Parsing on Import;
+        :Check export for the undefined element;
+        if (export contains undefined element) then (true)
+            :Module Level Analysis to get Type;
+        else (false)
+        endif
+        repeat while (undefined element not resolved **AND** Imports remaining)
+        ' we have to consider all imports because of overloading and elements with the same name in general
+    }
+    endif
+    :Continue Semantic Analysis;
 }
-endif
-
-:Semantic Analysis;
 :Code Generation;
 stop
 

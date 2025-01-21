@@ -255,6 +255,7 @@ class ProgramParserImplTest {
                                           .identifier("Parameter1")
                                           .separator(",")
                                           .identifier("MyType")
+                                          .operator("!")
                                           .separator(":")
                                           .identifier("Parameter2")
                                           .separator(")")

@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import java.util.List;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
+import static java.util.function.Predicate.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -343,7 +345,8 @@ class AuxiliaryParserImplTest {
                                                     .resultMatches(node -> node.getArrayDimensionDefinitions()
                                                                                .get(1) == null)
                                                     .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(0) == mockedExpression);
+                                                                               .get(0) == mockedExpression)
+                                                    .resultMatches(TypeNode::isNoneSafe);
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier").keyword("another statement").build();
@@ -351,8 +354,22 @@ class AuxiliaryParserImplTest {
                                                     .resultMatches(node -> "MyIdentifier".equals(node.getType()
                                                                                                      .value()))
                                                     .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .isEmpty());
+                                                                               .isEmpty())
+                                                    .resultMatches(not(TypeNode::isNoneSafe));
         assertThat(queue).hasNextTokenValueMatch("another statement");
+
+        queue = new TokenQueueTestBuilder().identifier("MyType")
+                                           .operator("!")
+                                           .separator("[")
+                                           .number("4")
+                                           .separator("]")
+                                           .separator(";")
+                                           .build();
+        assertThat(auxiliaryParser.parseType(queue)).isSuccessful()
+                                                    .resultMatches(node -> "MyType".equals(node.getType().value()))
+                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
+                                                                               .get(0) == mockedExpression)
+                                                    .resultMatches(TypeNode::isNoneSafe);
 
         queue = new TokenQueueTestBuilder().operator("+")
                                            .separator("[")
@@ -369,35 +386,6 @@ class AuxiliaryParserImplTest {
         assertThat(auxiliaryParser.parseType(queue)).isUnsuccessful()
                                                     .syntaxDiagnosticContains("Expected ']'");
     }
-
-    @Test
-    void parseSimpleType() {
-        TokenQueue queue = new TokenQueueTestBuilder().keyword("number")
-                                                      .keyword("string")
-                                                      .identifier("MyIdentifier")
-                                                      .bool("true")
-                                                      .build();
-
-        assertThat(auxiliaryParser.parseSimpleType(queue)).isSuccessful()
-                                                          .resultMatches(token -> TokenType.KEYWORD.equals(
-                                                                  token.type()))
-                                                          .resultMatches(token -> "number".equals(token.value()));
-
-        assertThat(auxiliaryParser.parseSimpleType(queue)).isSuccessful()
-                                                          .resultMatches(token -> TokenType.KEYWORD.equals(
-                                                                  token.type()))
-                                                          .resultMatches(token -> "string".equals(token.value()));
-
-        assertThat(auxiliaryParser.parseSimpleType(queue)).isSuccessful()
-                                                          .resultMatches(token -> TokenType.IDENTIFIER.equals(
-                                                                  token.type()))
-                                                          .resultMatches(token -> "MyIdentifier".equals(
-                                                                  token.value()));
-
-        assertThat(auxiliaryParser.parseSimpleType(queue)).isUnsuccessful()
-                                                          .syntaxDiagnosticContains("Expected a type");
-    }
-
 
     @Test
     void parseArrayTypeDefinition() {

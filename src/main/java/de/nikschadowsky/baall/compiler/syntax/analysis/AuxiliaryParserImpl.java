@@ -71,10 +71,12 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                 ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff());
                 if (parsedIdentifier.isSuccessful()) {
                     queue.mergeBranch(parsedIdentifier.getTokenQueueId());
-                    return ParseResult.successfulParse(Map.entry(
-                            parsedTypeNode.getParseResult(),
-                            parsedIdentifier.getParseResult()
-                    ), queue.getId());
+                    return ParseResult.successfulParse(
+                            Map.entry(
+                                    parsedTypeNode.getParseResult(),
+                                    parsedIdentifier.getParseResult()
+                            ), queue.getId()
+                    );
                 }
                 return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
             }
@@ -154,10 +156,12 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
             return ParseResult.successfulParse(queue.poll(), queue.getId());
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(
-                queue.poll(),
-                "Expected an assignment operator!"
-        ), queue.getId());
+        return ParseResult.unsuccessfulParse(
+                new SyntaxDiagnostic(
+                        queue.poll(),
+                        "Expected an assignment operator!"
+                ), queue.getId()
+        );
     }
 
     @CompleteParse
@@ -193,40 +197,39 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
     @Override
     public ParseResult<TypeNode> parseType(TokenQueue queue) {
         TypeNodeImpl node = astFactory.createTypeNode();
-        ParseResult<Token> parsedSimpleType = parseSimpleType(queue.branchOff());
-        if (parsedSimpleType.isSuccessful()) {
-            queue.mergeBranch(parsedSimpleType.getTokenQueueId());
 
-            node.setType(parsedSimpleType.getParseResult());
-            ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
-                    parseArrayTypeDefinition(queue.branchOff());
-            if (parsedArrayTypeDefinitions.isSuccessful()) {
-                queue.mergeBranch(parsedArrayTypeDefinitions.getTokenQueueId());
-
-                node.setArrayDimensionDefinitions(parsedArrayTypeDefinitions.getParseResult());
-                return ParseResult.successfulParse(node, queue.getId());
-            }
-            return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic(), queue.getId());
-        }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a type!"), queue.getId());
-    }
-
-    @CompleteParse
-    @Override
-    public ParseResult<Token> parseSimpleType(TokenQueue queue) {
         Token nextToken = queue.peek();
-
         if (SyntaxSet.SIMPLE_TYPES.stream().anyMatch(e -> e.matches(nextToken))) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            node.setType(queue.poll());
+            node.setNoneSafe(true);
         } else {
-            // check if type is identifier
             ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff());
             if (parsedIdentifier.isSuccessful()) {
                 queue.mergeBranch(parsedIdentifier.getTokenQueueId());
-                return ParseResult.successfulParse(parsedIdentifier.getParseResult(), queue.getId());
+                node.setType(parsedIdentifier.getParseResult());
+            } else {
+                return ParseResult.unsuccessfulParse(
+                        new SyntaxDiagnostic(queue.poll(), "Expected a type!"),
+                        queue.getId()
+                );
+            }
+            // todo extend tests using types
+            if (SyntaxSet.LANGUAGE_ELEMENTS.get("!").matches(queue.peek())) {
+                queue.poll();
+                node.setNoneSafe(true);
+            } else {
+                node.setNoneSafe(false);
             }
         }
-        return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a type!"), queue.getId());
+        ParseResult<List<ExpressionNode>> parsedArrayTypeDefinitions =
+                parseArrayTypeDefinition(queue.branchOff());
+        if (parsedArrayTypeDefinitions.isSuccessful()) {
+            queue.mergeBranch(parsedArrayTypeDefinitions.getTokenQueueId());
+
+            node.setArrayDimensionDefinitions(parsedArrayTypeDefinitions.getParseResult());
+            return ParseResult.successfulParse(node, queue.getId());
+        }
+        return ParseResult.unsuccessfulParse(parsedArrayTypeDefinitions.getDiagnostic(), queue.getId());
     }
 
     @CompleteParse

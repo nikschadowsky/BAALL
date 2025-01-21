@@ -95,23 +95,14 @@ public interface AuxiliaryParser {
     ParseResult<Token> parseIdentifier(TokenQueue queue);
 
     /**
-     * Parses a type declaration consisting of a {@link #parseSimpleType(TokenQueue) simple type} and optional
-     * {@link #parseArrayTypeDefinition(TokenQueue) array type definitions}.
+     * Parses a type declaration consisting of a base or custom type and optional
+     * {@link #parseArrayTypeDefinition(TokenQueue) array type definitions}. Custom types can be flagged as none-safe.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed type
      */
     @CompleteParse
     ParseResult<TypeNode> parseType(TokenQueue queue);
-
-    /**
-     * Parses a simple type specified by the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
-     *
-     * @param queue queue of the tokens
-     * @return complete parse result of the simple type
-     */
-    @CompleteParse
-    ParseResult<Token> parseSimpleType(TokenQueue queue);
 
     /**
      * Parses a list of array type definitions. Each type definition is represented either an

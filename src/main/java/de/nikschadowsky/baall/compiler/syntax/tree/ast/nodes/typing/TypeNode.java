@@ -15,4 +15,5 @@ public interface TypeNode extends Node {
 
     List<ExpressionNode> getArrayDimensionDefinitions();
 
+    boolean isNoneSafe();
 }

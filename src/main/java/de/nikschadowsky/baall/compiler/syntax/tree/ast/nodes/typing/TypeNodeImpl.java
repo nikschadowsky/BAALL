@@ -21,6 +21,8 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
 
     private Token identifier;
 
+    private boolean noneSafe;
+
     public TypeNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
@@ -41,6 +43,15 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
 
     public void setArrayDimensionDefinitions(List<ExpressionNode> arrayTypeDefinition) {
         arrayDimensionDefinitions = new LinkedList<>(arrayTypeDefinition);
+    }
+
+    @Override
+    public boolean isNoneSafe() {
+        return noneSafe;
+    }
+
+    public void setNoneSafe(boolean noneSafe) {
+        this.noneSafe = noneSafe;
     }
 
     @Override

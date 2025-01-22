@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
+import de.nikschadowsky.baall.compiler.output.BaallFileReference;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 
 import java.util.List;
@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface ImportsNode extends Node {
 
-    List<Token> getImports();
+    List<BaallFileReference> getImports();
 
 }

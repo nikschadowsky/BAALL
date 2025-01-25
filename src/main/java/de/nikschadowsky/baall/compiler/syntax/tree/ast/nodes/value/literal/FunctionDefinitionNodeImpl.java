@@ -7,20 +7,21 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @since 28.07.2024
  */
 public class FunctionDefinitionNodeImpl extends AbstractNode implements FunctionDefinitionNode {
 
-    private List<Map.Entry<TypeNode, Token>> parameters;
+    private List<TypeNode> parameterTypes;
+
+    private List<Token> parameterNames;
 
     private StatementsNode functionBody;
 
@@ -29,12 +30,21 @@ public class FunctionDefinitionNodeImpl extends AbstractNode implements Function
     }
 
     @Override
-    public @UnmodifiableView List<Map.Entry<TypeNode, Token>> getParameters() {
-        return NodeUtility.toUnmodifiableList(parameters);
+    public @UnmodifiableView List<TypeNode> getParameterTypes() {
+        return Collections.unmodifiableList(parameterTypes);
     }
 
-    public void setParameters(List<Map.Entry<TypeNode, Token>> parameters) {
-        this.parameters = new LinkedList<>(parameters);
+    public void setParameterTypes(List<TypeNode> types) {
+        this.parameterTypes = new ArrayList<>(types);
+    }
+
+    @Override
+    public @UnmodifiableView List<Token> getParameterNames() {
+        return Collections.unmodifiableList(parameterNames);
+    }
+
+    public void setParameterNames(List<Token> names) {
+        this.parameterNames = new ArrayList<>(names);
     }
 
     public void setFunctionBody(StatementsNode functionBody) {

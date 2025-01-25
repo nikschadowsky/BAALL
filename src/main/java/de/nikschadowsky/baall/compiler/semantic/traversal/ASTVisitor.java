@@ -1,7 +1,6 @@
 package de.nikschadowsky.baall.compiler.semantic.traversal;
 
 
-import de.nikschadowsky.baall.compiler.output.Program;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ControlStructureNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
@@ -9,6 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.W
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
@@ -31,7 +31,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
  */
 public interface ASTVisitor {
 
-    void visitProgram(Program that);
+    void visitProgram(ProgramNode that);
 
     void visitImports(ImportsNode that);
 

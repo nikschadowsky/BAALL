@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Root interface for all AST node types @since 29.07.2024
  */
-public interface Node {
+public interface Node extends ASTVisitable {
 
     @NotNull
     NodeType getNodeType();

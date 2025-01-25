@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 29.07.2024
  */
-public abstract class AbstractNode implements Node, ASTVisitable {
+public abstract class AbstractNode implements Node {
 
     private final NodeDiagnosticCollector diagnostics;
 

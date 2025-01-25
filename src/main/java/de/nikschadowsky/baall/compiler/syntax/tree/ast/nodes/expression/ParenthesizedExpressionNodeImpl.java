@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -28,5 +29,10 @@ public class ParenthesizedExpressionNodeImpl extends AbstractNode implements Par
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PAREN_EXPRESSION;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitParenthesizedExpression(this);
     }
 }

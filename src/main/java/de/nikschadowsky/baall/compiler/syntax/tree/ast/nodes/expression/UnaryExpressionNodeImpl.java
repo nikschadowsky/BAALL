@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -52,5 +53,10 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.UNARY_EXPRESSION;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitUnaryExpression(this);
     }
 }

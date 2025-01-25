@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -22,5 +23,10 @@ public class BreakStatementNodeImpl extends AbstractNode implements LoopControlS
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.BREAK;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitControlStatement(this);
     }
 }

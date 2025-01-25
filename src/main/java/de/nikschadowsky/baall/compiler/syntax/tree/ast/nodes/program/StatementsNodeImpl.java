@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
@@ -34,5 +35,10 @@ public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.STATEMENTS;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitStatements(this);
     }
 }

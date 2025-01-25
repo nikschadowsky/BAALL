@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -65,5 +66,10 @@ public class ProgramNodeImpl extends AbstractNode implements ProgramNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PROGRAM;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitProgram(this);
     }
 }

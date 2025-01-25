@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructInitializationLiteralNode;
@@ -29,5 +30,10 @@ public class RaiseStatementNodeImpl extends AbstractNode implements RaiseStateme
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.RAISE;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitRaise(this);
     }
 }

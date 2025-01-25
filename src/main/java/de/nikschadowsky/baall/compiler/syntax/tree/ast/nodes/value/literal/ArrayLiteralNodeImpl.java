@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
@@ -34,5 +35,10 @@ public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNo
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.ARRAY_LITERAL;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitArrayLiteral(this);
     }
 }

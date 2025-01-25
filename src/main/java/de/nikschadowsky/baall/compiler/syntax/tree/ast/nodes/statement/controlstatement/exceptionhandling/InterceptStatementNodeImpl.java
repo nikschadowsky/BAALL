@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -55,5 +56,10 @@ public class InterceptStatementNodeImpl extends AbstractNode implements Intercep
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.INTERCEPT;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitIntercept(this);
     }
 }

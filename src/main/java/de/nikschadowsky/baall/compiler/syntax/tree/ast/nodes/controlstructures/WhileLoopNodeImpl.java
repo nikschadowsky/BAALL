@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
@@ -41,5 +42,10 @@ public class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.WHILE;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitWhileLoop(this);
     }
 }

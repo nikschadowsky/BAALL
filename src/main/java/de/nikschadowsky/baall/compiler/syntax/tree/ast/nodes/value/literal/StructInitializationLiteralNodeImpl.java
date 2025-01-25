@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
@@ -46,5 +47,10 @@ public class StructInitializationLiteralNodeImpl extends AbstractNode implements
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.STRUCT_INITIALIZATION;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitStructInitializationLiteral(this);
     }
 }

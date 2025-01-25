@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -66,5 +67,10 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.EXPORT;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitExports(this);
     }
 }

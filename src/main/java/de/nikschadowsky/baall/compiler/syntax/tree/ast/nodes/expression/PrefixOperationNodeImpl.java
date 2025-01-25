@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -40,5 +41,10 @@ public class PrefixOperationNodeImpl extends AbstractNode implements PrefixOpera
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PREFIX_OPERATION;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitPrefixOperation(this);
     }
 }

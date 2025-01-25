@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -53,5 +54,10 @@ public class VariableReassignmentNodeImpl extends AbstractNode implements Variab
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.VARIABLE_REASSIGNMENT;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitVariableReassignment(this);
     }
 }

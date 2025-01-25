@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -57,5 +58,10 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.TYPE;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitType(this);
     }
 }

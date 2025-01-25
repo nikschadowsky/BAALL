@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
@@ -75,5 +76,10 @@ public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.IF;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitConditional(this);
     }
 }

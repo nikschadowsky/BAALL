@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -36,5 +37,10 @@ public class StructDefinitionLiteralNodeImpl extends AbstractNode implements Str
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.STRUCT_DEFINITION;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitStructDefinitionLiteral(this);
     }
 }

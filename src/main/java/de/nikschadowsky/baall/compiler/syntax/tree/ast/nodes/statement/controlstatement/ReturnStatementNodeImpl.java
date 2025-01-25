@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
@@ -29,5 +30,10 @@ public class ReturnStatementNodeImpl extends AbstractNode implements ReturnState
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.RETURN;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitReturnStatement(this);
     }
 }

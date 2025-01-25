@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
 
+import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -46,5 +47,10 @@ public class IdentifierAccessNodeImpl extends AbstractNode implements Identifier
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.IDENTIFIER_ACCESS;
+    }
+
+    @Override
+    public void accept(ASTVisitor visitor) {
+        visitor.visitIdentifierAccess(this);
     }
 }

@@ -1,7 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes;
 
 
-import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
+import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 
 /**
  * @since 23.01.2025

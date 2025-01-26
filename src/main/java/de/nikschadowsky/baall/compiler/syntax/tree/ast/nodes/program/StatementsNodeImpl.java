@@ -1,9 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.semantic.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;

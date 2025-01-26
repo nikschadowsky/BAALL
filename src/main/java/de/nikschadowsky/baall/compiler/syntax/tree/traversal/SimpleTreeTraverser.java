@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.semantic.traversal;
+package de.nikschadowsky.baall.compiler.syntax.tree.traversal;
 
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;

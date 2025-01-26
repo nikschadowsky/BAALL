@@ -6,6 +6,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 /**
  * @since 29.07.2024
  */
@@ -32,7 +34,7 @@ public class ParenthesizedExpressionNodeImpl extends AbstractNode implements Par
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitParenthesizedExpression(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitParenthesizedExpression(this, data);
     }
 }

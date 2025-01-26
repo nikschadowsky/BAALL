@@ -12,6 +12,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @since 11.07.2024
@@ -61,7 +62,7 @@ public class TypeNodeImpl extends AbstractNode implements TypeNode {
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitType(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitType(this, data);
     }
 }

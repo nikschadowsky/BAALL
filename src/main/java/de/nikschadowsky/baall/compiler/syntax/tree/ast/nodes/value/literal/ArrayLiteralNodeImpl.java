@@ -11,6 +11,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @since 29.07.2024
@@ -38,7 +39,7 @@ public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNo
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitArrayLiteral(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitArrayLiteral(this, data);
     }
 }

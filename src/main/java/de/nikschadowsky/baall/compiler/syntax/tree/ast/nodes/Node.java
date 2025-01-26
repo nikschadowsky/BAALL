@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
+import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitable;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 

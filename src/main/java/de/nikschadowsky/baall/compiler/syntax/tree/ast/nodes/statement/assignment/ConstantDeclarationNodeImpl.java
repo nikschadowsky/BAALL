@@ -9,6 +9,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 /**
  * @since 30.07.2024
  */
@@ -57,7 +59,7 @@ public class ConstantDeclarationNodeImpl extends AbstractNode implements Constan
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitConstantDeclaration(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitConstantDeclaration(this, data);
     }
 }

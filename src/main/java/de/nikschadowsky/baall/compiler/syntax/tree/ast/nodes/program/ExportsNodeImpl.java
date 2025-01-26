@@ -70,7 +70,7 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitExports(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitExports(this, data);
     }
 }

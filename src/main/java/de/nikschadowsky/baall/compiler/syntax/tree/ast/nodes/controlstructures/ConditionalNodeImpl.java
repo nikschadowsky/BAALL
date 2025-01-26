@@ -79,7 +79,7 @@ public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitConditional(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitConditional(this, data);
     }
 }

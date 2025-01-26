@@ -26,88 +26,90 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 
+import java.util.Optional;
+
 /**
  * @since 23.01.2025
  */
-public interface ASTVisitor {
+public interface ASTVisitor<D, R> {
 
-    void visitProgram(ProgramNode that);
+    Optional<R> visitProgram(ProgramNode that, D data);
 
-    void visitImports(ImportsNode that);
+    Optional<R> visitImports(ImportsNode that, D data);
 
-    void visitStatements(StatementsNode that);
+    Optional<R> visitStatements(StatementsNode that, D data);
 
-    void visitExports(ExportsNode that);
-
-    //
-    void visitDeclaration(DeclarationNode that);
-
-    void visitConstantDeclaration(ConstantDeclarationNode that);
-
-    void visitVariableDeclaration(VariableDeclarationNode that);
-
-    void visitReassignment(ReassignmentNode that);
-
-    void visitVariableReassignment(VariableReassignmentNode that);
+    Optional<R> visitExports(ExportsNode that, D data);
 
     //
-    void visitType(TypeNode that);
+    Optional<R> visitDeclaration(DeclarationNode that, D data);
+
+    Optional<R> visitConstantDeclaration(ConstantDeclarationNode that, D data);
+
+    Optional<R> visitVariableDeclaration(VariableDeclarationNode that, D data);
+
+    Optional<R> visitReassignment(ReassignmentNode that, D data);
+
+    Optional<R> visitVariableReassignment(VariableReassignmentNode that, D data);
 
     //
-    void visitControlStructure(ControlStructureNode that);
-
-    void visitConditional(ConditionalNode that);
-
-    void visitForLoop(ForLoopNode that);
-
-    void visitWhileLoop(WhileLoopNode that);
+    Optional<R> visitType(TypeNode that, D data);
 
     //
-    void visitExpression(ExpressionNode that);
+    Optional<R> visitControlStructure(ControlStructureNode that, D data);
 
-    void visitBinaryExpression(BinaryExpressionNode that);
+    Optional<R> visitConditional(ConditionalNode that, D data);
 
-    void visitParenthesizedExpression(ParenthesizedExpressionNode that);
+    Optional<R> visitForLoop(ForLoopNode that, D data);
 
-    void visitPrefixOperation(PrefixOperationNode that);
-
-    void visitUnaryExpression(UnaryExpressionNode that);
+    Optional<R> visitWhileLoop(WhileLoopNode that, D data);
 
     //
-    void visitEnsure(EnsureStatementNode that);
+    Optional<R> visitExpression(ExpressionNode that, D data);
 
-    void visitIntercept(InterceptStatementNode that);
+    Optional<R> visitBinaryExpression(BinaryExpressionNode that, D data);
 
-    void visitRaise(RaiseStatementNode that);
+    Optional<R> visitParenthesizedExpression(ParenthesizedExpressionNode that, D data);
 
-    void visitTry(TryStatementNode that);
+    Optional<R> visitPrefixOperation(PrefixOperationNode that, D data);
 
-    //
-    void visitControlStatement(ControlStatementNode that);
-
-    void visitLoopControlStatement(LoopControlStatementNode that);
-
-    void visitReturnStatement(ReturnStatementNode that);
-
-    void visitStatement(StatementNode that);
+    Optional<R> visitUnaryExpression(UnaryExpressionNode that, D data);
 
     //
-    void visitArrayLiteral(ArrayLiteralNode that);
+    Optional<R> visitEnsure(EnsureStatementNode that, D data);
 
-    void visitFunctionDefinition(FunctionDefinitionNode that);
+    Optional<R> visitIntercept(InterceptStatementNode that, D data);
 
-    void visitPrimitiveLiteral(PrimitiveLiteralNode that);
+    Optional<R> visitRaise(RaiseStatementNode that, D data);
 
-    void visitStructDefinitionLiteral(StructDefinitionLiteralNode that);
-
-    void visitStructInitializationLiteral(StructInitializationLiteralNode that);
+    Optional<R> visitTry(TryStatementNode that, D data);
 
     //
-    void visitFunctionCall(FunctionCallNode that);
+    Optional<R> visitControlStatement(ControlStatementNode that, D data);
 
-    void visitIdentifierAccess(IdentifierAccessNode that);
+    Optional<R> visitLoopControlStatement(LoopControlStatementNode that, D data);
 
-    void visitLiteral(LiteralNode that);
+    Optional<R> visitReturnStatement(ReturnStatementNode that, D data);
 
-    void visitTerm(TermNode that);
+    Optional<R> visitStatement(StatementNode that, D data);
+
+    //
+    Optional<R> visitArrayLiteral(ArrayLiteralNode that, D data);
+
+    Optional<R> visitFunctionDefinition(FunctionDefinitionNode that, D data);
+
+    Optional<R> visitPrimitiveLiteral(PrimitiveLiteralNode that, D data);
+
+    Optional<R> visitStructDefinitionLiteral(StructDefinitionLiteralNode that, D data);
+
+    Optional<R> visitStructInitializationLiteral(StructInitializationLiteralNode that, D data);
+
+    //
+    Optional<R> visitFunctionCall(FunctionCallNode that, D data);
+
+    Optional<R> visitIdentifierAccess(IdentifierAccessNode that, D data);
+
+    Optional<R> visitLiteral(LiteralNode that, D data);
+
+    Optional<R> visitTerm(TermNode that, D data);
 }

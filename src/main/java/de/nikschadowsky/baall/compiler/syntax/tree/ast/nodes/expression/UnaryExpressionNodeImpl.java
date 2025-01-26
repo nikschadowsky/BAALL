@@ -8,6 +8,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
+
 /**
  * @since 29.07.2024
  */
@@ -56,7 +58,7 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitUnaryExpression(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitUnaryExpression(this, data);
     }
 }

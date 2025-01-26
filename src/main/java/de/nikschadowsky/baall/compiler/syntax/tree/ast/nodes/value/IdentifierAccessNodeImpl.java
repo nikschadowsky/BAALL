@@ -12,6 +12,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @since 11.07.2024
@@ -50,7 +51,7 @@ public class IdentifierAccessNodeImpl extends AbstractNode implements Identifier
     }
 
     @Override
-    public void accept(ASTVisitor visitor) {
-        visitor.visitIdentifierAccess(this);
+    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+        return visitor.visitIdentifierAccess(this, data);
     }
 }

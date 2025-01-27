@@ -20,10 +20,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 
 import java.util.Optional;
@@ -112,4 +109,10 @@ public interface ASTVisitor<D, R> {
     Optional<R> visitLiteral(LiteralNode that, D data);
 
     Optional<R> visitTerm(TermNode that, D data);
+
+    Optional<R> visitField(FieldNode that, D data);
+
+    Optional<R> visitIdentifier(IdentifierNode that, D data);
+
+    Optional<R> visitOperator(OperatorNode that, D data);
 }

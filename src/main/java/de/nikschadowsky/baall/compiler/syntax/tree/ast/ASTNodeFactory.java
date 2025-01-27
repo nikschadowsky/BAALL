@@ -3,10 +3,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.BinaryExpressionNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ParenthesizedExpressionNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.PrefixOperationNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNodeImpl;
@@ -22,8 +19,10 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 
@@ -162,5 +161,17 @@ public class ASTNodeFactory {
 
     public TypeNodeImpl createTypeNode() {
         return new TypeNodeImpl(diagnostics);
+    }
+
+    public IdentifierNodeImpl createIdentifierNode() {
+        return new IdentifierNodeImpl(diagnostics);
+    }
+
+    public FieldNodeImpl createFieldNode() {
+        return new FieldNodeImpl(diagnostics);
+    }
+
+    public OperatorNodeImpl createOperatorNode() {
+        return new OperatorNodeImpl(diagnostics);
     }
 }

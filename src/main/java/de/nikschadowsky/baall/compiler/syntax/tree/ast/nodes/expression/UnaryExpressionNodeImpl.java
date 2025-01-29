@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
@@ -16,10 +15,8 @@ import java.util.Optional;
 public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpressionNode {
 
     private IdentifierAccessNode identifierAccess;
-
     private boolean isPrefix;
-
-    private Token operator;
+    private OperatorNode operator;
 
     public UnaryExpressionNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -35,11 +32,11 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
     }
 
     @Override
-    public Token getOperator() {
+    public OperatorNode getOperator() {
         return operator;
     }
 
-    public void setOperator(Token operator) {
+    public void setOperator(OperatorNode operator) {
         this.operator = operator;
     }
 

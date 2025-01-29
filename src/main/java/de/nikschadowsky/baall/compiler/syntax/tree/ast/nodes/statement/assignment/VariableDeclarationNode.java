@@ -5,10 +5,18 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 import java.util.Optional;
 
 /**
+ * Represents the declaration of a variable
+ *
  * @since 30.07.2024
  */
 public interface VariableDeclarationNode extends DeclarationNode {
 
+    /**
+     * Optional initialization value.
+     *
+     * @return optional initial value
+     * @apiNote Optional is empty when there was no initial value supplied.
+     */
     Optional<ExpressionNode> getInitializationValue();
 
 }

@@ -1,9 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -17,9 +17,7 @@ import java.util.Optional;
 public class VariableReassignmentNodeImpl extends AbstractNode implements VariableReassignmentNode {
 
     private IdentifierAccessNode identifier;
-
-    private Token operator;
-
+    private OperatorNode operator;
     private ExpressionNode value;
 
     public VariableReassignmentNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -36,11 +34,11 @@ public class VariableReassignmentNodeImpl extends AbstractNode implements Variab
     }
 
     @Override
-    public Token getOperator() {
+    public OperatorNode getOperator() {
         return operator;
     }
 
-    public void setOperator(Token operator) {
+    public void setOperator(OperatorNode operator) {
         this.operator = operator;
     }
 

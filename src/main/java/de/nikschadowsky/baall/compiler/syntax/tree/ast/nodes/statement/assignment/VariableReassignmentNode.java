@@ -3,9 +3,16 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignme
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 
 /**
+ * Represents the reassignment of a variable.
+ *
  * @since 30.07.2024
  */
 public interface VariableReassignmentNode extends ReassignmentNode {
 
+    /**
+     * Updated value of the variable.
+     *
+     * @return evaluable expression
+     */
     ExpressionNode getValueExpression();
 }

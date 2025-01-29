@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
@@ -14,8 +13,7 @@ import java.util.Optional;
  */
 public class PrefixOperationNodeImpl extends AbstractNode implements PrefixOperationNode {
 
-    private Token operator;
-
+    private OperatorNode operator;
     private ExpressionNode operand;
 
     public PrefixOperationNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -23,11 +21,11 @@ public class PrefixOperationNodeImpl extends AbstractNode implements PrefixOpera
     }
 
     @Override
-    public Token getOperator() {
+    public OperatorNode getOperator() {
         return operator;
     }
 
-    public void setOperator(Token operator) {
+    public void setOperator(OperatorNode operator) {
         this.operator = operator;
     }
 

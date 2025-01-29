@@ -1,18 +1,17 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,21 +20,20 @@ import java.util.Optional;
  */
 public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
 
-    private List<IdentifierAccessNode> exports;
-
-    private Token namespace;
+    private List<IdentifierAccessNode> exports = Collections.emptyList();
+    private IdentifierNode namespace;
 
     public ExportsNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public @UnmodifiableView List<IdentifierAccessNode> getExportedElements() {
-        return NodeUtility.toUnmodifiableList(exports);
+    public @NotNull @UnmodifiableView List<IdentifierAccessNode> getExportedElements() {
+        return Collections.unmodifiableList(exports);
     }
 
-    public void setExports(List<IdentifierAccessNode> exports) {
-        this.exports = new LinkedList<>(exports);
+    public void setExports(@NotNull List<IdentifierAccessNode> exports) {
+        this.exports = new ArrayList<>(exports);
 
         if (exports.isEmpty()) {
             getDiagnosticCollector().report(new NodeDiagnostic(
@@ -50,17 +48,17 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
                .filter(e -> Collections.frequency(exports, e) > 1)
                .forEach(e -> getDiagnosticCollector().report(new NodeDiagnostic(
                        "Duplicate export",
-                       e.getIdentifier(),
+                       e.getIdentifier().getIdentifier(),
                        NodeDiagnostic.ReportingLevel.WARN
                )));
     }
 
     @Override
-    public Optional<Token> getNamespace() {
+    public Optional<IdentifierNode> getNamespace() {
         return Optional.ofNullable(namespace);
     }
 
-    public void setNamespace(@NotNull Token namespace) {
+    public void setNamespace(@NotNull IdentifierNode namespace) {
         this.namespace = namespace;
     }
 

@@ -16,7 +16,6 @@ import java.util.Optional;
 public class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
 
     private ExpressionNode condition;
-
     private StatementsNode body;
 
     public WhileLoopNodeImpl(NodeDiagnosticCollector diagnostics) {

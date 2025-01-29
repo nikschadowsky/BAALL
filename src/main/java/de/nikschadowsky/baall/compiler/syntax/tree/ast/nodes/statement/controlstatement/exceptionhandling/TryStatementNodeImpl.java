@@ -6,8 +6,10 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsN
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,7 +19,7 @@ import java.util.Optional;
 public class TryStatementNodeImpl extends AbstractNode implements TryStatementNode {
 
     private StatementsNode body;
-    private List<InterceptStatementNode> interceptBlocks;
+    private List<InterceptStatementNode> interceptBlocks = Collections.emptyList();
     private EnsureStatementNode ensureBlock;
 
     public TryStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -34,12 +36,12 @@ public class TryStatementNodeImpl extends AbstractNode implements TryStatementNo
     }
 
     @Override
-    public List<InterceptStatementNode> getInterceptBlocks() {
-        return interceptBlocks;
+    public @NotNull @UnmodifiableView List<InterceptStatementNode> getInterceptBlocks() {
+        return Collections.unmodifiableList(interceptBlocks);
     }
 
-    public void setInterceptBlocks(List<InterceptStatementNode> interceptBlocks) {
-        this.interceptBlocks = new LinkedList<>(interceptBlocks);
+    public void setInterceptBlocks(@NotNull List<InterceptStatementNode> interceptBlocks) {
+        this.interceptBlocks = new ArrayList<>(interceptBlocks);
     }
 
     @Override

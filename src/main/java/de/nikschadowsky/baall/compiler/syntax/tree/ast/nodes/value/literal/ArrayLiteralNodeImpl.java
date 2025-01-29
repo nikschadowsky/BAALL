@@ -5,11 +5,11 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,19 +18,19 @@ import java.util.Optional;
  */
 public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNode {
 
-    private List<ExpressionNode> elements;
+    private List<ExpressionNode> elements = Collections.emptyList();
 
     public ArrayLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public @UnmodifiableView List<ExpressionNode> getElements() {
-        return NodeUtility.toUnmodifiableList(elements);
+    public @NotNull @UnmodifiableView List<ExpressionNode> getElements() {
+        return Collections.unmodifiableList(elements);
     }
 
-    public void setElements(List<ExpressionNode> elements) {
-        this.elements = new LinkedList<>(elements);
+    public void setElements(@NotNull List<ExpressionNode> elements) {
+        this.elements = new ArrayList<>(elements);
     }
 
     @Override

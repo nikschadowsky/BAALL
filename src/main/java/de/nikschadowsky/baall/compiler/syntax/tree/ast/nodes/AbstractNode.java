@@ -4,6 +4,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Abstract superclass of every AST node.
+ *
  * @since 29.07.2024
  */
 public abstract class AbstractNode implements Node {

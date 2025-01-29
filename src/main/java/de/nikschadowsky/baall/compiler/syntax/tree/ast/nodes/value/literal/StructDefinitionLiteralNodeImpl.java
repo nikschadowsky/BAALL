@@ -1,9 +1,8 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -19,30 +18,19 @@ import java.util.Optional;
  */
 public class StructDefinitionLiteralNodeImpl extends AbstractNode implements StructDefinitionLiteralNode {
 
-    private List<TypeNode> fieldTypes;
-
-    private List<Token> fieldNames;
+    private List<FieldNode> fields = Collections.emptyList();
 
     public StructDefinitionLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public @UnmodifiableView List<TypeNode> getFieldTypes() {
-        return Collections.unmodifiableList(fieldTypes);
+    public @NotNull @UnmodifiableView List<FieldNode> getFields() {
+        return Collections.unmodifiableList(fields);
     }
 
-    public void setFieldTypes(List<TypeNode> fieldTypes) {
-        this.fieldTypes = new ArrayList<>(fieldTypes);
-    }
-
-    @Override
-    public @UnmodifiableView List<Token> getFieldNames() {
-        return Collections.unmodifiableList(fieldNames);
-    }
-
-    public void setFieldNames(List<Token> fieldNames) {
-        this.fieldNames = new ArrayList<>(fieldNames);
+    public void setFields(@NotNull List<FieldNode> fields) {
+        this.fields = new ArrayList<>(fields);
     }
 
     @Override

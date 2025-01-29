@@ -5,11 +5,11 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,19 +18,19 @@ import java.util.Optional;
  */
 public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
 
-    private List<StatementNode> statements;
+    private List<StatementNode> statements = Collections.emptyList();
 
     public StatementsNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public @UnmodifiableView List<StatementNode> getStatements() {
-        return NodeUtility.toUnmodifiableList(statements);
+    public @NotNull @UnmodifiableView List<StatementNode> getStatements() {
+        return Collections.unmodifiableList(statements);
     }
 
-    public void setStatements(List<StatementNode> statements) {
-        this.statements = new LinkedList<>(statements);
+    public void setStatements(@NotNull List<StatementNode> statements) {
+        this.statements = new ArrayList<>(statements);
     }
 
     @Override

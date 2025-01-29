@@ -1,15 +1,17 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,30 +20,29 @@ import java.util.Optional;
  */
 public class InterceptStatementNodeImpl extends AbstractNode implements InterceptStatementNode {
 
-    private List<IdentifierAccessNode> interceptedExceptions;
-    private Token raisedExceptionIdentifier;
+    private List<IdentifierAccessNode> interceptedExceptions = Collections.emptyList();
+    private IdentifierNode raisedExceptionIdentifier;
     private StatementsNode body;
-
 
     public InterceptStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public List<IdentifierAccessNode> getInterceptedExceptions() {
-        return interceptedExceptions;
+    public @UnmodifiableView @NotNull List<IdentifierAccessNode> getInterceptedExceptions() {
+        return Collections.unmodifiableList(interceptedExceptions);
     }
 
-    public void setInterceptedExceptions(List<IdentifierAccessNode> interceptedExceptions) {
-        this.interceptedExceptions = new LinkedList<>(interceptedExceptions);
+    public void setInterceptedExceptions(@NotNull List<IdentifierAccessNode> interceptedExceptions) {
+        this.interceptedExceptions = new ArrayList<>(interceptedExceptions);
     }
 
     @Override
-    public Token getRaisedExceptionIdentifier() {
+    public IdentifierNode getRaisedExceptionIdentifier() {
         return raisedExceptionIdentifier;
     }
 
-    public void setRaisedExceptionIdentifier(Token raisedExceptionIdentifier) {
+    public void setRaisedExceptionIdentifier(IdentifierNode raisedExceptionIdentifier) {
         this.raisedExceptionIdentifier = raisedExceptionIdentifier;
     }
 

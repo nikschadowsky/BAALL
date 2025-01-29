@@ -4,12 +4,24 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 
 /**
+ * Represents a while loop.
+ *
  * @since 30.07.2024
  */
 public interface WhileLoopNode extends ControlStructureNode {
 
+    /**
+     * Evaluable expression for this while loop.
+     *
+     * @return condition expression
+     */
     ExpressionNode getCondition();
 
+    /**
+     * Body of the while loop.
+     *
+     * @return statements in the body
+     */
     StatementsNode getBody();
 
 }

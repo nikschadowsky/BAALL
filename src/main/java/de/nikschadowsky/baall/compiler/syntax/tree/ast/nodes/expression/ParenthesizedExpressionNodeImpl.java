@@ -19,13 +19,13 @@ public class ParenthesizedExpressionNodeImpl extends AbstractNode implements Par
         super(diagnostics);
     }
 
-    public void setInnerExpression(ExpressionNode innerExpression) {
-        this.innerExpression = innerExpression;
-    }
-
     @Override
     public ExpressionNode getInnerExpressionNode() {
         return innerExpression;
+    }
+
+    public void setInnerExpression(ExpressionNode innerExpression) {
+        this.innerExpression = innerExpression;
     }
 
     @Override

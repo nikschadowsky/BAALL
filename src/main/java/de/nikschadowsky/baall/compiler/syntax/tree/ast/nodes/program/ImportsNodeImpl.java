@@ -28,7 +28,7 @@ public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
 
     @Override
-    public @UnmodifiableView List<BaallFileReference> getImports() {
+    public @UnmodifiableView @NotNull List<BaallFileReference> getImports() {
         return Collections.unmodifiableList(imports);
     }
 

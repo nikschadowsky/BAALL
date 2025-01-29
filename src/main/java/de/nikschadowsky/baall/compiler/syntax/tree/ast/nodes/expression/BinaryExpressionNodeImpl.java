@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
@@ -16,17 +15,11 @@ import java.util.Optional;
 public class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpressionNode {
 
     private TermNode leftOperand;
-
-    private Token operator;
-
+    private OperatorNode operator;
     private ExpressionNode rightOperand;
 
     public BinaryExpressionNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
-    }
-
-    public void setLeftOperand(TermNode leftOperand) {
-        this.leftOperand = leftOperand;
     }
 
     @Override
@@ -34,22 +27,26 @@ public class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpr
         return leftOperand;
     }
 
-    public void setOperator(Token operator) {
-        this.operator = operator;
+    public void setLeftOperand(TermNode leftOperand) {
+        this.leftOperand = leftOperand;
     }
 
     @Override
-    public Token getOperator() {
+    public OperatorNode getOperator() {
         return operator;
     }
 
-    public void setRightOperand(ExpressionNode rightOperand) {
-        this.rightOperand = rightOperand;
+    public void setOperator(OperatorNode operator) {
+        this.operator = operator;
     }
 
     @Override
     public ExpressionNode getRightOperand() {
         return rightOperand;
+    }
+
+    public void setRightOperand(ExpressionNode rightOperand) {
+        this.rightOperand = rightOperand;
     }
 
     @Override

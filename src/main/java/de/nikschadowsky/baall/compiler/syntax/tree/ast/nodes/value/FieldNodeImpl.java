@@ -22,7 +22,6 @@ public class FieldNodeImpl extends AbstractNode implements FieldNode {
         super(diagnostics);
     }
 
-
     @Override
     public TypeNode getType() {
         return type;
@@ -33,11 +32,11 @@ public class FieldNodeImpl extends AbstractNode implements FieldNode {
     }
 
     @Override
-    public IdentifierNode getName() {
+    public IdentifierNode getIdentifier() {
         return name;
     }
 
-    public void setName(IdentifierNode name) {
+    public void setIdentifier(IdentifierNode name) {
         this.name = name;
     }
 

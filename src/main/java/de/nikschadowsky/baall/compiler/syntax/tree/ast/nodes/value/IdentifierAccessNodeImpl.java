@@ -1,16 +1,15 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,30 +18,29 @@ import java.util.Optional;
  */
 public class IdentifierAccessNodeImpl extends AbstractNode implements IdentifierAccessNode {
 
-    private Token identifier;
-
-    private List<ExpressionNode> arrayIndexes;
+    private IdentifierNode identifier;
+    private List<ExpressionNode> arrayIndices = Collections.emptyList();
 
     public IdentifierAccessNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public Token getIdentifier() {
+    public IdentifierNode getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(Token identifier) {
+    public void setIdentifier(IdentifierNode identifier) {
         this.identifier = identifier;
     }
 
     @Override
-    public @UnmodifiableView List<ExpressionNode> getArrayIndices() {
-        return NodeUtility.toUnmodifiableList(arrayIndexes);
+    public @NotNull @UnmodifiableView List<ExpressionNode> getArrayIndices() {
+        return Collections.unmodifiableList(arrayIndices);
     }
 
-    public void setArrayIndexes(List<ExpressionNode> arrayIndex) {
-        this.arrayIndexes = new LinkedList<>(arrayIndex);
+    public void setArrayIndices(@NotNull List<ExpressionNode> arrayIndex) {
+        this.arrayIndices = new ArrayList<>(arrayIndex);
     }
 
     @Override

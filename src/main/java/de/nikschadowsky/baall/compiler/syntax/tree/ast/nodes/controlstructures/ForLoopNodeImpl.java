@@ -1,11 +1,11 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -17,28 +17,22 @@ import java.util.Optional;
  */
 public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
 
-    private Token identifier;
-
+    private IdentifierNode identifier;
     private ExpressionNode startIndex;
-
     private ExpressionNode endIndex;
-
     private ReassignmentNode optionalStepperStatement;
-
     private StatementsNode body;
-
-    private boolean hasOptionalStepperStatement;
 
     public ForLoopNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public Token getIdentifier() {
+    public IdentifierNode getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(Token identifier) {
+    public void setIdentifier(IdentifierNode identifier) {
         this.identifier = identifier;
     }
 
@@ -67,15 +61,6 @@ public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
 
     public void setOptionalStepperStatement(ReassignmentNode optionalStepperStatement) {
         this.optionalStepperStatement = optionalStepperStatement;
-    }
-
-    @Override
-    public boolean hasOptionalStepperStatement() {
-        return hasOptionalStepperStatement;
-    }
-
-    public void setHasOptionalStepperStatement(boolean hasOptionalStepperStatement) {
-        this.hasOptionalStepperStatement = hasOptionalStepperStatement;
     }
 
     @Override

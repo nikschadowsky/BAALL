@@ -1,10 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +19,7 @@ import java.util.Optional;
  */
 public class FunctionDefinitionNodeImpl extends AbstractNode implements FunctionDefinitionNode {
 
-    private List<TypeNode> parameterTypes;
-
-    private List<Token> parameterNames;
-
+    private List<FieldNode> parameters = Collections.emptyList();
     private StatementsNode functionBody;
 
     public FunctionDefinitionNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -31,30 +27,21 @@ public class FunctionDefinitionNodeImpl extends AbstractNode implements Function
     }
 
     @Override
-    public @UnmodifiableView List<TypeNode> getParameterTypes() {
-        return Collections.unmodifiableList(parameterTypes);
+    public @NotNull @UnmodifiableView List<FieldNode> getParameters() {
+        return Collections.unmodifiableList(parameters);
     }
 
-    public void setParameterTypes(List<TypeNode> types) {
-        this.parameterTypes = new ArrayList<>(types);
-    }
-
-    @Override
-    public @UnmodifiableView List<Token> getParameterNames() {
-        return Collections.unmodifiableList(parameterNames);
-    }
-
-    public void setParameterNames(List<Token> names) {
-        this.parameterNames = new ArrayList<>(names);
-    }
-
-    public void setFunctionBody(StatementsNode functionBody) {
-        this.functionBody = functionBody;
+    public void setParameters(@NotNull List<FieldNode> parameters) {
+        this.parameters = new ArrayList<>(parameters);
     }
 
     @Override
     public StatementsNode getFunctionBody() {
         return functionBody;
+    }
+
+    public void setFunctionBody(StatementsNode functionBody) {
+        this.functionBody = functionBody;
     }
 
     @Override

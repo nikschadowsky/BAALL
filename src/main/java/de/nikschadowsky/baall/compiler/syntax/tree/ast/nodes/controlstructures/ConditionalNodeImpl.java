@@ -17,11 +17,8 @@ import java.util.Optional;
 public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode {
 
     private ExpressionNode condition;
-
     private StatementsNode thenBranch;
-
     private ConditionalNode elseBranch;
-
     private ConditionBranch conditionBranch;
 
     public ConditionalNodeImpl(NodeDiagnosticCollector diagnostics) {

@@ -1,10 +1,10 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -17,9 +17,7 @@ import java.util.Optional;
 public class VariableDeclarationNodeImpl extends AbstractNode implements VariableDeclarationNode {
 
     private TypeNode type;
-
-    private Token identifier;
-
+    private IdentifierNode identifier;
     private ExpressionNode initializationValue;
 
     public VariableDeclarationNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -36,11 +34,11 @@ public class VariableDeclarationNodeImpl extends AbstractNode implements Variabl
     }
 
     @Override
-    public Token getIdentifier() {
+    public IdentifierNode getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(Token identifier) {
+    public void setIdentifier(IdentifierNode identifier) {
         this.identifier = identifier;
     }
 

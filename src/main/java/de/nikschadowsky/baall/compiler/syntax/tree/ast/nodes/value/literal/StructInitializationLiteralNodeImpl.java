@@ -6,11 +6,11 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
-import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,8 +20,7 @@ import java.util.Optional;
 public class StructInitializationLiteralNodeImpl extends AbstractNode implements StructInitializationLiteralNode {
 
     private IdentifierAccessNode identifier;
-
-    private List<ExpressionNode> arguments;
+    private List<ExpressionNode> arguments = Collections.emptyList();
 
     public StructInitializationLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -37,12 +36,12 @@ public class StructInitializationLiteralNodeImpl extends AbstractNode implements
     }
 
     @Override
-    public @UnmodifiableView List<ExpressionNode> getArguments() {
-        return NodeUtility.toUnmodifiableList(arguments);
+    public @NotNull @UnmodifiableView List<ExpressionNode> getArguments() {
+        return Collections.unmodifiableList(arguments);
     }
 
-    public void setArguments(List<ExpressionNode> arguments) {
-        this.arguments = new LinkedList<>(arguments);
+    public void setArguments(@NotNull List<ExpressionNode> arguments) {
+        this.arguments = new ArrayList<>(arguments);
     }
 
     @Override

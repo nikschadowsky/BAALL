@@ -17,11 +17,8 @@ import java.util.Optional;
 public class ProgramNodeImpl extends AbstractNode implements ProgramNode {
 
     private ImportsNode imports;
-
     private StatementsNode statements;
-
     private ExportsNode exports;
-
     private List<SyntaxDiagnostic> diagnostics;
 
     public ProgramNodeImpl(NodeDiagnosticCollector diagnostics) {

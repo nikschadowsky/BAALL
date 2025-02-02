@@ -21,10 +21,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 
 import java.util.Optional;
@@ -222,7 +219,7 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
     public Optional<R> visitFunctionDefinition(FunctionDefinitionNode that, D data) {
-        R r = scan(that.getParameterTypes(), data);
+        R r = scan(that.getParameters(), data);
         r = scanAndReduce(that.getFunctionBody(), data, r);
         return Optional.ofNullable(r);
     }
@@ -235,7 +232,7 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
     public Optional<R> visitStructDefinitionLiteral(StructDefinitionLiteralNode that, D data) {
-        R r = scan(that.getFieldTypes(), data);
+        R r = scan(that.getFields(), data);
         return Optional.ofNullable(r);
     }
 
@@ -270,18 +267,37 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
         return Optional.empty();
     }
 
+    //todo
+    @Override
+    public Optional<R> visitField(FieldNode that, D data) {
+        R r = scan(that.getType(), data);
+        return Optional.ofNullable(scanAndReduce(that.getIdentifier(), data, r));
+    }
+
+    @Override
+    public Optional<R> visitIdentifier(IdentifierNode that, D data) {
+        // empty implementation
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<R> visitOperator(OperatorNode that, D data) {
+        // empty implementation
+        return Optional.empty();
+    }
+
     /*
     UTILITY
      */
 
-    private R scan(Node node, D data) {
+    protected R scan(Node node, D data) {
         if (node != null) {
             return node.accept(this, data).orElse(null);
         }
         return null;
     }
 
-    private R scan(Iterable<? extends Node> nodes, D data) {
+    protected R scan(Iterable<? extends Node> nodes, D data) {
         R r = null;
         if (nodes != null) {
             boolean first = true;
@@ -293,15 +309,15 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
         return r;
     }
 
-    private R scanAndReduce(Node node, D data, R r) {
+    protected R scanAndReduce(Node node, D data, R r) {
         return reduce(scan(node, data), r);
     }
 
-    private R scanAndReduce(Iterable<? extends Node> nodes, D data, R r) {
+    protected R scanAndReduce(Iterable<? extends Node> nodes, D data, R r) {
         return reduce(scan(nodes, data), r);
     }
 
-    private R reduce(R r1, R r2) {
+    protected R reduce(R r1, R r2) {
         return r1;
     }
 

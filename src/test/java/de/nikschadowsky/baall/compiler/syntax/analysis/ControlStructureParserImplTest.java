@@ -449,6 +449,7 @@ class ControlStructureParserImplTest {
                                                       .build();
         assertThat(controlStructureParser.parseForLoop(queue)).isSuccessful()
                                                               .resultMatches(node -> "i".equals(node.getIdentifier()
+                                                                                                    .getIdentifier()
                                                                                                     .value()))
                                                               .resultMatches(node -> {
                                                                   PrimitiveLiteralNode expressionNode =
@@ -480,6 +481,7 @@ class ControlStructureParserImplTest {
                                            .build();
         assertThat(controlStructureParser.parseForLoop(queue)).isSuccessful()
                                                               .resultMatches(node -> "i".equals(node.getIdentifier()
+                                                                                                    .getIdentifier()
                                                                                                     .value()))
                                                               .resultMatches(node -> {
                                                                   PrimitiveLiteralNode expressionNode =
@@ -638,6 +640,7 @@ class ControlStructureParserImplTest {
                                                                                        .getInterceptedExceptions()
                                                                                        .get(0)
                                                                                        .getIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
                                                                                               .get(0)
@@ -649,6 +652,7 @@ class ControlStructureParserImplTest {
                                                                            .equals(node.getInterceptBlocks()
                                                                                        .get(0)
                                                                                        .getRaisedExceptionIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
                                                                                               .get(1)
@@ -658,6 +662,7 @@ class ControlStructureParserImplTest {
                                                                                        .get(1)
                                                                                        .getInterceptedExceptions()
                                                                                        .get(0)
+                                                                                       .getIdentifier()
                                                                                        .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
@@ -670,6 +675,7 @@ class ControlStructureParserImplTest {
                                                                            .equals(node.getInterceptBlocks()
                                                                                        .get(1)
                                                                                        .getRaisedExceptionIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
                                                                                               .get(0)
@@ -706,6 +712,7 @@ class ControlStructureParserImplTest {
                                                                                        .getInterceptedExceptions()
                                                                                        .get(0)
                                                                                        .getIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
                                                                                               .get(0)
@@ -717,6 +724,7 @@ class ControlStructureParserImplTest {
                                                                            .equals(node.getInterceptBlocks()
                                                                                        .get(0)
                                                                                        .getRaisedExceptionIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                    .resultMatches(node -> node.getInterceptBlocks()
                                                                                               .get(0)
@@ -805,9 +813,11 @@ class ControlStructureParserImplTest {
                                                                                        .getInterceptedExceptions()
                                                                                        .get(0)
                                                                                        .getIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                           .resultMatches(nodes -> nodes.get(0)
                                                                                                        .getRaisedExceptionIdentifier()
+                                                                                                       .getIdentifier()
                                                                                                        .value()
                                                                                                        .equals("MyIdentifier1"))
                                                                           .resultMatches(nodes -> nodes.get(0)
@@ -820,9 +830,11 @@ class ControlStructureParserImplTest {
                                                                                        .getInterceptedExceptions()
                                                                                        .get(0)
                                                                                        .getIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()))
                                                                           .resultMatches(nodes -> nodes.get(1)
                                                                                                        .getRaisedExceptionIdentifier()
+                                                                                                       .getIdentifier()
                                                                                                        .value()
                                                                                                        .equals("MyIdentifier2"))
                                                                           .resultMatches(nodes -> nodes.get(1)
@@ -880,9 +892,11 @@ class ControlStructureParserImplTest {
                                                                                  node.getInterceptedExceptions()
                                                                                      .get(0)
                                                                                      .getIdentifier()
+                                                                                     .getIdentifier()
                                                                                      .value()))
                                                                          .resultMatches(node -> "MyIdentifier".equals(
                                                                                  node.getRaisedExceptionIdentifier()
+                                                                                     .getIdentifier()
                                                                                      .value()))
                                                                          .resultMatches(node -> node.getBody() == mockedStatements);
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -908,6 +922,7 @@ class ControlStructureParserImplTest {
                                                                                  node.getInterceptedExceptions()
                                                                                      .get(0)
                                                                                      .getIdentifier()
+                                                                                     .getIdentifier()
                                                                                      .value()))
                                                                          .resultMatches(node -> node.getInterceptedExceptions()
                                                                                                     .get(0)
@@ -917,6 +932,7 @@ class ControlStructureParserImplTest {
                                                                                  node.getInterceptedExceptions()
                                                                                      .get(1)
                                                                                      .getIdentifier()
+                                                                                     .getIdentifier()
                                                                                      .value()))
                                                                          .resultMatches(node -> node.getInterceptedExceptions()
                                                                                                     .get(1)
@@ -924,6 +940,7 @@ class ControlStructureParserImplTest {
                                                                                                     .size() == 1)
                                                                          .resultMatches(node -> "MyIdentifier".equals(
                                                                                  node.getRaisedExceptionIdentifier()
+                                                                                     .getIdentifier()
                                                                                      .value()))
                                                                          .resultMatches(node -> node.getBody() == mockedStatements);
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -941,6 +958,7 @@ class ControlStructureParserImplTest {
                                                                                                     .size() == 1)
                                                                          .resultMatches(node -> node.getInterceptedExceptions()
                                                                                                     .get(0)
+                                                                                                    .getIdentifier()
                                                                                                     .getIdentifier()
                                                                                                     .value()
                                                                                                     .equals("myException")).

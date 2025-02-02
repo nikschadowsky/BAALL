@@ -90,6 +90,7 @@ class ControlStatementParserImplTest {
                                                                                    raiseStatementNode.getException()
                                                                                                      .getIdentifier()
                                                                                                      .getIdentifier()
+                                                                                                     .getIdentifier()
                                                                                                      .value());
                                                                        }).resultMatches(node -> {
                                                                            RaiseStatementNode raiseStatementNode =

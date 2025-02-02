@@ -384,11 +384,13 @@ class StatementParserImplTest {
         assertThat(statementParser.parseVariableDeclaration(queue)).isSuccessful()
                                                                    .resultMatches(node -> "string".equals(node.getType()
                                                                                                               .getType()
+                                                                                                              .getIdentifier()
                                                                                                               .value()))
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getArrayDimensionDefinitions()
                                                                                               .isEmpty())
                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
+                                                                                                                    .getIdentifier()
                                                                                                                     .value()))
                                                                    .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
                                                                            ((PrimitiveLiteralNode) node.getInitializationValue()
@@ -403,9 +405,11 @@ class StatementParserImplTest {
         assertThat(statementParser.parseVariableDeclaration(queue)).isSuccessful()
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getType()
+                                                                                              .getIdentifier()
                                                                                               .value()
                                                                                               .equals("MyType"))
                                                                    .resultMatches(node -> node.getIdentifier()
+                                                                                              .getIdentifier()
                                                                                               .value()
                                                                                               .equals("MyIdentifier"))
                                                                    .resultMatches(node -> node.getInitializationValue()
@@ -424,11 +428,13 @@ class StatementParserImplTest {
         assertThat(statementParser.parseVariableDeclaration(queue)).isPartiallyParsed()
                                                                    .resultMatches(node -> "MyType".equals(node.getType()
                                                                                                               .getType()
+                                                                                                              .getIdentifier()
                                                                                                               .value()))
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getArrayDimensionDefinitions()
                                                                                               .size() == 1)
                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
+                                                                                                                    .getIdentifier()
                                                                                                                     .value()))
                                                                    .resultMatches(node -> node.getInitializationValue()
                                                                                               .isEmpty())
@@ -452,11 +458,13 @@ class StatementParserImplTest {
         assertThat(statementParser.parseConstantDeclaration(queue)).isSuccessful()
                                                                    .resultMatches(node -> "string".equals(node.getType()
                                                                                                               .getType()
+                                                                                                              .getIdentifier()
                                                                                                               .value()))
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getArrayDimensionDefinitions()
                                                                                               .isEmpty())
                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
+                                                                                                                    .getIdentifier()
                                                                                                                     .value()))
                                                                    .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
                                                                            ((PrimitiveLiteralNode) node.getInitializationValue()).getPrimitiveType()));
@@ -473,11 +481,13 @@ class StatementParserImplTest {
         assertThat(statementParser.parseConstantDeclaration(queue)).isPartiallyParsed()
                                                                    .resultMatches(node -> "MyType".equals(node.getType()
                                                                                                               .getType()
+                                                                                                              .getIdentifier()
                                                                                                               .value()))
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getArrayDimensionDefinitions()
                                                                                               .size() == 1)
                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
+                                                                                                                    .getIdentifier()
                                                                                                                     .value()))
                                                                    .resultMatches(node -> node.getInitializationValue() == null)
                                                                    .syntaxDiagnosticContains("Expected an expression");
@@ -495,11 +505,13 @@ class StatementParserImplTest {
         assertThat(statementParser.parseConstantDeclaration(queue)).isPartiallyParsed()
                                                                    .resultMatches(node -> "MyType".equals(node.getType()
                                                                                                               .getType()
+                                                                                                              .getIdentifier()
                                                                                                               .value()))
                                                                    .resultMatches(node -> node.getType()
                                                                                               .getArrayDimensionDefinitions()
                                                                                               .size() == 1)
                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
+                                                                                                                    .getIdentifier()
                                                                                                                     .value()))
                                                                    .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
                                                                            ((PrimitiveLiteralNode) node.getInitializationValue()).getPrimitiveType()))
@@ -526,12 +538,14 @@ class StatementParserImplTest {
         assertThat(statementParser.parseReassignment(queue)).isSuccessful()
                                                             .resultMatches(node -> node.getIdentifierAccess()
                                                                                        .getIdentifier()
+                                                                                       .getIdentifier()
                                                                                        .value()
                                                                                        .equals("MyIdentifier"))
                                                             .resultMatches(node -> node.getIdentifierAccess()
                                                                                        .getArrayIndices()
                                                                                        .isEmpty())
                                                             .resultMatches(node -> node.getOperator()
+                                                                                       .getOperator()
                                                                                        .value()
                                                                                        .equals("++"))
                                                             .resultMatches(node -> !((UnaryExpressionNode) node).isPrefix());
@@ -565,8 +579,10 @@ class StatementParserImplTest {
                                                                     })
                                                                     .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
                                                                                                                      .getIdentifier()
+                                                                                                                     .getIdentifier()
                                                                                                                      .value()))
                                                                     .resultMatches(node -> node.getOperator()
+                                                                                               .getOperator()
                                                                                                .value()
                                                                                                .equals("+="));
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -584,9 +600,11 @@ class StatementParserImplTest {
                                                                         IdentifierAccessNode value =
                                                                                 (IdentifierAccessNode) node.getValueExpression();
                                                                         return "expression".equals(value.getIdentifier()
+                                                                                                        .getIdentifier()
                                                                                                         .value());
                                                                     })
                                                                     .resultMatches(node -> node.getIdentifierAccess()
+                                                                                               .getIdentifier()
                                                                                                .getIdentifier()
                                                                                                .value()
                                                                                                .equals("MyIdentifier"))
@@ -602,6 +620,7 @@ class StatementParserImplTest {
                                                                                                    .value());
                                                                     })
                                                                     .resultMatches(node -> "=".equals(node.getOperator()
+                                                                                                          .getOperator()
                                                                                                           .value()));
         assertThat(queue).hasNextTokenValueMatch(";");
 
@@ -613,6 +632,7 @@ class StatementParserImplTest {
         assertThat(statementParser.parseVariableReassignment(queue)).isPartiallyParsed()
                                                                     .resultMatches(node -> node.getValueExpression() instanceof PrimitiveLiteralNode)
                                                                     .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
+                                                                                                                     .getIdentifier()
                                                                                                                      .getIdentifier()
                                                                                                                      .value()))
                                                                     .syntaxDiagnosticContains(
@@ -627,8 +647,10 @@ class StatementParserImplTest {
         assertThat(statementParser.parseVariableReassignment(queue)).isPartiallyParsed()
                                                                     .resultMatches(node -> node.getValueExpression() == null)
                                                                     .resultMatches(node -> "=".equals(node.getOperator()
+                                                                                                          .getOperator()
                                                                                                           .value()))
                                                                     .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
+                                                                                                                     .getIdentifier()
                                                                                                                      .getIdentifier()
                                                                                                                      .value()))
                                                                     .syntaxDiagnosticContains("Not an expression");
@@ -662,10 +684,13 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
                                                                                                         .get(0)
                                                                                                         .getIdentifier()
+                                                                                                        .getIdentifier()
                                                                                                         .value()))
                                                        .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
                                                                                                        .orElseThrow()
-                                                                                                       .value()));;
+                                                                                                       .getIdentifier()
+                                                                                                       .value()));
+        ;
         assertThat(queue).hasNextTokenValueMatch("end");
 
         queue = new TokenQueueTestBuilder().keyword("export")
@@ -683,13 +708,16 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> "MyIdentifier1".equals(node.getExportedElements()
                                                                                                          .get(0)
                                                                                                          .getIdentifier()
+                                                                                                         .getIdentifier()
                                                                                                          .value()))
                                                        .resultMatches(node -> "MyIdentifier2".equals(node.getExportedElements()
                                                                                                          .get(1)
                                                                                                          .getIdentifier()
+                                                                                                         .getIdentifier()
                                                                                                          .value()))
                                                        .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
                                                                                                        .orElseThrow()
+                                                                                                       .getIdentifier()
                                                                                                        .value()));
         assertThat(queue).isAtEnd();
 
@@ -713,6 +741,7 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
                                                                                                         .get(0)
                                                                                                         .getIdentifier()
+                                                                                                        .getIdentifier()
                                                                                                         .value()))
                                                        .syntaxDiagnosticContains("Expected '}'");
         assertThat(queue).hasNextTokenValueMatch("end");
@@ -728,6 +757,7 @@ class StatementParserImplTest {
                                                        .resultMatches(node -> node.getExportedElements().size() == 1)
                                                        .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
                                                                                                         .get(0)
+                                                                                                        .getIdentifier()
                                                                                                         .getIdentifier()
                                                                                                         .value()))
                                                        .syntaxDiagnosticContains("Expected an identifier");

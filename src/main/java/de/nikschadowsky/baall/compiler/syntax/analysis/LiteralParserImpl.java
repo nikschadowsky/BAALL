@@ -8,6 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
@@ -17,7 +18,6 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @since 11.08.2024
@@ -120,6 +120,7 @@ public class LiteralParserImpl implements LiteralParser {
     public ParseResult<StructDefinitionLiteralNode> parseStructDefinition(TokenQueue queue) {
         List<TypeNode> fieldTypes = new ArrayList<>();
         List<Token> fieldNames = new ArrayList<>();
+        List<FieldNode> fields = new ArrayList<>();
 
         StructDefinitionLiteralNodeImpl node =
                 astFactory.createStructDefinitionLiteralNode();
@@ -129,17 +130,16 @@ public class LiteralParserImpl implements LiteralParser {
         }
         queue.poll();
 
-        ParseResult<Map.Entry<TypeNode, Token>> parsedStructField =
+        ParseResult<FieldNode> parsedStructField =
                 programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff());
         if (parsedStructField.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
             return ParseResult.unsuccessfulParse(parsedStructField.getDiagnostic(), queue.getId());
         }
         queue.mergeBranch(parsedStructField.getTokenQueueId());
-        fieldTypes.add(parsedStructField.getParseResult().getKey());
-        fieldNames.add(parsedStructField.getParseResult().getValue());
+        fields.add(parsedStructField.getParseResult());
 
-        ParseResult<List<Map.Entry<TypeNode, Token>>> parsedStructFields =
+        ParseResult<List<FieldNode>> parsedStructFields =
                 programParser.getAuxiliaryParser().parseFieldDeclarations(queue.branchOff());
         if (parsedStructFields.isUnsuccessful()) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get(")"));
@@ -147,15 +147,9 @@ public class LiteralParserImpl implements LiteralParser {
         }
         queue.mergeBranch(parsedStructFields.getTokenQueueId());
 
-        List<Map.Entry<TypeNode, Token>> fields = new LinkedList<>();
+        fields.addAll(parsedStructFields.getParseResult());
 
-        parsedStructFields.getParseResult().forEach(entry -> {
-            fieldTypes.add(entry.getKey());
-            fieldNames.add(entry.getValue());
-        });
-
-        node.setFieldTypes(fieldTypes);
-        node.setFieldNames(fieldNames);
+        node.setFields(fields);
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"), queue.getId());
@@ -222,9 +216,7 @@ public class LiteralParserImpl implements LiteralParser {
     @Override
     public ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue) {
         FunctionDefinitionNodeImpl node = astFactory.createFunctionDefinitionNode();
-        List<Map.Entry<TypeNode, Token>> parameterDeclarations = new LinkedList<>();
-        List<TypeNode> parameterTypes = new ArrayList<>();
-        List<Token> parameterNames = new ArrayList<>();
+        List<FieldNode> parameters = new ArrayList<>();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
             queue.skipOver(SyntaxSet.LANGUAGE_ELEMENTS.get("}"));
@@ -233,25 +225,21 @@ public class LiteralParserImpl implements LiteralParser {
         queue.poll();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-            ParseResult<Map.Entry<TypeNode, Token>> parsedFunctionParameter =
+            ParseResult<FieldNode> parsedFunctionParameter =
                     programParser.getAuxiliaryParser().parseFieldDeclaration(queue.branchOff());
             if (parsedFunctionParameter.isUnsuccessful()) {
                 return ParseResult.unsuccessfulParse(parsedFunctionParameter.getDiagnostic(), queue.getId());
             }
             queue.mergeBranch(parsedFunctionParameter.getTokenQueueId());
-            parameterTypes.add(parsedFunctionParameter.getParseResult().getKey());
-            parameterNames.add(parsedFunctionParameter.getParseResult().getValue());
+            parameters.add(parsedFunctionParameter.getParseResult());
 
-            ParseResult<List<Map.Entry<TypeNode, Token>>> parsedParameterDeclarations =
+            ParseResult<List<FieldNode>> parsedParameterDeclarations =
                     programParser.getAuxiliaryParser().parseFieldDeclarations(queue.branchOff());
             if (parsedParameterDeclarations.isUnsuccessful()) {
                 return ParseResult.unsuccessfulParse(parsedParameterDeclarations.getDiagnostic(), queue.getId());
             }
             queue.mergeBranch(parsedParameterDeclarations.getTokenQueueId());
-            parsedParameterDeclarations.getParseResult().forEach(entry -> {
-                parameterTypes.add(entry.getKey());
-                parameterNames.add(entry.getValue());
-            });
+            parameters.addAll(parsedParameterDeclarations.getParseResult());
         }
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
@@ -259,8 +247,7 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected ')'!"), queue.getId());
         }
         queue.poll();
-        node.setParameterTypes(parameterTypes);
-        node.setParameterNames(parameterNames);
+        node.setParameters(parameters);
 
         ParseResult<StatementsNode> parsedBody = programParser.getAuxiliaryParser().parseCodeBlock(queue.branchOff());
         if (!parsedBody.isSuccessful()) {

@@ -8,6 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ControlStructureNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
@@ -16,6 +17,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
@@ -295,7 +297,7 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
         }
 
-        ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -352,7 +354,7 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
         }
 
-        ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -436,7 +438,7 @@ public class StatementParserImpl implements StatementParser {
         queue.mergeBranch(parsedIdentifier.getTokenQueueId());
         node.setIdentifier(parsedIdentifier.getParseResult());
 
-        ParseResult<Token> parsedShorthandOperator =
+        ParseResult<OperatorNode> parsedShorthandOperator =
                 programParser.getAuxiliaryParser().parseVariableAssignmentOperator(queue.branchOff());
         if (parsedShorthandOperator.isSuccessful()) {
             queue.mergeBranch(parsedShorthandOperator.getTokenQueueId());
@@ -486,7 +488,7 @@ public class StatementParserImpl implements StatementParser {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected namespace identifier!"));
                 } else {
                     queue.poll();
-                    ParseResult<Token> parsedNamespaceIdentifier =
+                    ParseResult<IdentifierNode> parsedNamespaceIdentifier =
                             programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
                     if (parsedNamespaceIdentifier.isUnsuccessful()) {
                         diagnostics.add(parsedNamespaceIdentifier.getDiagnostic());
@@ -542,7 +544,7 @@ public class StatementParserImpl implements StatementParser {
                     diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected namespace identifier!"));
                 } else {
                     queue.poll();
-                    ParseResult<Token> parsedNamespaceIdentifier =
+                    ParseResult<IdentifierNode> parsedNamespaceIdentifier =
                             programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
                     if (parsedNamespaceIdentifier.isUnsuccessful()) {
                         diagnostics.add(parsedNamespaceIdentifier.getDiagnostic());

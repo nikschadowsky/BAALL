@@ -7,17 +7,21 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.*;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.LanguageElement;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,19 +40,19 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue) {
+    public ParseResult<List<FieldNode>> parseFieldDeclarations(TokenQueue queue) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get(",").matches(queue.peek())) {
             queue.poll();
-            ParseResult<Map.Entry<TypeNode, Token>> parsedFieldDeclaration =
+            ParseResult<FieldNode> parsedFieldDeclaration =
                     parseFieldDeclaration(queue.branchOff());
             if (parsedFieldDeclaration.isSuccessful()) {
                 queue.mergeBranch(parsedFieldDeclaration.getTokenQueueId());
-                ParseResult<List<Map.Entry<TypeNode, Token>>> parsedFunctionParameterList =
+                ParseResult<List<FieldNode>> parsedFunctionParameterList =
                         parseFieldDeclarations(queue.branchOff());
                 if (parsedFunctionParameterList.isSuccessful()) {
                     queue.mergeBranch(parsedFunctionParameterList.getTokenQueueId());
 
-                    List<Map.Entry<TypeNode, Token>> parameterFields = new LinkedList<>();
+                    List<FieldNode> parameterFields = new LinkedList<>();
                     parameterFields.add(parsedFieldDeclaration.getParseResult());
                     parameterFields.addAll(parsedFunctionParameterList.getParseResult());
                     return ParseResult.successfulParse(parameterFields, queue.getId());
@@ -62,21 +66,20 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue) {
+    public ParseResult<FieldNode> parseFieldDeclaration(TokenQueue queue) {
+        FieldNodeImpl node = astFactory.createFieldNode();
+
         ParseResult<TypeNode> parsedTypeNode = parseType(queue.branchOff());
         if (parsedTypeNode.isSuccessful()) {
             queue.mergeBranch(parsedTypeNode.getTokenQueueId());
+            node.setType(parsedTypeNode.getParseResult());
             if (SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
                 queue.poll();
-                ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff());
+                ParseResult<IdentifierNode> parsedIdentifier = parseIdentifier(queue.branchOff());
                 if (parsedIdentifier.isSuccessful()) {
                     queue.mergeBranch(parsedIdentifier.getTokenQueueId());
-                    return ParseResult.successfulParse(
-                            Map.entry(
-                                    parsedTypeNode.getParseResult(),
-                                    parsedIdentifier.getParseResult()
-                            ), queue.getId()
-                    );
+                    node.setIdentifier(parsedIdentifier.getParseResult());
+                    return ParseResult.successfulParse(node, queue.getId());
                 }
                 return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
             }
@@ -112,7 +115,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parseBinaryOperator(TokenQueue queue) {
+    public ParseResult<OperatorNode> parseBinaryOperator(TokenQueue queue) {
         // todo syntax set should differentiate between unary and binary operators
         Set<LanguageElement> validBinaryOperators =
                 Stream.of("+", "-", "*", "/", "%", "&", "|", "^", "<<", ">>", "==", "<", ">", "&&", "||")
@@ -120,7 +123,9 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                       .collect(Collectors.toSet());
 
         if (validBinaryOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            OperatorNodeImpl node = astFactory.createOperatorNode();
+            node.setOperator(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
         }
         return ParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(queue.poll(), "Expected an operator!"),
@@ -130,14 +135,16 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parseUnaryOperator(TokenQueue queue) {
+    public ParseResult<OperatorNode> parseUnaryOperator(TokenQueue queue) {
         Set<LanguageElement> validShorthandOperators =
                 Stream.of("++", "--")
                       .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            OperatorNodeImpl node = astFactory.createOperatorNode();
+            node.setOperator(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
         }
         return ParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(queue.poll(), "Expected a unary operator!"),
@@ -147,14 +154,16 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parseVariableAssignmentOperator(TokenQueue queue) {
+    public ParseResult<OperatorNode> parseVariableAssignmentOperator(TokenQueue queue) {
         Set<LanguageElement> validShorthandOperators =
                 Stream.of("=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
                       .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            OperatorNodeImpl node = astFactory.createOperatorNode();
+            node.setOperator(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
         }
         return ParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(
@@ -166,14 +175,16 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parsePrefixOperator(TokenQueue queue) {
+    public ParseResult<OperatorNode> parsePrefixOperator(TokenQueue queue) {
         Set<LanguageElement> validShorthandOperators =
                 Stream.of("+", "-", "!")
                       .map(SyntaxSet.LANGUAGE_ELEMENTS::get)
                       .collect(Collectors.toSet());
 
         if (validShorthandOperators.stream().anyMatch(e -> e.matches(queue.peek()))) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            OperatorNodeImpl node = astFactory.createOperatorNode();
+            node.setOperator(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
         }
         return ParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(queue.poll(), "Expected a prefix operator!"),
@@ -183,9 +194,11 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     @CompleteParse
     @Override
-    public ParseResult<Token> parseIdentifier(TokenQueue queue) {
+    public ParseResult<IdentifierNode> parseIdentifier(TokenQueue queue) {
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("identifier_primitive").matches(queue.peek())) {
-            return ParseResult.successfulParse(queue.poll(), queue.getId());
+            IdentifierNodeImpl node = astFactory.createIdentifierNode();
+            node.setName(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
         }
         return ParseResult.unsuccessfulParse(
                 new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"),
@@ -200,10 +213,12 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
         Token nextToken = queue.peek();
         if (SyntaxSet.SIMPLE_TYPES.stream().anyMatch(e -> e.matches(nextToken))) {
-            node.setType(queue.poll());
+            IdentifierNodeImpl identifier = astFactory.createIdentifierNode();
+            identifier.setName(queue.poll());
+            node.setType(identifier);
             node.setNoneSafe(true);
         } else {
-            ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff());
+            ParseResult<IdentifierNode> parsedIdentifier = parseIdentifier(queue.branchOff());
             if (parsedIdentifier.isSuccessful()) {
                 queue.mergeBranch(parsedIdentifier.getTokenQueueId());
                 node.setType(parsedIdentifier.getParseResult());
@@ -306,7 +321,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
     @Override
     public ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue) {
         IdentifierAccessNodeImpl node = astFactory.createIdentifierAccessNode();
-        ParseResult<Token> parsedIdentifier = parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier = parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch(parsedIdentifier.getTokenQueueId());
             node.setIdentifier(parsedIdentifier.getParseResult());
@@ -314,7 +329,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
                     parseArrayIndexInformation(queue.branchOff());
             if (parsedOptionalArrayIndices.isSuccessful()) {
                 queue.mergeBranch(parsedOptionalArrayIndices.getTokenQueueId());
-                node.setArrayIndexes(parsedOptionalArrayIndices.getParseResult());
+                node.setArrayIndices(parsedOptionalArrayIndices.getParseResult());
                 return ParseResult.successfulParse(node, queue.getId());
             }
             return ParseResult.unsuccessfulParse(parsedOptionalArrayIndices.getDiagnostic(), queue.getId());

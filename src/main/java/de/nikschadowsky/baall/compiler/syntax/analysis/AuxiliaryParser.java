@@ -1,19 +1,20 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @since 25.08.2024
@@ -27,7 +28,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed field declarations
      */
     @CompleteParse
-    ParseResult<List<Map.Entry<TypeNode, Token>>> parseFieldDeclarations(TokenQueue queue);
+    ParseResult<List<FieldNode>> parseFieldDeclarations(TokenQueue queue);
 
     /**
      * Parses a single field declaration in the format of 'TYPE : IDENTIFIER'.
@@ -36,7 +37,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed field declaration
      */
     @CompleteParse
-    ParseResult<Map.Entry<TypeNode, Token>> parseFieldDeclaration(TokenQueue queue);
+    ParseResult<FieldNode> parseFieldDeclaration(TokenQueue queue);
 
     /**
      * Parses a list of arguments in the form of {@link ExpressionParser#parseExpression(TokenQueue) expressions} with a
@@ -55,7 +56,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed binary operator
      */
     @CompleteParse
-    ParseResult<Token> parseBinaryOperator(TokenQueue queue);
+    ParseResult<OperatorNode> parseBinaryOperator(TokenQueue queue);
 
     /**
      * Parses a unary operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
@@ -64,7 +65,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed unary operator
      */
     @CompleteParse
-    ParseResult<Token> parseUnaryOperator(TokenQueue queue);
+    ParseResult<OperatorNode> parseUnaryOperator(TokenQueue queue);
 
     /**
      * Parses a variable assignment operator from the
@@ -74,7 +75,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed shorthand operator
      */
     @CompleteParse
-    ParseResult<Token> parseVariableAssignmentOperator(TokenQueue queue);
+    ParseResult<OperatorNode> parseVariableAssignmentOperator(TokenQueue queue);
 
     /**
      * Parses a prefix operator from the {@link de.nikschadowsky.baall.compiler.util.SyntaxSet syntax set}.
@@ -83,7 +84,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed prefix operator
      */
     @CompleteParse
-    ParseResult<Token> parsePrefixOperator(TokenQueue queue);
+    ParseResult<OperatorNode> parsePrefixOperator(TokenQueue queue);
 
     /**
      * Parses an identifier.
@@ -92,7 +93,7 @@ public interface AuxiliaryParser {
      * @return complete parse result of the parsed identifier
      */
     @CompleteParse
-    ParseResult<Token> parseIdentifier(TokenQueue queue);
+    ParseResult<IdentifierNode> parseIdentifier(TokenQueue queue);
 
     /**
      * Parses a type declaration consisting of a base or custom type and optional

@@ -12,6 +12,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsN
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
@@ -222,7 +223,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
         }
         queue.poll();
 
-        ParseResult<Token> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch(parsedIdentifier.getTokenQueueId());
             node.setIdentifier(parsedIdentifier.getParseResult());
@@ -265,7 +267,6 @@ public class ControlStructureParserImpl implements ControlStructureParser {
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get("::").matches(queue.peek())) {
             queue.poll();
-            node.setHasOptionalStepperStatement(true);
             ParseResult<ReassignmentNode> parsedOptionalForStepper =
                     programParser.getStatementParser().parseReassignment(queue.branchOff());
             if (parsedOptionalForStepper.isSuccessful()) {
@@ -508,7 +509,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             queue.skipTo(SyntaxSet.LANGUAGE_ELEMENTS.get("{"));
         } else {
             queue.poll();
-            ParseResult<Token> parsedExceptionIdentifier =
+            ParseResult<IdentifierNode> parsedExceptionIdentifier =
                     programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
             if (parsedExceptionIdentifier.isUnsuccessful()) {
                 diagnostics.add(parsedExceptionIdentifier.getDiagnostic());

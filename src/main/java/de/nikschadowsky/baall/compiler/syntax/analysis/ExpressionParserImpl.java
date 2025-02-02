@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
@@ -35,7 +34,7 @@ public class ExpressionParserImpl implements ExpressionParser {
     @CompleteParse
     @Override
     public ParseResult<ExpressionNode> parseExpression(TokenQueue queue) {
-        ParseResult<Token> parsedPrefixOperator =
+        ParseResult<OperatorNode> parsedPrefixOperator =
                 programParser.getAuxiliaryParser().parsePrefixOperator(queue.branchOff());
         if (parsedPrefixOperator.isSuccessful()) {
             queue.mergeBranch(parsedPrefixOperator.getTokenQueueId());
@@ -57,7 +56,7 @@ public class ExpressionParserImpl implements ExpressionParser {
         if (parsedValue.isSuccessful()) {
             queue.mergeBranch(parsedValue.getTokenQueueId());
 
-            ParseResult<Token> parsedBinaryOperator =
+            ParseResult<OperatorNode> parsedBinaryOperator =
                     programParser.getAuxiliaryParser().parseBinaryOperator(queue.branchOff());
             if (parsedBinaryOperator.isSuccessful()) {
                 queue.mergeBranch(parsedBinaryOperator.getTokenQueueId());
@@ -211,7 +210,7 @@ public class ExpressionParserImpl implements ExpressionParser {
     @CompleteParse
     @Override
     public ParseResult<UnaryExpressionNode> parseUnaryExpression(TokenQueue queue) {
-        ParseResult<Token> parsedUnaryOperator;
+        ParseResult<OperatorNode> parsedUnaryOperator;
         ParseResult<IdentifierAccessNode> parsedIdentifier;
         UnaryExpressionNodeImpl node;
 

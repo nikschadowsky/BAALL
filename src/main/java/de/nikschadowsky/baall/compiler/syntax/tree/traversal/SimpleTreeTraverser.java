@@ -24,266 +24,241 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 
-import java.util.Optional;
-
 /**
  * @since 23.01.2025
  */
 public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
-    public Optional<R> visitProgram(ProgramNode that, D data) {
+    public R visitProgram(ProgramNode that, D data) {
         R r = scan(that.getImports(), data);
         r = scanAndReduce(that.getStatements(), data, r);
         r = scanAndReduce(that.getExports(), data, r);
-        return Optional.ofNullable(r);
+        return r;
     }
 
     @Override
-    public Optional<R> visitImports(ImportsNode that, D data) {
+    public R visitImports(ImportsNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitStatements(StatementsNode that, D data) {
-        R r = scan(that.getStatements(), data);
-        return Optional.ofNullable(r);
+    public R visitStatements(StatementsNode that, D data) {
+        return scan(that.getStatements(), data);
     }
 
     @Override
-    public Optional<R> visitExports(ExportsNode that, D data) {
-        R r = scan(that.getExportedElements(), data);
-        return Optional.ofNullable(r);
+    public R visitExports(ExportsNode that, D data) {
+        return scan(that.getExportedElements(), data);
     }
 
     @Override
-    public Optional<R> visitDeclaration(DeclarationNode that, D data) {
-        R r = scan(that.getType(), data);
-        return Optional.ofNullable(r);
+    public R visitDeclaration(DeclarationNode that, D data) {
+        return scan(that.getType(), data);
     }
 
     @Override
-    public Optional<R> visitConstantDeclaration(ConstantDeclarationNode that, D data) {
-        R r = scan(that.getType(), data);
-        return Optional.ofNullable(r);
+    public R visitConstantDeclaration(ConstantDeclarationNode that, D data) {
+        return scan(that.getType(), data);
     }
 
     @Override
-    public Optional<R> visitVariableDeclaration(VariableDeclarationNode that, D data) {
-        R r = scan(that.getType(), data);
-        return Optional.ofNullable(r);
+    public R visitVariableDeclaration(VariableDeclarationNode that, D data) {
+        return scan(that.getType(), data);
     }
 
     @Override
-    public Optional<R> visitReassignment(ReassignmentNode that, D data) {
-        R r = scan(that.getIdentifierAccess(), data);
-        return Optional.ofNullable(r);
+    public R visitReassignment(ReassignmentNode that, D data) {
+        return scan(that.getIdentifierAccess(), data);
     }
 
     @Override
-    public Optional<R> visitVariableReassignment(VariableReassignmentNode that, D data) {
-        R r = scan(that.getIdentifierAccess(), data);
-        return Optional.ofNullable(r);
+    public R visitVariableReassignment(VariableReassignmentNode that, D data) {
+        return scan(that.getIdentifierAccess(), data);
     }
 
     @Override
-    public Optional<R> visitType(TypeNode that, D data) {
-        R r = scan(that.getArrayDimensionDefinitions(), data);
-        return Optional.ofNullable(r);
+    public R visitType(TypeNode that, D data) {
+        return scan(that.getArrayDimensionDefinitions(), data);
     }
 
     @Override
-    public Optional<R> visitControlStructure(ControlStructureNode that, D data) {
+    public R visitControlStructure(ControlStructureNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitConditional(ConditionalNode that, D data) {
+    public R visitConditional(ConditionalNode that, D data) {
         R r = scan(that.getCondition(), data);
         r = scanAndReduce(that.getThenBlock(), data, r);
         if (that.getElseBranch().isPresent()) {
             r = scanAndReduce(that.getElseBranch().get(), data, r);
         }
-        return Optional.ofNullable(r);
+        return r;
     }
 
     @Override
-    public Optional<R> visitForLoop(ForLoopNode that, D data) {
+    public R visitForLoop(ForLoopNode that, D data) {
         R r = scan(that.getStartIndexExpression(), data);
         r = scanAndReduce(that.getEndIndexExpression(), data, r);
         if (that.getOptionalStepperStatement().isPresent()) {
             r = scanAndReduce(that.getOptionalStepperStatement().get(), data, r);
         }
-        r = scanAndReduce(that.getBody(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getBody(), data, r);
     }
 
     @Override
-    public Optional<R> visitWhileLoop(WhileLoopNode that, D data) {
+    public R visitWhileLoop(WhileLoopNode that, D data) {
         R r = scan(that.getCondition(), data);
-        r = scanAndReduce(that.getBody(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getBody(), data, r);
     }
 
     @Override
-    public Optional<R> visitExpression(ExpressionNode that, D data) {
+    public R visitExpression(ExpressionNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitBinaryExpression(BinaryExpressionNode that, D data) {
+    public R visitBinaryExpression(BinaryExpressionNode that, D data) {
         R r = scan(that.getLeftOperand(), data);
-        r = scanAndReduce(that.getRightOperand(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getRightOperand(), data, r);
     }
 
     @Override
-    public Optional<R> visitParenthesizedExpression(ParenthesizedExpressionNode that, D data) {
-        R r = scan(that.getInnerExpressionNode(), data);
-        return Optional.ofNullable(r);
+    public R visitParenthesizedExpression(ParenthesizedExpressionNode that, D data) {
+        return scan(that.getInnerExpressionNode(), data);
     }
 
     @Override
-    public Optional<R> visitPrefixOperation(PrefixOperationNode that, D data) {
-        R r = scan(that.getOperand(), data);
-        return Optional.ofNullable(r);
+    public R visitPrefixOperation(PrefixOperationNode that, D data) {
+        return scan(that.getOperand(), data);
     }
 
     @Override
-    public Optional<R> visitUnaryExpression(UnaryExpressionNode that, D data) {
-        R r = scan(that.getIdentifierAccess(), data);
-        return Optional.ofNullable(r);
+    public R visitUnaryExpression(UnaryExpressionNode that, D data) {
+        return scan(that.getIdentifierAccess(), data);
     }
 
     @Override
-    public Optional<R> visitEnsure(EnsureStatementNode that, D data) {
-        R r = scan(that.getBody(), data);
-        return Optional.ofNullable(r);
+    public R visitEnsure(EnsureStatementNode that, D data) {
+        return scan(that.getBody(), data);
     }
 
     @Override
-    public Optional<R> visitIntercept(InterceptStatementNode that, D data) {
+    public R visitIntercept(InterceptStatementNode that, D data) {
         R r = scan(that.getInterceptedExceptions(), data);
-        r = scanAndReduce(that.getBody(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getBody(), data, r);
     }
 
     @Override
-    public Optional<R> visitRaise(RaiseStatementNode that, D data) {
-        R r = scan(that.getException(), data);
-        return Optional.ofNullable(r);
+    public R visitRaise(RaiseStatementNode that, D data) {
+        return scan(that.getException(), data);
     }
 
     @Override
-    public Optional<R> visitTry(TryStatementNode that, D data) {
+    public R visitTry(TryStatementNode that, D data) {
         R r = scan(that.getBody(), data);
         r = scanAndReduce(that.getInterceptBlocks(), data, r);
         if (that.getEnsureBlock().isPresent()) {
             r = scanAndReduce(that.getEnsureBlock().get(), data, r);
         }
-        return Optional.ofNullable(r);
+        return r;
     }
 
     @Override
-    public Optional<R> visitControlStatement(ControlStatementNode that, D data) {
+    public R visitControlStatement(ControlStatementNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitLoopControlStatement(LoopControlStatementNode that, D data) {
+    public R visitLoopControlStatement(LoopControlStatementNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitReturnStatement(ReturnStatementNode that, D data) {
-        R r = scan(that.getReturnExpression(), data);
-        return Optional.ofNullable(r);
+    public R visitReturnStatement(ReturnStatementNode that, D data) {
+        return scan(that.getReturnExpression(), data);
     }
 
     @Override
-    public Optional<R> visitStatement(StatementNode that, D data) {
+    public R visitStatement(StatementNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitArrayLiteral(ArrayLiteralNode that, D data) {
-        R r = scan(that.getElements(), data);
-        return Optional.ofNullable(r);
+    public R visitArrayLiteral(ArrayLiteralNode that, D data) {
+        return scan(that.getElements(), data);
     }
 
     @Override
-    public Optional<R> visitFunctionDefinition(FunctionDefinitionNode that, D data) {
+    public R visitFunctionDefinition(FunctionDefinitionNode that, D data) {
         R r = scan(that.getParameters(), data);
-        r = scanAndReduce(that.getFunctionBody(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getFunctionBody(), data, r);
     }
 
     @Override
-    public Optional<R> visitPrimitiveLiteral(PrimitiveLiteralNode that, D data) {
+    public R visitPrimitiveLiteral(PrimitiveLiteralNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitStructDefinitionLiteral(StructDefinitionLiteralNode that, D data) {
-        R r = scan(that.getFields(), data);
-        return Optional.ofNullable(r);
+    public R visitStructDefinitionLiteral(StructDefinitionLiteralNode that, D data) {
+        return scan(that.getFields(), data);
     }
 
     @Override
-    public Optional<R> visitStructInitializationLiteral(StructInitializationLiteralNode that, D data) {
+    public R visitStructInitializationLiteral(StructInitializationLiteralNode that, D data) {
         R r = scan(that.getIdentifier(), data);
-        r = scanAndReduce(that.getArguments(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getArguments(), data, r);
     }
 
     @Override
-    public Optional<R> visitFunctionCall(FunctionCallNode that, D data) {
+    public R visitFunctionCall(FunctionCallNode that, D data) {
         R r = scan(that.getFunctionIdentifier(), data);
-        r = scanAndReduce(that.getArguments(), data, r);
-        return Optional.ofNullable(r);
+        return scanAndReduce(that.getArguments(), data, r);
     }
 
     @Override
-    public Optional<R> visitIdentifierAccess(IdentifierAccessNode that, D data) {
-        return Optional.ofNullable(scan(that.getArrayIndices(), data));
+    public R visitIdentifierAccess(IdentifierAccessNode that, D data) {
+        return scan(that.getArrayIndices(), data);
     }
 
     @Override
-    public Optional<R> visitLiteral(LiteralNode that, D data) {
+    public R visitLiteral(LiteralNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitTerm(TermNode that, D data) {
+    public R visitTerm(TermNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     //todo
     @Override
-    public Optional<R> visitField(FieldNode that, D data) {
+    public R visitField(FieldNode that, D data) {
         R r = scan(that.getType(), data);
-        return Optional.ofNullable(scanAndReduce(that.getIdentifier(), data, r));
+        return scanAndReduce(that.getIdentifier(), data, r);
     }
 
     @Override
-    public Optional<R> visitIdentifier(IdentifierNode that, D data) {
+    public R visitIdentifier(IdentifierNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<R> visitOperator(OperatorNode that, D data) {
+    public R visitOperator(OperatorNode that, D data) {
         // empty implementation
-        return Optional.empty();
+        return null;
     }
 
     /*
@@ -292,7 +267,7 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     protected R scan(Node node, D data) {
         if (node != null) {
-            return node.accept(this, data).orElse(null);
+            return node.accept(this, data);
         }
         return null;
     }

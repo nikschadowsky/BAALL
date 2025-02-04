@@ -78,7 +78,7 @@ public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitForLoop(this, data);
     }
 }

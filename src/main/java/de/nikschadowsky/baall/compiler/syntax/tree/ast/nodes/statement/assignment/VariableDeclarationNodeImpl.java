@@ -57,7 +57,7 @@ public class VariableDeclarationNodeImpl extends AbstractNode implements Variabl
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitVariableDeclaration(this, data);
     }
 }

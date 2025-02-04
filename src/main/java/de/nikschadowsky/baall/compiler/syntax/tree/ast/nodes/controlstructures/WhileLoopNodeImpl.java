@@ -8,8 +8,6 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 /**
  * @since 21.04.2024
  */
@@ -46,7 +44,7 @@ public class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitWhileLoop(this, data);
     }
 }

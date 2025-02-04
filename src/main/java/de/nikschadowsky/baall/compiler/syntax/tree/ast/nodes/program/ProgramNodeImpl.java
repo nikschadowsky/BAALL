@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @since 14.04.2024
@@ -67,7 +66,7 @@ public class ProgramNodeImpl extends AbstractNode implements ProgramNode {
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitProgram(this, data);
     }
 }

@@ -12,7 +12,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @since 28.07.2024
@@ -50,7 +49,7 @@ public class FunctionDefinitionNodeImpl extends AbstractNode implements Function
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitFunctionDefinition(this, data);
     }
 }

@@ -68,7 +68,7 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitExports(this, data);
     }
 }

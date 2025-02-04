@@ -13,7 +13,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @since 13.04.2024
@@ -60,7 +59,7 @@ public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitImports(this, data);
     }
 }

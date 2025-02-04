@@ -13,7 +13,6 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @since 11.08.2024
@@ -61,7 +60,7 @@ public class InterceptStatementNodeImpl extends AbstractNode implements Intercep
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitIntercept(this, data);
     }
 }

@@ -59,7 +59,7 @@ public class TryStatementNodeImpl extends AbstractNode implements TryStatementNo
     }
 
     @Override
-    public <D, R> Optional<R> accept(ASTVisitor<D, R> visitor, D data) {
+    public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
         return visitor.visitTry(this, data);
     }
 }

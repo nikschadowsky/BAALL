@@ -9,7 +9,6 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
@@ -62,12 +61,10 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(parseStructDefinitionLiteral.getParseResult(), queue.getId());
         }
 
-        ParseResult<StructInitializationLiteralNode>
-                parsedStructInitializationLiteral =
-                parseStructInitialization(queue.branchOff());
-        if (parsedStructInitializationLiteral.isSuccessful()) {
-            queue.mergeBranch(parsedStructInitializationLiteral.getTokenQueueId());
-            return ParseResult.successfulParse(parsedStructInitializationLiteral.getParseResult(), queue.getId());
+        ParseResult<StructNoneLiteralNode> parsedStructNone = parseStructNone(queue.branchOff());
+        if (parsedStructNone.isSuccessful()) {
+            queue.mergeBranch(parsedStructNone.getTokenQueueId());
+            return ParseResult.successfulParse(parsedStructNone.getParseResult(), queue.getId());
         }
 
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected a literal!"), queue.getId());
@@ -158,58 +155,14 @@ public class LiteralParserImpl implements LiteralParser {
         return ParseResult.successfulParse(node, queue.getId());
     }
 
-    @CompleteParse
     @Override
-    public ParseResult<StructInitializationLiteralNode> parseStructInitialization(TokenQueue queue) {
-        StructInitializationLiteralNodeImpl node = astFactory.createStructInitializationLiteralNode();
-
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get("none").matches(queue.peek())) {
-            queue.poll();
-            node.setArguments(new LinkedList<>());
-            return ParseResult.successfulParse(node, queue.getId());
-        }
-
-        ParseResult<IdentifierAccessNode> parsedStructType =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
-        if (parsedStructType.isUnsuccessful()) {
-            return ParseResult.unsuccessfulParse(parsedStructType.getDiagnostic(), queue.getId());
-        }
-        queue.mergeBranch(parsedStructType.getTokenQueueId());
-        node.setIdentifier(parsedStructType.getParseResult());
-
-        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("(").matches(queue.peek())) {
-            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '('!"), queue.getId());
+    public ParseResult<StructNoneLiteralNode> parseStructNone(TokenQueue queue) {
+        if (!SyntaxSet.LANGUAGE_ELEMENTS.get("none").matches(queue.peek())) {
+            return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected 'none'!"), queue.getId());
         }
         queue.poll();
-
-        ParseResult<ExpressionNode> parsedExpression =
-                programParser.getExpressionParser().parseExpression(queue.branchOff());
-        if (parsedExpression.isSuccessful()) {
-            queue.mergeBranch(parsedExpression.getTokenQueueId());
-            ParseResult<List<ExpressionNode>> parsedArguments =
-                    programParser.getAuxiliaryParser().parseArgumentList(queue.branchOff());
-            if (parsedArguments.isSuccessful()) {
-                queue.mergeBranch(parsedArguments.getTokenQueueId());
-
-                if (SyntaxSet.LANGUAGE_ELEMENTS.get(")").matches(queue.peek())) {
-                    queue.poll();
-                    List<ExpressionNode> arguments = new LinkedList<>();
-                    arguments.add(parsedExpression.getParseResult());
-                    arguments.addAll(parsedArguments.getParseResult());
-                    node.setArguments(arguments);
-                    return ParseResult.successfulParse(node, queue.getId());
-                }
-                return ParseResult.unsuccessfulParse(
-                        new SyntaxDiagnostic(queue.poll(), "Expected ')'!"),
-                        queue.getId()
-                );
-            }
-            return ParseResult.unsuccessfulParse(parsedArguments.getDiagnostic(), queue.getId());
-        }
-        return ParseResult.unsuccessfulParse(
-                new SyntaxDiagnostic(queue.poll(), "Expected an expression or 'none'!"),
-                queue.getId()
-        );
+        StructNoneLiteralNodeImpl node = astFactory.createStructNoneLiteralNode();
+        return ParseResult.successfulParse(node, queue.getId());
     }
 
     @CompleteParse

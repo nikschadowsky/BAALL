@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class SyntaxSet {
     public static final @Unmodifiable Set<LanguageElement> PRIMITIVES = getPrimitives();
     public static final @Unmodifiable Set<LanguageElement> KEYWORDS = getKeywords();
-    public static final @Unmodifiable Set<LanguageElement> SIMPLE_TYPES = getSimpleTypes();
+    public static final @Unmodifiable Set<LanguageElement> PRIMITIVE_TYPES = getPrimitiveTypes();
     public static final @Unmodifiable Set<LanguageElement> OPERATORS = getOperators();
     public static final @Unmodifiable Set<LanguageElement> SEPARATORS = getSeparators();
 
@@ -54,13 +54,13 @@ public class SyntaxSet {
         keywords.add(new LanguageElement("as", TokenType.KEYWORD, "as"));
 
         // all simple types are keywords
-        keywords.addAll(getSimpleTypes());
+        keywords.addAll(getPrimitiveTypes());
 
         System.out.println("Keywords: " + keywords + "\n Number of elements: " + keywords.size());
         return Collections.unmodifiableSet(keywords);
     }
 
-    private static Set<LanguageElement> getSimpleTypes() {
+    private static Set<LanguageElement> getPrimitiveTypes() {
         Set<LanguageElement> simpleTypes = new LinkedHashSet<>();
         // TODO undecided language feature, just reserve it for now
         simpleTypes.add(new LanguageElement("char", TokenType.KEYWORD, "char"));

@@ -2,7 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controls
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructInitializationLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -12,18 +12,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RaiseStatementNodeImpl extends AbstractNode implements RaiseStatementNode {
 
-    private StructInitializationLiteralNode exception;
+    private FunctionCallNode exception;
 
     public RaiseStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public StructInitializationLiteralNode getException() {
+    public FunctionCallNode getException() {
         return exception;
     }
 
-    public void setException(StructInitializationLiteralNode exception) {
+    public void setException(FunctionCallNode exception) {
         this.exception = exception;
     }
 
@@ -34,6 +34,6 @@ public class RaiseStatementNodeImpl extends AbstractNode implements RaiseStateme
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitRaise(this, data);
+        return visitor.visitRaiseStatement(this, data);
     }
 }

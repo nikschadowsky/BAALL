@@ -19,7 +19,8 @@ class TokenizerTest {
             0xFFFF,0b10101,
             1234.1234 .123 123
             identifier
-            
+            $another._identifier
+            _
             
             
             struct
@@ -39,6 +40,8 @@ class TokenizerTest {
 
                 TokenType.NUMBER, TokenType.SEPARATOR, TokenType.NUMBER, TokenType.SEPARATOR,
                 TokenType.NUMBER, TokenType.NUMBER, TokenType.NUMBER,
+                TokenType.IDENTIFIER,
+                TokenType.OPERATOR, TokenType.IDENTIFIER, TokenType.SEPARATOR, TokenType.IDENTIFIER,
                 TokenType.IDENTIFIER,
                 TokenType.KEYWORD,
                 TokenType.KEYWORD,

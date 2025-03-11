@@ -116,6 +116,7 @@ public class SyntaxSet {
         operators.add(new LanguageElement("||", TokenType.OPERATOR, "||"));
 
         operators.add(new LanguageElement("?", TokenType.OPERATOR, "?"));
+        operators.add(new LanguageElement("$", TokenType.OPERATOR, "$"));
 
         System.out.println("Operators: " + operators + "\n Number of elements: " + operators.size());
         return Collections.unmodifiableSet(operators);

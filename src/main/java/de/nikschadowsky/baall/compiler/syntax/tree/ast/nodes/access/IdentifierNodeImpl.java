@@ -1,4 +1,4 @@
-package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
+package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access;
 
 
 import de.nikschadowsky.baall.compiler.symbol.Token;

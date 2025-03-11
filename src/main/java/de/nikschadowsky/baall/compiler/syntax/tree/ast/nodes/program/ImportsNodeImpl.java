@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.output.BaallFileReference;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
@@ -19,7 +18,7 @@ import java.util.List;
  */
 public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
-    private final List<BaallFileReference> imports = new ArrayList<>();
+    private final List<Token> imports = new ArrayList<>();
 
     public ImportsNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -27,7 +26,7 @@ public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
 
     @Override
-    public @UnmodifiableView @NotNull List<BaallFileReference> getImports() {
+    public @UnmodifiableView @NotNull List<Token> getImports() {
         return Collections.unmodifiableList(imports);
     }
 
@@ -49,7 +48,7 @@ public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
                        NodeDiagnostic.ReportingLevel.WARN
                )));
 
-        imports.stream().distinct().forEach(_import -> this.imports.add(new BaallFileReference(_import.value())));
+        imports.stream().distinct().forEach(this.imports::add);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
-import de.nikschadowsky.baall.compiler.output.BaallFileReference;
+import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -21,6 +21,6 @@ public interface ImportsNode extends Node {
      */
     @NotNull
     @UnmodifiableView
-    List<BaallFileReference> getImports();
+    List<Token> getImports();
 
 }

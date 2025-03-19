@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
+import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 
@@ -17,7 +18,8 @@ public class PartialParseResultAssertion<T> extends BaseAssertion<PartialParseRe
 
     public SuccessfulParseResultAssertion<T> isSuccessful() {
         truthinessAssert(
-                pr -> "ParseResult is " + (pr.isPartial() ?  "partial" : "unsuccessful") + "!\n syntax diagnostic: " + pr.getDiagnostic().getMessage(),
+                pr -> "ParseResult is " + (pr.isPartial() ? "partial" : "unsuccessful") + "!\n syntax diagnostic: " + pr.getDiagnostic()
+                                                                                                                        .getMessage(),
                 PartialParseResult::isSuccessful
         );
         return new SuccessfulParseResultAssertion<>(actual);
@@ -42,16 +44,13 @@ public class PartialParseResultAssertion<T> extends BaseAssertion<PartialParseRe
         return new PartiallyParsedParseResultAssertion<>(actual);
     }
 
-    public static class SuccessfulParseResultAssertion<T> extends BaseAssertion<SuccessfulParseResultAssertion<T>, PartialParseResult<T>> {
-        public SuccessfulParseResultAssertion(PartialParseResult<T> actual) {
+    public static class SuccessfulParseResultAssertion<ACT> extends BaseAssertion<SuccessfulParseResultAssertion<ACT>, PartialParseResult<ACT>> {
+        public SuccessfulParseResultAssertion(PartialParseResult<ACT> actual) {
             super(actual, SuccessfulParseResultAssertion.class);
         }
 
-        public SuccessfulParseResultAssertion<T> resultMatches(Predicate<T> predicate) {
-            return truthinessAssert(
-                    pr -> "Result does not match predicate!",
-                    pr -> predicate.test(pr.getParseResult())
-            );
+        public <ASS extends BaseAssertion<ASS, ? super ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {
+            return factory.map(actual.getParseResult());
         }
     }
 
@@ -61,46 +60,58 @@ public class PartialParseResultAssertion<T> extends BaseAssertion<PartialParseRe
         }
 
         public UnsuccessfulParseResultAssertion<T> syntaxDiagnosticContains(String expected) {
-            return truthinessAssert(pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
-                    pr.getDiagnostic().getMessage(),
-                    expected
-            ), pr -> pr.getDiagnostic().getMessage().contains(expected));
+            return truthinessAssert(
+                    pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
+                            pr.getDiagnostic().getMessage(),
+                            expected
+                    ), pr -> pr.getDiagnostic().getMessage().contains(expected)
+            );
         }
 
         public UnsuccessfulParseResultAssertion<T> syntaxDiagnosticEquals(String expected) {
             return truthinessAssert(
-                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(pr.getDiagnostic()
-                                                                                         .getMessage(), expected),
+                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(
+                            pr.getDiagnostic()
+                              .getMessage(), expected
+                    ),
                     pr -> expected.equals(pr.getDiagnostic().getMessage())
             );
         }
     }
 
-    public static class PartiallyParsedParseResultAssertion<T> extends BaseAssertion<PartiallyParsedParseResultAssertion<T>, PartialParseResult<T>> {
-        public PartiallyParsedParseResultAssertion(PartialParseResult<T> actual) {
+    public static class PartiallyParsedParseResultAssertion<ACT> extends BaseAssertion<PartiallyParsedParseResultAssertion<ACT>, PartialParseResult<ACT>> {
+        public PartiallyParsedParseResultAssertion(PartialParseResult<ACT> actual) {
             super(actual, PartiallyParsedParseResultAssertion.class);
         }
 
-        public PartiallyParsedParseResultAssertion<T> syntaxDiagnosticContains(String expected) {
-            return truthinessAssert(pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
-                    pr.getDiagnostic().getMessage(),
-                    expected
-            ), pr -> pr.getDiagnostic().getMessage().contains(expected));
+        public PartiallyParsedParseResultAssertion<ACT> syntaxDiagnosticContains(String expected) {
+            return truthinessAssert(
+                    pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
+                            pr.getDiagnostic().getMessage(),
+                            expected
+                    ), pr -> pr.getDiagnostic().getMessage().contains(expected)
+            );
         }
 
-        public PartiallyParsedParseResultAssertion<T> syntaxDiagnosticEquals(String expected) {
+        public PartiallyParsedParseResultAssertion<ACT> syntaxDiagnosticEquals(String expected) {
             return truthinessAssert(
-                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(pr.getDiagnostic()
-                                                                                         .getMessage(), expected),
+                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(
+                            pr.getDiagnostic()
+                              .getMessage(), expected
+                    ),
                     pr -> expected.equals(pr.getDiagnostic().getMessage())
             );
         }
 
-        public PartiallyParsedParseResultAssertion<T> resultMatches(Predicate<T> predicate) {
+        public PartiallyParsedParseResultAssertion<ACT> resultMatches(Predicate<ACT> predicate) {
             return truthinessAssert(
                     pr -> "Result does not match predicate!",
                     pr -> predicate.test(pr.getParseResult())
             );
+        }
+
+        public <ASS extends BaseAssertion<ASS, ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {
+            return factory.map(actual.getParseResult());
         }
     }
 }

@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
+import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 
 import java.util.function.Predicate;
@@ -28,16 +29,20 @@ public class ParseResultAssertion<T> extends BaseAssertion<ParseResultAssertion<
         return new UnsuccessfulParseResultAssertion<>(actual);
     }
 
-    public static class SuccessfulParseResultAssertion<T> extends BaseAssertion<SuccessfulParseResultAssertion<T>, ParseResult<T>> {
-        public SuccessfulParseResultAssertion(ParseResult<T> actual) {
+    public static class SuccessfulParseResultAssertion<ACT> extends BaseAssertion<SuccessfulParseResultAssertion<ACT>, ParseResult<ACT>> {
+        public SuccessfulParseResultAssertion(ParseResult<ACT> actual) {
             super(actual, SuccessfulParseResultAssertion.class);
         }
 
-        public SuccessfulParseResultAssertion<T> resultMatches(Predicate<T> predicate) {
+        public SuccessfulParseResultAssertion<ACT> resultMatches(Predicate<ACT> predicate) {
             return truthinessAssert(
                     pr -> "Result does not match predicate!",
                     pr -> predicate.test(pr.getParseResult())
             );
+        }
+
+        public <ASS extends BaseAssertion<ASS, ? super ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {
+            return factory.map(actual.getParseResult());
         }
     }
 
@@ -47,16 +52,20 @@ public class ParseResultAssertion<T> extends BaseAssertion<ParseResultAssertion<
         }
 
         public UnsuccessfulParseResultAssertion<T> syntaxDiagnosticContains(String expected) {
-            return truthinessAssert(pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
-                    pr.getDiagnostic().getMessage(),
-                    expected
-            ), pr -> pr.getDiagnostic().getMessage().contains(expected));
+            return truthinessAssert(
+                    pr -> "Syntax diagnostic:\n<%s>\n does not contain:\n<%s>".formatted(
+                            pr.getDiagnostic().getMessage(),
+                            expected
+                    ), pr -> pr.getDiagnostic().getMessage().contains(expected)
+            );
         }
 
         public UnsuccessfulParseResultAssertion<T> syntaxDiagnosticEquals(String expected) {
             return truthinessAssert(
-                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(pr.getDiagnostic()
-                                                                                         .getMessage(), expected),
+                    pr -> "Syntax diagnostic:\n<%s>\n does not equal:\n<%s>".formatted(
+                            pr.getDiagnostic()
+                              .getMessage(), expected
+                    ),
                     pr -> expected.equals(pr.getDiagnostic().getMessage())
             );
         }

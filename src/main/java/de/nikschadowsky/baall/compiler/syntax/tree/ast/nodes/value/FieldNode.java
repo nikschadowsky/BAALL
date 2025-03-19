@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
 
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 
 /**

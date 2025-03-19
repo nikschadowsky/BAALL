@@ -1,9 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures;
 
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 
 import java.util.Optional;
 

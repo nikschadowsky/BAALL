@@ -1,8 +1,8 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment;
 
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 
 /**
  * Represents a reassigned field.
@@ -16,7 +16,7 @@ public interface ReassignmentNode extends StatementNode {
      *
      * @return element to be updated
      */
-    IdentifierAccessNode getIdentifierAccess();
+    ElementAccessNode getElementAccess();
 
     /**
      * Operator of the reassignment.

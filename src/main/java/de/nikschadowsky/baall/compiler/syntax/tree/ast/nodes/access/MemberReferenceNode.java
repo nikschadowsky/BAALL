@@ -6,6 +6,6 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access;
  */
 public interface MemberReferenceNode extends CompositeIdentifierNode{
 
-    IdentifierNode getSelf();
+    ElementAccessNode getSelf();
 
 }

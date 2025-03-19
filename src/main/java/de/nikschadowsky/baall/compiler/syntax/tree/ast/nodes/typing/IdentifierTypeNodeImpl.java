@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class IdentifierTypeNodeImpl extends AbstractNode implements IdentifierTypeNode {
 
-    private IdentifierNode type;
+    private ElementAccessNode type;
     private boolean noneSafe;
 
     public IdentifierTypeNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -21,11 +21,11 @@ public class IdentifierTypeNodeImpl extends AbstractNode implements IdentifierTy
     }
 
     @Override
-    public IdentifierNode getType() {
+    public ElementAccessNode getType() {
         return type;
     }
 
-    public void setType(IdentifierNode type) {
+    public void setType(ElementAccessNode type) {
         this.type = type;
     }
 

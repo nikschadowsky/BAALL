@@ -1,9 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -21,9 +21,9 @@ public interface InterceptStatementNode extends Node {
      *
      * @return exceptions
      */
-    @NotNull
     @UnmodifiableView
-    List<IdentifierAccessNode> getInterceptedExceptions();
+    @NotNull
+    List<TypeNode> getInterceptedExceptions();
 
     /**
      * Binding variable of the exceptions.

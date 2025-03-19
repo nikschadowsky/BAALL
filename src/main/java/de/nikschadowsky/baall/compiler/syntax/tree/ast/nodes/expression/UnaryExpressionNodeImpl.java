@@ -2,7 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpressionNode {
 
-    private IdentifierAccessNode identifierAccess;
+    private ElementAccessNode identifierAccess;
     private boolean isPrefix;
     private OperatorNode operator;
 
@@ -21,11 +21,11 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
     }
 
     @Override
-    public IdentifierAccessNode getIdentifierAccess() {
+    public ElementAccessNode getElementAccess() {
         return identifierAccess;
     }
 
-    public void setIdentifierAccess(IdentifierAccessNode identifier) {
+    public void setIdentifierAccess(ElementAccessNode identifier) {
         this.identifierAccess = identifier;
     }
 

@@ -1,8 +1,8 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment;
 
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 
 /**
  * Represents a declaration of a field, struct, exception or function.

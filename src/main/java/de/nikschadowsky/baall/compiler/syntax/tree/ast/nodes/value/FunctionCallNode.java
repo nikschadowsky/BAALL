@@ -1,5 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
 
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,7 @@ public interface FunctionCallNode extends TermNode, StatementNode {
      *
      * @return function identifier access
      */
-    IdentifierAccessNode getFunctionIdentifier();
+    ElementAccessNode getFunctionIdentifier();
 
     /**
      * Arguments to call the function with.

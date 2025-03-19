@@ -2,8 +2,8 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
 
-    private List<IdentifierAccessNode> exports = Collections.emptyList();
+    private List<ElementAccessNode> exports = Collections.emptyList();
     private IdentifierNode namespace;
 
     public ExportsNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -28,11 +28,11 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     }
 
     @Override
-    public @NotNull @UnmodifiableView List<IdentifierAccessNode> getExportedElements() {
+    public @NotNull @UnmodifiableView List<ElementAccessNode> getExportedElements() {
         return Collections.unmodifiableList(exports);
     }
 
-    public void setExports(@NotNull List<IdentifierAccessNode> exports) {
+    public void setExports(@NotNull List<ElementAccessNode> exports) {
         this.exports = new ArrayList<>(exports);
 
         if (exports.isEmpty()) {
@@ -44,13 +44,13 @@ public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
             return;
         }
 
-        exports.stream()
+        /*exports.stream()
                .filter(e -> Collections.frequency(exports, e) > 1)
                .forEach(e -> getDiagnosticCollector().report(new NodeDiagnostic(
                        "Duplicate export",
                        e.getIdentifier().getIdentifier(),
                        NodeDiagnostic.ReportingLevel.WARN
-               )));
+               ))); */
     }
 
     @Override

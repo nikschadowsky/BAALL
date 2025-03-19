@@ -2,9 +2,9 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignme
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class VariableReassignmentNodeImpl extends AbstractNode implements VariableReassignmentNode {
 
-    private IdentifierAccessNode identifier;
+    private ElementAccessNode identifier;
     private OperatorNode operator;
     private ExpressionNode value;
 
@@ -23,11 +23,11 @@ public class VariableReassignmentNodeImpl extends AbstractNode implements Variab
     }
 
     @Override
-    public IdentifierAccessNode getIdentifierAccess() {
+    public ElementAccessNode getElementAccess() {
         return identifier;
     }
 
-    public void setIdentifier(IdentifierAccessNode identifier) {
+    public void setIdentifier(ElementAccessNode identifier) {
         this.identifier = identifier;
     }
 

@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNode {
 
-    private IdentifierAccessNode functionIdentifier;
+    private ElementAccessNode functionIdentifier;
     private List<ExpressionNode> arguments = Collections.emptyList();
 
     public FunctionCallNodeImpl(NodeDiagnosticCollector diagnostics) {
@@ -25,11 +26,11 @@ public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNo
     }
 
     @Override
-    public IdentifierAccessNode getFunctionIdentifier() {
+    public ElementAccessNode getFunctionIdentifier() {
         return functionIdentifier;
     }
 
-    public void setFunctionIdentifier(IdentifierAccessNode functionIdentifier) {
+    public void setFunctionIdentifier(ElementAccessNode functionIdentifier) {
         this.functionIdentifier = functionIdentifier;
     }
 

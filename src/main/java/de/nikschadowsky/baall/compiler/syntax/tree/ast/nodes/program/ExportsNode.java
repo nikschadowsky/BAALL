@@ -1,8 +1,8 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -23,7 +23,7 @@ public interface ExportsNode extends Node {
      */
     @NotNull
     @UnmodifiableView
-    List<IdentifierAccessNode> getExportedElements();
+    List<ElementAccessNode> getExportedElements();
 
     /**
      * Optional namespace of the exports. A namespace allows for referencing exported fields in another program when

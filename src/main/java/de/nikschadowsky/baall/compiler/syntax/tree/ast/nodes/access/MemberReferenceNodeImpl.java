@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class MemberReferenceNodeImpl extends AbstractNode implements MemberReferenceNode {
 
     private ElementAccessNode inner;
-    private IdentifierNode self;
+    private ElementAccessNode self;
 
     public MemberReferenceNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
@@ -29,11 +29,11 @@ public class MemberReferenceNodeImpl extends AbstractNode implements MemberRefer
     }
 
     @Override
-    public IdentifierNode getSelf() {
+    public ElementAccessNode getSelf() {
         return self;
     }
 
-    public void setSelf(IdentifierNode self) {
+    public void setSelf(ElementAccessNode self) {
         this.self = self;
     }
 

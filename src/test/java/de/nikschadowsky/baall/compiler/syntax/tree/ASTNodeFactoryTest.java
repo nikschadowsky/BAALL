@@ -113,11 +113,6 @@ class ASTNodeFactoryTest {
     }
 
     @Test
-    void createIdentifierAccessNode() {
-        assertThat(astFactory.createIdentifierAccessNode()).hasNodeType(NodeType.IDENTIFIER_ACCESS);
-    }
-
-    @Test
     void createRaiseStatementNode() {
         assertThat(astFactory.createRaiseStatementNode()).hasNodeType(NodeType.RAISE);
     }
@@ -148,11 +143,6 @@ class ASTNodeFactoryTest {
     }
 
     @Test
-    void createStructInitializationLiteralNode() {
-        assertThat(astFactory.createStructInitializationLiteralNode()).hasNodeType(NodeType.STRUCT_INITIALIZATION);
-    }
-
-    @Test
     void createArrayLiteralNode() {
         assertThat(astFactory.createArrayLiteralNode()).hasNodeType(NodeType.ARRAY_LITERAL);
     }
@@ -160,10 +150,5 @@ class ASTNodeFactoryTest {
     @Test
     void createFunctionDefinitionNode() {
         assertThat(astFactory.createFunctionDefinitionNode()).hasNodeType(NodeType.FUNCTION_DEFINITION);
-    }
-
-    @Test
-    void createTypeNode() {
-        assertThat(astFactory.createTypeNode()).hasNodeType(NodeType.TYPE);
     }
 }

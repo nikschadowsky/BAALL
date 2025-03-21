@@ -8,7 +8,9 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.F
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ConstantDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableReassignmentNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.BreakStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ContinueStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ReturnStatementNode;
@@ -86,30 +88,6 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
     public StatementNodeAssertion.RaiseStatementNodeAssertion isRaiseStatement() {
         isInstanceOf(RaiseStatementNode.class);
         return NodeAssertionFactory.create((RaiseStatementNode) actual);
-    }
-
-    // todo useful?
-    public static class ReassignmentNodeAssertion extends BaseAssertion<ReassignmentNodeAssertion, ReassignmentNode> {
-
-        public ReassignmentNodeAssertion(ReassignmentNode actual) {
-            super(actual, ReassignmentNodeAssertion.class);
-        }
-
-        public StatementNodeAssertion toStatementAssertion() {
-            return NodeAssertionFactory.create((StatementNode) actual);
-        }
-    }
-
-    // todo useful?
-    public static class DeclarationNodeAssertion extends BaseAssertion<DeclarationNodeAssertion, DeclarationNode> {
-
-        public DeclarationNodeAssertion(DeclarationNode actual) {
-            super(actual, DeclarationNodeAssertion.class);
-        }
-
-        public StatementNodeAssertion toStatementAssertion() {
-            return NodeAssertionFactory.create((StatementNode) actual);
-        }
     }
 
     public static class VariableDeclarationNodeAssertion extends BaseAssertion<VariableDeclarationNodeAssertion, VariableDeclarationNode> {

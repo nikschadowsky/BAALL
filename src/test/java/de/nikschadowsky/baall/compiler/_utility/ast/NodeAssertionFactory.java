@@ -11,7 +11,9 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ConstantDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableReassignmentNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ReturnStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.EnsureStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.InterceptStatementNode;
@@ -171,16 +173,8 @@ public interface NodeAssertionFactory<ASSERTION, ACTUAL> {
         return new StatementNodeAssertion.VariableReassignmentNodeAssertion(actual);
     }
 
-    static StatementNodeAssertion.ReassignmentNodeAssertion create(ReassignmentNode actual) {
-        return new StatementNodeAssertion.ReassignmentNodeAssertion(actual);
-    }
-
     static ImportsNodeAssertion create(ImportsNode actual) {
         return new ImportsNodeAssertion(actual);
-    }
-
-    static StatementNodeAssertion.DeclarationNodeAssertion create(DeclarationNode actual) {
-        return new StatementNodeAssertion.DeclarationNodeAssertion(actual);
     }
 
     static ExportsNodeAssertion create(ExportsNode actual) {

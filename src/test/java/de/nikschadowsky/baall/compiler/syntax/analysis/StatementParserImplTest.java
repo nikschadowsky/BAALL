@@ -1,23 +1,19 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
+import de.nikschadowsky.baall.compiler._utility.BaseAssertion;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
+import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
+import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ConstantDeclarationNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableReassignmentNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ReturnStatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.FunctionDefinitionNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
 import static org.mockito.Mockito.mock;
@@ -57,10 +53,11 @@ class StatementParserImplTest {
     void parseImports() {
         TokenQueue queue =
                 new TokenQueueTestBuilder().keyword("use").string("MyImport").separator(";").operator("end").build();
-        assertThat(statementParser.parseImports(queue)).isSuccessful()
-                                                       .resultMatches(imports -> imports.size() == 1)
-                                                       .resultMatches(imports -> "MyImport".equals(imports.get(0)
-                                                                                                          .value()));
+        PartialParseResult<ImportsNode> actual = statementParser.parseImports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasImports(1)
+                          .hasImport(0, "MyImport");
         assertThat(queue).hasNextTokenValueMatch("end");
 
         queue = new TokenQueueTestBuilder().keyword("use")
@@ -70,30 +67,33 @@ class StatementParserImplTest {
                                            .string("MyImport2")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseImports(queue)).isSuccessful()
-                                                       .resultMatches(imports -> imports.size() == 2)
-                                                       .resultMatches(imports -> "MyImport1".equals(imports.get(0)
-                                                                                                           .value()))
-                                                       .resultMatches(imports -> "MyImport2".equals(imports.get(1)
-                                                                                                           .value()));
+        actual = statementParser.parseImports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasImports(2)
+                          .hasImport(0, "MyImport1")
+                          .hasImport(1, "MyImport2");
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("use").separator(";").operator("end").build();
-        assertThat(statementParser.parseImports(queue)).isPartiallyParsed()
-                                                       .resultMatches(List::isEmpty)
-                                                       .syntaxDiagnosticContains("Expected a string");
+        actual = statementParser.parseImports(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected a string")
+                          .map(NodeAssertionFactory::create)
+                          .hasNoImports();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator("something").separator(";").build();
-        assertThat(statementParser.parseImports(queue)).isSuccessful().resultMatches(List::isEmpty);
+        actual = statementParser.parseImports(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasNoImports();
         assertThat(queue).hasNextTokenValueMatch("something");
     }
 
     @Test
     void parseStatements() {
         TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(statementParser.parseStatements(queue)).isSuccessful()
-                                                          .resultMatches(node -> node.getStatements().isEmpty());
+        PartialParseResult<StatementsNode> actual = statementParser.parseStatements(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasNoStatements();
 
         queue = new TokenQueueTestBuilder().identifier("MyFunctionCall")
                                            .separator("(")
@@ -138,8 +138,8 @@ class StatementParserImplTest {
                                            .number("MyNumber2")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseStatements(queue)).isSuccessful()
-                                                          .resultMatches(node -> node.getStatements().size() == 4);
+        actual = statementParser.parseStatements(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasStatements(4);
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().identifier("MyFunction")
@@ -156,9 +156,10 @@ class StatementParserImplTest {
                                            .keyword("break")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseStatements(queue)).isPartiallyParsed()
-                                                          .resultMatches(node -> node.getStatements().size() == 3)
-                                                          .syntaxDiagnosticContains("Not an expression");
+        actual = statementParser.parseStatements(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Not an expression")
+                          .map(NodeAssertionFactory::create).hasStatements(3);
         assertThat(queue).isAtEnd();
     }
 
@@ -173,17 +174,10 @@ class StatementParserImplTest {
                                                       .separator(";")
                                                       .separator("}")
                                                       .build();
-        assertThat(statementParser.parseDelimitedStatement(queue)).isSuccessful().resultMatches(node -> {
-            WhileLoopNode whileLoopNode = (WhileLoopNode) node;
-            PrimitiveLiteralNode condition = (PrimitiveLiteralNode) whileLoopNode.getCondition();
-            return PrimitiveLiteralNode.PrimitiveType.BOOLEAN.equals(condition.getPrimitiveType());
-        }).resultMatches(node -> {
-            WhileLoopNode whileLoopNode = (WhileLoopNode) node;
-            return whileLoopNode.getBody().getStatements().size() == 1;
-        }).resultMatches(node -> {
-            WhileLoopNode whileLoopNode = (WhileLoopNode) node;
-            return whileLoopNode.getBody().getStatements().get(0) instanceof FunctionCallNode;
-        });
+        PartialParseResult<StatementNode> actual = statementParser.parseDelimitedStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isWhileLoop();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().identifier("MyFunction")
@@ -194,13 +188,12 @@ class StatementParserImplTest {
                                            .separator(")")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDelimitedStatement(queue)).isSuccessful()
-                                                                  .resultMatches(node -> node instanceof FunctionCallNode);
+        actual = statementParser.parseDelimitedStatement(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).isFunctionCall();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
                                            .separator("[")
-                                           .identifier("Array-Size")
                                            .separator("]")
                                            .separator(":")
                                            .identifier("MyFunction")
@@ -218,9 +211,8 @@ class StatementParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDelimitedStatement(queue)).isSuccessful()
-                                                                  .resultMatches(node -> node instanceof ConstantDeclarationNode)
-                                                                  .resultMatches(node -> ((ConstantDeclarationNode) node).getInitializationValue() instanceof FunctionDefinitionNode);
+        actual = statementParser.parseDelimitedStatement(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).isConstantDeclaration();
         assertThat(queue).isAtEnd();
     }
 
@@ -233,8 +225,10 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isSuccessful()
-                                                               .resultMatches(node -> node instanceof VariableDeclarationNode);
+        PartialParseResult<StatementNode> actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -244,19 +238,25 @@ class StatementParserImplTest {
                                            .number("expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isSuccessful()
-                                                               .resultMatches(node -> node instanceof ConstantDeclarationNode);
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isConstantDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
 
         queue = new TokenQueueTestBuilder().keyword("return").number("expression").separator(";").build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isSuccessful()
-                                                               .resultMatches(node -> node instanceof ReturnStatementNode);
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isReturnStatement();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("--").identifier("MyIdentifier").build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isSuccessful()
-                                                               .resultMatches(node -> node instanceof UnaryExpressionNode);
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isUnaryExpression();
 
         queue = new TokenQueueTestBuilder().identifier("MyFunction")
                                            .separator("(")
@@ -264,8 +264,10 @@ class StatementParserImplTest {
                                            .separator(")")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isSuccessful()
-                                                               .resultMatches(node -> node instanceof FunctionCallNode);
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isFunctionCall();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         // todo partial
@@ -276,9 +278,11 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isPartiallyParsed()
-                                                               .resultMatches(node -> node instanceof VariableDeclarationNode)
-                                                               .syntaxDiagnosticContains("Expected an expression");
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an expression")
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -288,14 +292,14 @@ class StatementParserImplTest {
                                            .operator("something")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isPartiallyParsed()
-                                                               .syntaxDiagnosticContains("Expected ':'");
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isPartiallyParsed().syntaxDiagnosticContains("Expected ':'");
         assertThat(queue).hasNextTokenValueMatch(";");
 
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(statementParser.parseSimpleStatement(queue)).isUnsuccessful()
-                                                               .syntaxDiagnosticContains("Not a statement");
+        actual = statementParser.parseSimpleStatement(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Not a statement");
         assertThat(queue).isAtEnd();
     }
 
@@ -308,8 +312,10 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseDeclaration(queue)).isSuccessful()
-                                                           .resultMatches(node -> node instanceof VariableDeclarationNode);
+        PartialParseResult<DeclarationNode> actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -317,8 +323,10 @@ class StatementParserImplTest {
                                            .identifier("MyIdentifier")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDeclaration(queue)).isSuccessful()
-                                                           .resultMatches(node -> node instanceof VariableDeclarationNode);
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -328,8 +336,10 @@ class StatementParserImplTest {
                                            .number("expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDeclaration(queue)).isSuccessful()
-                                                           .resultMatches(node -> node instanceof ConstantDeclarationNode);
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isConstantDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -339,9 +349,11 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDeclaration(queue)).isPartiallyParsed()
-                                                           .resultMatches(node -> node instanceof VariableDeclarationNode)
-                                                           .syntaxDiagnosticContains("Expected an expression");
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an expression")
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -349,9 +361,11 @@ class StatementParserImplTest {
                                            .identifier("MyIdentifier")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDeclaration(queue)).isPartiallyParsed()
-                                                           .resultMatches(node -> node instanceof VariableDeclarationNode)
-                                                           .syntaxDiagnosticContains("Expected ':'");
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected ':'")
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("string")
@@ -361,14 +375,16 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseDeclaration(queue)).isPartiallyParsed()
-                                                           .resultMatches(node -> node instanceof VariableDeclarationNode)
-                                                           .syntaxDiagnosticContains("Expected an expression");
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an expression")
+                          .map(NodeAssertionFactory::create)
+                          .isVariableDeclaration();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(statementParser.parseDeclaration(queue)).isUnsuccessful()
-                                                           .syntaxDiagnosticContains("Not a statement");
+        actual = statementParser.parseDeclaration(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Not a statement");
         assertThat(queue).isAtEnd();
     }
 
@@ -381,20 +397,13 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseVariableDeclaration(queue)).isSuccessful()
-                                                                   .resultMatches(node -> "string".equals(node.getType()
-                                                                                                              .getType()
-                                                                                                              .getIdentifier()
-                                                                                                              .value()))
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getArrayDimensionDefinitions()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
-                                                                                                                    .getIdentifier()
-                                                                                                                    .value()))
-                                                                   .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
-                                                                           ((PrimitiveLiteralNode) node.getInitializationValue()
-                                                                                                       .orElseThrow()).getPrimitiveType()));
+        PartialParseResult<VariableDeclarationNode> actual = statementParser.parseVariableDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasIdentifierName("MyIdentifier")
+                          .hasInitializationValue()
+                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
@@ -402,19 +411,14 @@ class StatementParserImplTest {
                                            .identifier("MyIdentifier")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseVariableDeclaration(queue)).isSuccessful()
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getType()
-                                                                                              .getIdentifier()
-                                                                                              .value()
-                                                                                              .equals("MyType"))
-                                                                   .resultMatches(node -> node.getIdentifier()
-                                                                                              .getIdentifier()
-                                                                                              .value()
-                                                                                              .equals("MyIdentifier"))
-                                                                   .resultMatches(node -> node.getInitializationValue()
-                                                                                              .isEmpty());
-
+        actual = statementParser.parseVariableDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isIdentifierType()
+                                                 .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType"))
+                                                 .isNotNoneSafe())
+                          .hasIdentifierName("MyIdentifier")
+                          .hasNoInitializationValue();
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
                                            .separator("[")
@@ -425,25 +429,21 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseVariableDeclaration(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> "MyType".equals(node.getType()
-                                                                                                              .getType()
-                                                                                                              .getIdentifier()
-                                                                                                              .value()))
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getArrayDimensionDefinitions()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
-                                                                                                                    .getIdentifier()
-                                                                                                                    .value()))
-                                                                   .resultMatches(node -> node.getInitializationValue()
-                                                                                              .isEmpty())
-                                                                   .syntaxDiagnosticContains("Expected an expression");
+        actual = statementParser.parseVariableDeclaration(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isListType()
+                                                 .mapToInner()
+                                                 .isIdentifierType()
+                                                 .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType"))
+                          )
+                          .hasNoInitializationValue();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("something else").separator(";").build();
-        assertThat(statementParser.parseVariableDeclaration(queue)).isUnsuccessful()
-                                                                   .syntaxDiagnosticContains("Not a statement");
+        actual = statementParser.parseVariableDeclaration(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Not a statement");
     }
 
     @Test
@@ -455,19 +455,12 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseConstantDeclaration(queue)).isSuccessful()
-                                                                   .resultMatches(node -> "string".equals(node.getType()
-                                                                                                              .getType()
-                                                                                                              .getIdentifier()
-                                                                                                              .value()))
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getArrayDimensionDefinitions()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
-                                                                                                                    .getIdentifier()
-                                                                                                                    .value()))
-                                                                   .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
-                                                                           ((PrimitiveLiteralNode) node.getInitializationValue()).getPrimitiveType()));
+        PartialParseResult<ConstantDeclarationNode> actual = statementParser.parseConstantDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasIdentifierName("MyIdentifier")
+                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
         queue = new TokenQueueTestBuilder().identifier("MyType")
                                            .separator("[")
@@ -478,19 +471,16 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseConstantDeclaration(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> "MyType".equals(node.getType()
-                                                                                                              .getType()
-                                                                                                              .getIdentifier()
-                                                                                                              .value()))
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getArrayDimensionDefinitions()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
-                                                                                                                    .getIdentifier()
-                                                                                                                    .value()))
-                                                                   .resultMatches(node -> node.getInitializationValue() == null)
-                                                                   .syntaxDiagnosticContains("Expected an expression");
+        actual = statementParser.parseConstantDeclaration(queue);
+        assertThat(actual).isPartiallyParsed().syntaxDiagnosticContains("Expected an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isListType()
+                                                 .mapToInner()
+                                                 .isIdentifierType()
+                                                 .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType"))
+                          )
+                          .hasIdentifierName("MyIdentifier")
+                          .hasInitializationValueMatching(BaseAssertion::isNull);
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
@@ -502,25 +492,23 @@ class StatementParserImplTest {
                                            .number("expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseConstantDeclaration(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> "MyType".equals(node.getType()
-                                                                                                              .getType()
-                                                                                                              .getIdentifier()
-                                                                                                              .value()))
-                                                                   .resultMatches(node -> node.getType()
-                                                                                              .getArrayDimensionDefinitions()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> "MyIdentifier".equals(node.getIdentifier()
-                                                                                                                    .getIdentifier()
-                                                                                                                    .value()))
-                                                                   .resultMatches(node -> PrimitiveLiteralNode.PrimitiveType.NUMBER.equals(
-                                                                           ((PrimitiveLiteralNode) node.getInitializationValue()).getPrimitiveType()))
-                                                                   .syntaxDiagnosticContains("Expected ':='");
+        actual = statementParser.parseConstantDeclaration(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected ':='")
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isListType()
+                                                 .mapToInner()
+                                                 .isIdentifierType()
+                                                 .hasIdentifierMatching(a1 -> a1.isIdentifier()
+                                                                                .hasName("MyType"))
+                          )
+                          .hasIdentifierName("MyIdentifier")
+                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("something else").separator(";").build();
-        assertThat(statementParser.parseConstantDeclaration(queue)).isUnsuccessful()
-                                                                   .syntaxDiagnosticContains("Not a statement");
+        actual = statementParser.parseConstantDeclaration(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Not a statement");
     }
 
     @Test
@@ -530,25 +518,23 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseReassignment(queue)).isSuccessful()
-                                                            .resultMatches(node -> node instanceof VariableReassignmentNode);
+        PartialParseResult<ReassignmentNode> actual = statementParser.parseReassignment(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isVariableReassignment();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier").operator("++").separator(";").build();
-        assertThat(statementParser.parseReassignment(queue)).isSuccessful()
-                                                            .resultMatches(node -> node.getIdentifierAccess()
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()
-                                                                                       .equals("MyIdentifier"))
-                                                            .resultMatches(node -> node.getIdentifierAccess()
-                                                                                       .getArrayIndices()
-                                                                                       .isEmpty())
-                                                            .resultMatches(node -> node.getOperator()
-                                                                                       .getOperator()
-                                                                                       .value()
-                                                                                       .equals("++"))
-                                                            .resultMatches(node -> !((UnaryExpressionNode) node).isPrefix());
+        actual = statementParser.parseReassignment(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isUnaryExpression()
+                          .hasOperator("++")
+                          .isPostfixOperation()
+                          .mapToInner()
+                          .isIdentifier()
+                          .hasName("MyIdentifier");
+
         assertThat(queue).hasNextTokenValueMatch(";");
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
                                            .operator("something")
@@ -556,9 +542,11 @@ class StatementParserImplTest {
                                            .operator("something")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseReassignment(queue)).isPartiallyParsed()
-                                                            .resultMatches(node -> node instanceof VariableReassignmentNode)
-                                                            .syntaxDiagnosticContains("Expected an assignment operator");
+        actual = statementParser.parseReassignment(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an assignment operator")
+                          .map(NodeAssertionFactory::create)
+                          .isVariableReassignment();
         assertThat(queue).hasNextTokenValueMatch(";");
 
     }
@@ -570,21 +558,12 @@ class StatementParserImplTest {
                                                       .number("expression")
                                                       .separator(";")
                                                       .build();
-        assertThat(statementParser.parseVariableReassignment(queue)).isSuccessful()
-                                                                    .resultMatches(node -> {
-                                                                        PrimitiveLiteralNode value =
-                                                                                (PrimitiveLiteralNode) node.getValueExpression();
-                                                                        return "expression".equals(value.getPrimitiveValue()
-                                                                                                        .value());
-                                                                    })
-                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .value()))
-                                                                    .resultMatches(node -> node.getOperator()
-                                                                                               .getOperator()
-                                                                                               .value()
-                                                                                               .equals("+="));
+        PartialParseResult<VariableReassignmentNode> actual = statementParser.parseVariableReassignment(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasElementAccessMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
+                          .hasOperator("+=")
+                          .hasValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -595,33 +574,21 @@ class StatementParserImplTest {
                                            .identifier("expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseVariableReassignment(queue)).isSuccessful()
-                                                                    .resultMatches(node -> {
-                                                                        IdentifierAccessNode value =
-                                                                                (IdentifierAccessNode) node.getValueExpression();
-                                                                        return "expression".equals(value.getIdentifier()
-                                                                                                        .getIdentifier()
-                                                                                                        .value());
-                                                                    })
-                                                                    .resultMatches(node -> node.getIdentifierAccess()
-                                                                                               .getIdentifier()
-                                                                                               .getIdentifier()
-                                                                                               .value()
-                                                                                               .equals("MyIdentifier"))
-                                                                    .resultMatches(node -> node.getIdentifierAccess()
-                                                                                               .getArrayIndices()
-                                                                                               .size() == 1)
-                                                                    .resultMatches(node -> {
-                                                                        PrimitiveLiteralNode index =
-                                                                                (PrimitiveLiteralNode) node.getIdentifierAccess()
-                                                                                                           .getArrayIndices()
-                                                                                                           .get(0);
-                                                                        return "index".equals(index.getPrimitiveValue()
-                                                                                                   .value());
-                                                                    })
-                                                                    .resultMatches(node -> "=".equals(node.getOperator()
-                                                                                                          .getOperator()
-                                                                                                          .value()));
+        actual = statementParser.parseVariableReassignment(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasElementAccessMatching(
+                                  a -> a.isIndexedAccess()
+                                        .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
+                                                                  .isNumber()
+                                                                  .hasPrimitiveValue("index")
+                                        )
+                                        .mapToInner()
+                                        .isIdentifier()
+                                        .hasName("MyIdentifier")
+                          )
+                          .hasOperator("=")
+                          .hasValueMatching(a -> a.isElementAccess().isIdentifier().hasName("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -629,14 +596,13 @@ class StatementParserImplTest {
                                            .number("expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseVariableReassignment(queue)).isPartiallyParsed()
-                                                                    .resultMatches(node -> node.getValueExpression() instanceof PrimitiveLiteralNode)
-                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .value()))
-                                                                    .syntaxDiagnosticContains(
-                                                                            "Expected an assignment operator");
+        actual = statementParser.parseVariableReassignment(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an assignment operator")
+                          .map(NodeAssertionFactory::create)
+                          .hasElementAccessMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
+                          .hasOperatorMatching(BaseAssertion::isNull)
+                          .hasValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression").isNumber());
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -644,16 +610,13 @@ class StatementParserImplTest {
                                            .operator("not an expression")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseVariableReassignment(queue)).isPartiallyParsed()
-                                                                    .resultMatches(node -> node.getValueExpression() == null)
-                                                                    .resultMatches(node -> "=".equals(node.getOperator()
-                                                                                                          .getOperator()
-                                                                                                          .value()))
-                                                                    .resultMatches(node -> "MyIdentifier".equals(node.getIdentifierAccess()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .getIdentifier()
-                                                                                                                     .value()))
-                                                                    .syntaxDiagnosticContains("Not an expression");
+        actual = statementParser.parseVariableReassignment(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Not an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasElementAccessMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
+                          .hasOperator("=")
+                          .hasValueMatching(BaseAssertion::isNull);
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().string("string").separator(";").build();
@@ -675,22 +638,21 @@ class StatementParserImplTest {
                                                       .separator(";")
                                                       .operator("end")
                                                       .build();
-        assertThat(statementParser.parseExports(queue)).isSuccessful()
-                                                       .resultMatches(node -> node.getExportedElements().size() == 1)
-                                                       .resultMatches(node -> node.getExportedElements()
-                                                                                  .get(0)
-                                                                                  .getArrayIndices()
-                                                                                  .size() == 1)
-                                                       .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
-                                                                                                        .get(0)
-                                                                                                        .getIdentifier()
-                                                                                                        .getIdentifier()
-                                                                                                        .value()))
-                                                       .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
-                                                                                                       .orElseThrow()
-                                                                                                       .getIdentifier()
-                                                                                                       .value()));
-        ;
+        PartialParseResult<ExportsNode> actual = statementParser.parseExports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasExports(1)
+                          .hasExportedElementMatching(
+                                  0,
+                                  a -> a.isIndexedAccess()
+                                        .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
+                                                                  .hasPrimitiveValue("index")
+                                                                  .isNumber()
+                                        )
+                                        .mapToInner()
+                                        .isIdentifier().hasName("MyIdentifier")
+                          ).hasNamespace()
+                          .hasNamespaceName("MyNamespace");
         assertThat(queue).hasNextTokenValueMatch("end");
 
         queue = new TokenQueueTestBuilder().keyword("export")
@@ -703,27 +665,22 @@ class StatementParserImplTest {
                                            .identifier("MyNamespace")
                                            .separator(";")
                                            .build();
-        assertThat(statementParser.parseExports(queue)).isSuccessful()
-                                                       .resultMatches(node -> node.getExportedElements().size() == 2)
-                                                       .resultMatches(node -> "MyIdentifier1".equals(node.getExportedElements()
-                                                                                                         .get(0)
-                                                                                                         .getIdentifier()
-                                                                                                         .getIdentifier()
-                                                                                                         .value()))
-                                                       .resultMatches(node -> "MyIdentifier2".equals(node.getExportedElements()
-                                                                                                         .get(1)
-                                                                                                         .getIdentifier()
-                                                                                                         .getIdentifier()
-                                                                                                         .value()))
-                                                       .resultMatches(node -> "MyNamespace".equals(node.getNamespace()
-                                                                                                       .orElseThrow()
-                                                                                                       .getIdentifier()
-                                                                                                       .value()));
+        actual = statementParser.parseExports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasExports(2)
+                          .hasExportedElementMatching(0, a -> a.isIdentifier().hasName("MyIdentifier1"))
+                          .hasExportedElementMatching(1, a -> a.isIdentifier().hasName("MyIdentifier2"))
+                          .hasNamespace()
+                          .hasNamespaceName("MyNamespace");
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("export").separator("{").separator("}").separator(";").build();
-        assertThat(statementParser.parseExports(queue)).isSuccessful()
-                                                       .resultMatches(node -> node.getExportedElements().isEmpty());
+        actual = statementParser.parseExports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasNoExports()
+                          .hasNoNamespace();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("export")
@@ -736,14 +693,12 @@ class StatementParserImplTest {
                                            .identifier("MyNamespace")
                                            .separator("end")
                                            .build();
-        assertThat(statementParser.parseExports(queue)).isPartiallyParsed()
-                                                       .resultMatches(node -> node.getExportedElements().size() == 1)
-                                                       .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
-                                                                                                        .get(0)
-                                                                                                        .getIdentifier()
-                                                                                                        .getIdentifier()
-                                                                                                        .value()))
-                                                       .syntaxDiagnosticContains("Expected '}'");
+        actual = statementParser.parseExports(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '}'")
+                          .map(NodeAssertionFactory::create)
+                          .hasExports(1)
+                          .hasExportedElementMatching(0, a -> a.isIdentifier().hasName("MyIdentifier"));
         assertThat(queue).hasNextTokenValueMatch("end");
 
         queue = new TokenQueueTestBuilder().keyword("export")
@@ -753,19 +708,19 @@ class StatementParserImplTest {
                                            .keyword("as")
                                            .identifier("MyNamespace")
                                            .build();
-        assertThat(statementParser.parseExports(queue)).isPartiallyParsed()
-                                                       .resultMatches(node -> node.getExportedElements().size() == 1)
-                                                       .resultMatches(node -> "MyIdentifier".equals(node.getExportedElements()
-                                                                                                        .get(0)
-                                                                                                        .getIdentifier()
-                                                                                                        .getIdentifier()
-                                                                                                        .value()))
-                                                       .syntaxDiagnosticContains("Expected an identifier");
+        actual = statementParser.parseExports(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an identifier")
+                          .map(NodeAssertionFactory::create)
+                          .hasExports(1)
+                          .hasExportedElementMatching(0, a -> a.isIdentifier().hasName("MyIdentifier"));
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(statementParser.parseExports(queue)).isSuccessful()
-                                                       .resultMatches(node -> node.getExportedElements().isEmpty());
+        actual = statementParser.parseExports(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasNoExports();
         assertThat(queue).hasNextTokenValueMatch(";");
     }
 }

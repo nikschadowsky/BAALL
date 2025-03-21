@@ -4,8 +4,6 @@ package de.nikschadowsky.baall.compiler._utility;
 import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 
-import java.util.function.Predicate;
-
 /**
  * @since 15.08.2024
  */
@@ -32,13 +30,6 @@ public class ParseResultAssertion<T> extends BaseAssertion<ParseResultAssertion<
     public static class SuccessfulParseResultAssertion<ACT> extends BaseAssertion<SuccessfulParseResultAssertion<ACT>, ParseResult<ACT>> {
         public SuccessfulParseResultAssertion(ParseResult<ACT> actual) {
             super(actual, SuccessfulParseResultAssertion.class);
-        }
-
-        public SuccessfulParseResultAssertion<ACT> resultMatches(Predicate<ACT> predicate) {
-            return truthinessAssert(
-                    pr -> "Result does not match predicate!",
-                    pr -> predicate.test(pr.getParseResult())
-            );
         }
 
         public <ASS extends BaseAssertion<ASS, ? super ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {

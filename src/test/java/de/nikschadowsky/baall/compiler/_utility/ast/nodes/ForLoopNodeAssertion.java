@@ -52,7 +52,7 @@ public class ForLoopNodeAssertion extends BaseAssertion<ForLoopNodeAssertion, Fo
         );
     }
 
-    public ForLoopNodeAssertion hasOptionalStepperMatching(NodeAssertionBuilder<StatementNodeAssertion.ReassignmentNodeAssertion> a) {
+    public ForLoopNodeAssertion hasOptionalStepperMatching(NodeAssertionBuilder<StatementNodeAssertion> a) {
         a.assertThat(NodeAssertionFactory.create(actual.getOptionalStepperStatement().orElseThrow()));
         return this;
     }

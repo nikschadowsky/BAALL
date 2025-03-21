@@ -2,11 +2,17 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
+import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
+import de.nikschadowsky.baall.compiler._utility.ast.nodes.TypeNodeAssertion;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
+import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +22,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import java.util.List;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
-import static java.util.function.Predicate.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
@@ -51,8 +56,10 @@ class AuxiliaryParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(auxiliaryParser.parseFieldDeclarations(queue)).isSuccessful()
-                                                                 .resultMatches(List::isEmpty);
+        ParseResult<List<FieldNode>> actual = auxiliaryParser.parseFieldDeclarations(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isEmpty();
 
         queue = new TokenQueueTestBuilder().separator(",")
                                            .keyword("number")
@@ -64,47 +71,53 @@ class AuxiliaryParserImplTest {
                                            .separator("]")
                                            .separator(":")
                                            .identifier("MyIdentifier2")
+                                           .separator(",")
+                                           .keyword("struct")
+                                           .operator("<")
+                                           .operator(">")
+                                           .separator(":")
+                                           .identifier("MyIdentifier3")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseFieldDeclarations(queue)).isSuccessful()
-                                                                 .resultMatches(list -> list.size() == 2)
-                                                                 .resultMatches(list -> list.get(0)
-                                                                                            .getType()
-                                                                                            .getType()
-                                                                                            .getIdentifier()
-                                                                                            .value()
-                                                                                            .equals("number"))
-                                                                 .resultMatches(list -> list.get(0)
-                                                                                            .getType()
-                                                                                            .getArrayDimensionDefinitions()
-                                                                                            .isEmpty())
-                                                                 .resultMatches(list -> list.get(0)
-                                                                                            .getIdentifier()
-                                                                                            .getIdentifier()
-                                                                                            .value()
-                                                                                            .equals("MyIdentifier"))
-                                                                 .resultMatches(list -> list.get(1)
-                                                                                            .getType()
-                                                                                            .getType()
-                                                                                            .getIdentifier()
-                                                                                            .value()
-                                                                                            .equals("MyType"))
-                                                                 .resultMatches(list -> list.get(1)
-                                                                                            .getType()
-                                                                                            .getArrayDimensionDefinitions()
-                                                                                            .size() == 1)
-                                                                 .resultMatches(list -> list.get(1)
-                                                                                            .getIdentifier()
-                                                                                            .getIdentifier()
-                                                                                            .value()
-                                                                                            .equals("MyIdentifier2"));
+        actual = auxiliaryParser.parseFieldDeclarations(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasSize(3)
+                          .hasElementMatching(
+                                  0,
+                                  NodeAssertionFactory::create,
+                                  a -> a.hasTypeMatching(a1 -> a1.isPrimitiveType().hasIdentifier("number"))
+                                        .hasName("MyIdentifier")
+                          )
+                          .hasElementMatching(
+                                  1,
+                                  NodeAssertionFactory::create,
+                                  a -> a.hasTypeMatching(a1 -> a1.isListType()
+                                                                 .mapToInner()
+                                                                 .isIdentifierType()
+                                                                 .hasIdentifierMatching(a2 -> a2.isIdentifier()
+                                                                                                .hasName("MyType")
+                                                                 )
+                                        )
+                                        .hasName("MyIdentifier2")
+                          )
+                          .hasElementMatching(
+                                  2,
+                                  NodeAssertionFactory::create,
+                                  a -> a.hasName("MyIdentifier3")
+                                        .hasTypeMatching(a1 -> a1.isFunctionType()
+                                                                 .hasNoParameterTypes()
+                                                                 .mapToInner()
+                                                                 .isPrimitiveType()
+                                                                 .hasIdentifier("struct")
+                                        )
+                          );
         assertThat(queue).hasNextTokenValueMatch(";");
 
 
         queue = new TokenQueueTestBuilder().separator(",").identifier("MyType").separator(":").build();
-        assertThat(auxiliaryParser.parseFieldDeclarations(queue)).isUnsuccessful()
-                                                                 .syntaxDiagnosticContains(
-                                                                         "Expected an identifier");
+        actual = auxiliaryParser.parseFieldDeclarations(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an identifier");
     }
 
     @Test
@@ -122,19 +135,12 @@ class AuxiliaryParserImplTest {
                                                       .identifier("MyIdentifier")
                                                       .separator(";")
                                                       .build();
-        assertThat(auxiliaryParser.parseFieldDeclaration(queue)).isSuccessful()
-                                                                .resultMatches(field -> field.getType()
-                                                                                             .getType()
-                                                                                             .getIdentifier()
-                                                                                             .value()
-                                                                                             .equals("MyType"))
-                                                                .resultMatches(field -> field.getType()
-                                                                                             .getArrayDimensionDefinitions()
-                                                                                             .isEmpty())
-                                                                .resultMatches(field -> field.getIdentifier()
-                                                                                             .getIdentifier()
-                                                                                             .value()
-                                                                                             .equals("MyIdentifier"));
+        ParseResult<FieldNode> actual = auxiliaryParser.parseFieldDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(TypeNodeAssertion::isIdentifierType)
+                          .hasTypeMatching(a -> a.isIdentifierType().isNotNoneSafe())
+                          .hasName("MyIdentifier");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
@@ -144,19 +150,14 @@ class AuxiliaryParserImplTest {
                                            .identifier("MyIdentifier")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseFieldDeclaration(queue)).isSuccessful()
-                                                                .resultMatches(field -> field.getType()
-                                                                                             .getType()
-                                                                                             .getIdentifier()
-                                                                                             .value()
-                                                                                             .equals("MyType"))
-                                                                .resultMatches(field -> field.getType()
-                                                                                             .getArrayDimensionDefinitions()
-                                                                                             .size() == 1)
-                                                                .resultMatches(field -> field.getIdentifier()
-                                                                                             .getIdentifier()
-                                                                                             .value()
-                                                                                             .equals("MyIdentifier"));
+        actual = auxiliaryParser.parseFieldDeclaration(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasTypeMatching(a -> a.isListType()
+                                                 .mapToInner()
+                                                 .isIdentifierType()
+                                                 .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType")))
+                          .hasName("MyIdentifier");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
@@ -179,13 +180,14 @@ class AuxiliaryParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(auxiliaryParser.parseArgumentList(queue)).isSuccessful().resultMatches(List::isEmpty);
+        assertThat(auxiliaryParser.parseArgumentList(queue)).isSuccessful().map(NodeAssertionFactory::create).isEmpty();
 
         queue = new TokenQueueTestBuilder().separator(",").operator("expression").separator(";").build();
-        assertThat(auxiliaryParser.parseArgumentList(queue)).isSuccessful()
-                                                            .resultMatches(list -> list.size() == 1)
-                                                            .resultMatches(list -> list.get(0)
-                                                                                       .equals(mockedExpression));
+        ParseResult<List<ExpressionNode>> actual = auxiliaryParser.parseArgumentList(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasSize(1)
+                          .hasElementMatching(0, NodeAssertionFactory::create, a -> a.isEqualTo(mockedExpression));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(",").operator("expression").separator(",").operator(",").build();
@@ -202,20 +204,14 @@ class AuxiliaryParserImplTest {
                                                       .build();
 
         assertThat(auxiliaryParser.parseBinaryOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                      node.getOperator().type()))
-                                                              .resultMatches(token -> "+".equals(token.getOperator()
-                                                                                                      .value()));
+                                                              .map(NodeAssertionFactory::create)
+                                                              .hasOperator("+");
         assertThat(auxiliaryParser.parseBinaryOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                      node.getOperator().type()))
-                                                              .resultMatches(token -> ">>".equals(token.getOperator()
-                                                                                                       .value()));
+                                                              .map(NodeAssertionFactory::create)
+                                                              .hasOperator(">>");
         assertThat(auxiliaryParser.parseBinaryOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                      node.getOperator().type()))
-                                                              .resultMatches(token -> ">".equals(token.getOperator()
-                                                                                                      .value()));
+                                                              .map(NodeAssertionFactory::create)
+                                                              .hasOperator(">");
         assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
                                                                           .syntaxDiagnosticContains(
                                                                                   "Expected an assignment operator");
@@ -233,15 +229,11 @@ class AuxiliaryParserImplTest {
                                                       .build();
 
         assertThat(auxiliaryParser.parseUnaryOperator(queue)).isSuccessful()
-                                                             .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                     node.getOperator().type()))
-                                                             .resultMatches(node -> ("++").equals(node.getOperator()
-                                                                                                      .value()));
+                                                             .map(NodeAssertionFactory::create)
+                                                             .hasOperator("++");
         assertThat(auxiliaryParser.parseUnaryOperator(queue)).isSuccessful()
-                                                             .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                     node.getOperator().type()))
-                                                             .resultMatches(node -> "--".equals(node.getOperator()
-                                                                                                    .value()));
+                                                             .map(NodeAssertionFactory::create)
+                                                             .hasOperator("--");
 
         assertThat(auxiliaryParser.parseUnaryOperator(queue)).isUnsuccessful()
                                                              .syntaxDiagnosticContains(
@@ -263,53 +255,36 @@ class AuxiliaryParserImplTest {
                                                       .string("anyString")
                                                       .build();
 
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
-                                                                          .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                                  node.getOperator().type()))
-                                                                          .resultMatches(node -> "=".equals(node.getOperator()
-                                                                                                                .value()));
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
-                                                                          .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                                  node.getOperator().type()))
-                                                                          .resultMatches(node -> "+=".equals(node.getOperator()
-                                                                                                                 .value()));
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isSuccessful()
-                                                                          .resultMatches(node -> TokenType.OPERATOR.equals(
-                                                                                  node.getOperator().type()))
-                                                                          .resultMatches(node -> "|=".equals(node.getOperator()
-                                                                                                                 .value()));
-
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
-                                                                          .syntaxDiagnosticContains(
-                                                                                  "Expected an assignment operator");
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
-                                                                          .syntaxDiagnosticContains(
-                                                                                  "Expected an assignment operator");
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
-                                                                          .syntaxDiagnosticContains(
-                                                                                  "Expected an assignment operator");
-        assertThat(auxiliaryParser.parseVariableAssignmentOperator(queue)).isUnsuccessful()
-                                                                          .syntaxDiagnosticContains(
-                                                                                  "Expected an assignment operator");
+        ParseResult<OperatorNode> actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("=");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("+=");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("|=");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an assignment operator");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an assignment operator");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an assignment operator");
+        actual = auxiliaryParser.parseVariableAssignmentOperator(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an assignment operator");
     }
 
     @Test
     void parsePrefixOperator() {
         TokenQueue queue = new TokenQueueTestBuilder().operator("+").operator("-").operator("!").build();
 
-        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> "+".equals(node.getOperator()
-                                                                                                    .value()));
-        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> "-".equals(node.getOperator()
-                                                                                                    .value()));
-        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isSuccessful()
-                                                              .resultMatches(node -> "!".equals(node.getOperator()
-                                                                                                    .value()));
+        ParseResult<OperatorNode> actual = auxiliaryParser.parsePrefixOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("+");
+        actual = auxiliaryParser.parsePrefixOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("-");
+        actual = auxiliaryParser.parsePrefixOperator(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasOperator("!");
 
         queue = new TokenQueueTestBuilder().operator("++").build();
-        assertThat(auxiliaryParser.parsePrefixOperator(queue)).isUnsuccessful()
-                                                              .syntaxDiagnosticContains("Expected a prefix operator");
+        actual = auxiliaryParser.parsePrefixOperator(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected a prefix operator");
     }
 
     @Test
@@ -318,10 +293,10 @@ class AuxiliaryParserImplTest {
 
         // parsing identifier
         assertThat(auxiliaryParser.parseIdentifier(queue)).isSuccessful()
-                                                          .resultMatches(node -> TokenType.IDENTIFIER.equals(
-                                                                  node.getIdentifier().type()))
-                                                          .resultMatches(node -> "MyIdentifier".equals(
-                                                                  node.getIdentifier().value()));
+                                                          .map(NodeAssertionFactory::create)
+                                                          .hasName("MyIdentifier")
+                                                          .hasTokenType(TokenType.IDENTIFIER);
+
         // parsing number
         assertThat(auxiliaryParser.parseIdentifier(queue)).isUnsuccessful()
                                                           .syntaxDiagnosticContains("Expected an identifier");
@@ -340,78 +315,124 @@ class AuxiliaryParserImplTest {
 
         TokenQueue queue = new TokenQueueTestBuilder().keyword("string")
                                                       .separator("[")
-                                                      .operator("expression")
                                                       .separator("]")
                                                       .separator("[")
                                                       .separator("]")
                                                       .separator("[")
                                                       .separator("]")
                                                       .separator("[")
-                                                      .operator("expression")
                                                       .separator("]")
                                                       .separator(";")
                                                       .build();
 
-        assertThat(auxiliaryParser.parseType(queue)).isSuccessful()
-                                                    .resultMatches(node -> "string".equals(node.getType()
-                                                                                               .getIdentifier()
-                                                                                               .value()))
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .size() == 4)
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(0) == mockedExpression)
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(1) == null)
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(1) == null)
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(0) == mockedExpression)
-                                                    .resultMatches(TypeNode::isNoneSafe);
+        ParseResult<TypeNode> actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isListType()
+                          .mapToInner()
+                          .isListType()
+                          .mapToInner()
+                          .isListType()
+                          .mapToInner()
+                          .isListType()
+                          .mapToInner()
+                          .isPrimitiveType()
+                          .hasIdentifier("string");
+
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier").keyword("another statement").build();
-        assertThat(auxiliaryParser.parseType(queue)).isSuccessful()
-                                                    .resultMatches(node -> "MyIdentifier".equals(node.getType()
-                                                                                                     .getIdentifier()
-                                                                                                     .value()))
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .isEmpty())
-                                                    .resultMatches(not(TypeNode::isNoneSafe));
+
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isIdentifierType()
+                          .hasIdentifierMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
+                          .isNotNoneSafe();
+
         assertThat(queue).hasNextTokenValueMatch("another statement");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
                                            .operator("!")
                                            .separator("[")
-                                           .number("4")
                                            .separator("]")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseType(queue)).isSuccessful()
-                                                    .resultMatches(node -> "MyType".equals(node.getType()
-                                                                                               .getIdentifier()
-                                                                                               .value()))
-                                                    .resultMatches(node -> node.getArrayDimensionDefinitions()
-                                                                               .get(0) == mockedExpression)
-                                                    .resultMatches(TypeNode::isNoneSafe);
+
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isListType()
+                          .mapToInner()
+                          .isIdentifierType()
+                          .hasIdentifierMatching(a -> a.isIdentifier().hasName("MyType"))
+                          .isNoneSafe();
 
         queue = new TokenQueueTestBuilder().operator("+")
                                            .separator("[")
-                                           .keyword("another statement")
                                            .separator("]")
                                            .build();
-        assertThat(auxiliaryParser.parseType(queue)).isUnsuccessful()
-                                                    .syntaxDiagnosticContains("Expected a type");
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected a type");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
                                            .separator("[")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseType(queue)).isUnsuccessful()
-                                                    .syntaxDiagnosticContains("Expected ']'");
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected ']'");
+
+        queue = new TokenQueueTestBuilder().keyword("number").operator("<").keyword("string").operator(">").build();
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isFunctionType()
+                          .hasParameterTypes(1)
+                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .mapToInner()
+                          .isPrimitiveType()
+                          .hasIdentifier("number");
+
+        // myType![]<>[]<string<boolean>,number>
+        queue = new TokenQueueTestBuilder().identifier("myType")
+                                           .operator("!")
+                                           .separator("[")
+                                           .separator("]")
+                                           .operator("<")
+                                           .operator(">")
+                                           .separator("[")
+                                           .separator("]")
+                                           .operator("<")
+                                           .keyword("string")
+                                           .operator("<")
+                                           .keyword("boolean")
+                                           .operator(">")
+                                           .separator(",")
+                                           .keyword("number")
+                                           .operator(">")
+                                           .build();
+        actual = auxiliaryParser.parseType(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isFunctionType()
+                          .hasParameterTypes(2)
+                          .hasParameterTypeMatching(0, TypeNodeAssertion::isFunctionType)
+                          .hasParameterTypeMatching(1, TypeNodeAssertion::isPrimitiveType)
+                          .mapToInner()
+                          .isListType()
+                          .mapToInner()
+                          .isFunctionType()
+                          .hasNoParameterTypes()
+                          .mapToInner()
+                          .isListType()
+                          .mapToInner()
+                          .isIdentifierType()
+                          .isNoneSafe()
+                          .hasIdentifierMatching(a -> a.isIdentifier().hasName("myType"));
     }
 
     @Test
-    void parseArrayTypeDefinition() {
+    void parseElementAccess() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
@@ -421,73 +442,109 @@ class AuxiliaryParserImplTest {
                 "]"
         );
 
-        TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(auxiliaryParser.parseArrayTypeDefinition(queue)).isSuccessful()
-                                                                   .resultMatches(List::isEmpty);
-
-        queue = new TokenQueueTestBuilder().separator("[")
-                                           .separator("]")
-                                           .separator("[")
-                                           .operator("expression")
-                                           .separator("]")
-                                           .separator(";")
-                                           .build();
-        assertThat(auxiliaryParser.parseArrayTypeDefinition(queue)).isSuccessful()
-                                                                   .resultMatches(list -> list.size() == 2)
-                                                                   .resultMatches(list -> list.get(0) == null)
-                                                                   .resultMatches(list -> list.get(1) == mockedExpression);
+        TokenQueue queue = new TokenQueueTestBuilder().identifier("myIdentifier").separator(";").build();
+        ParseResult<ElementAccessNode> actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isIdentifier()
+                          .hasName("myIdentifier");
         assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().separator("[").separator(";").separator(".").build();
-        assertThat(auxiliaryParser.parseArrayTypeDefinition(queue)).isUnsuccessful()
-                                                                   .syntaxDiagnosticContains("Expected ']'");
-    }
-
-    @Test
-    void parseIdentifierAccess() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        parserMockerExtension.mockExpressionParserExecution(
-                programParser,
-                expParser -> expParser.parseExpression(any()),
-                mockedExpression,
-                "[",
-                "]"
-        );
-
-        TokenQueue queue = new TokenQueueTestBuilder().identifier("MyIdentifier").separator(";").build();
-        assertThat(auxiliaryParser.parseIdentifierAccess(queue)).isSuccessful()
-                                                                .resultMatches(ian -> "MyIdentifier".equals(
-                                                                        ian.getIdentifier().getIdentifier().value()))
-                                                                .resultMatches(ian -> ian.getArrayIndices()
-                                                                                         .isEmpty());
+        queue = new TokenQueueTestBuilder().operator("$").identifier("myIdentifier").separator(";").build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isScopeElevation()
+                          .mapToInner()
+                          .isIdentifier()
+                          .hasName("myIdentifier");
         assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
+        queue = new TokenQueueTestBuilder().identifier("myIdentifier")
                                            .separator("[")
-                                           .operator("expression")
+                                           .number("expr")
+                                           .separator("]")
+                                           .separator("[")
+                                           .number("expr")
                                            .separator("]")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseIdentifierAccess(queue)).isSuccessful()
-                                                                .resultMatches(ian -> "MyIdentifier".equals(
-                                                                        ian.getIdentifier().getIdentifier().value()))
-                                                                .resultMatches(ian -> ian.getArrayIndices()
-                                                                                         .size() == 1);
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isIndexedAccess()
+                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
+                          .mapToInner()
+                          .isIndexedAccess()
+                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
+                          .mapToInner()
+                          .isIdentifier()
+                          .hasName("myIdentifier");
         assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
-                                           .separator("[")
-                                           .operator("expression")
+        queue = new TokenQueueTestBuilder().identifier("myIdentifier1")
+                                           .separator(".")
+                                           .identifier("myIdentifier2")
                                            .separator(";")
                                            .build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create)
+                          .isMemberReference()
+                          .hasSelfMatching(a -> a.isIdentifier().hasName("myIdentifier1"))
+                          .mapToInner()
+                          .isIdentifier()
+                          .hasName("myIdentifier2");
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        assertThat(auxiliaryParser.parseIdentifierAccess(queue)).isUnsuccessful()
-                                                                .syntaxDiagnosticContains("Expected ']'");
+        queue = new TokenQueueTestBuilder().operator("$")
+                                           .identifier("myIdentifier1")
+                                           .separator("[")
+                                           .number("expr")
+                                           .separator("]")
+                                           .separator(".")
+                                           .identifier("myIdentifier2")
+                                           .separator("[")
+                                           .number("expr")
+                                           .separator("]")
+                                           .separator("[")
+                                           .number("expr")
+                                           .separator("]")
+                                           .separator(";")
+                                           .build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create)
+                          .isScopeElevation()
+                          .mapToInner()
+                          .isMemberReference()
+                          .hasSelfMatching(a -> a.isIndexedAccess()
+                                                 .hasIndexMatching(a1 -> a1.isEqualTo(mockedExpression))
+                                                 .mapToInner()
+                                                 .isIdentifier()
+                                                 .hasName("myIdentifier1")
+                          )
+                          .mapToInner()
+                          .isIndexedAccess()
+                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
+                          .mapToInner()
+                          .isIndexedAccess()
+                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
+                          .mapToInner()
+                          .isIdentifier()
+                          .hasName("myIdentifier2");
+        assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(auxiliaryParser.parseIdentifierAccess(queue)).isUnsuccessful()
-                                                                .syntaxDiagnosticContains(
-                                                                        "Expected an identifier");
+        queue = new TokenQueueTestBuilder().operator("$").separator(";").build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an identifier");
+
+        queue = new TokenQueueTestBuilder().identifier("myIdentifier").separator("[").number("expr").build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        // incomplete index information -> will not be consumed
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).isIdentifier();
+
+        queue = new TokenQueueTestBuilder().identifier("myIdentifier").separator(".").build();
+        actual = auxiliaryParser.parseElementAccess(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected an identifier");
     }
 
     @Test
@@ -502,13 +559,16 @@ class AuxiliaryParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(auxiliaryParser.parseArrayIndexInformation(queue)).isSuccessful()
-                                                                     .resultMatches(List::isEmpty);
+        ParseResult<List<ExpressionNode>> actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).isEmpty();
 
         queue = new TokenQueueTestBuilder().separator("[").operator("expression").separator("]").separator(";").build();
-        assertThat(auxiliaryParser.parseArrayIndexInformation(queue)).isSuccessful()
-                                                                     .resultMatches(list -> list.size() == 1)
-                                                                     .resultMatches(lst -> lst.get(0) == mockedExpression);
+
+        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasSize(1)
+                          .hasElementMatching(0, NodeAssertionFactory::create, a -> a.isEqualTo(mockedExpression));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("[")
@@ -519,88 +579,18 @@ class AuxiliaryParserImplTest {
                                            .separator("]")
                                            .separator(";")
                                            .build();
-        assertThat(auxiliaryParser.parseArrayIndexInformation(queue)).isSuccessful()
-                                                                     .resultMatches(list -> list.size() == 2)
-                                                                     .resultMatches(list -> list.get(0) == mockedExpression)
-                                                                     .resultMatches(list -> list.get(1) == mockedExpression);
+
+        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasSize(2)
+                          .hasElementMatching(0, NodeAssertionFactory::create, a -> a.isEqualTo(mockedExpression))
+                          .hasElementMatching(1, NodeAssertionFactory::create, a -> a.isEqualTo(mockedExpression));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("[").separator(";").build();
-        assertThat(auxiliaryParser.parseArrayIndexInformation(queue)).isUnsuccessful()
-                                                                     .syntaxDiagnosticContains(
-                                                                             "Expected ']'");
-    }
-
-    @Test
-    void parseAdditionalIdentifierAccesses() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
-        parserMockerExtension.mockExpressionParserExecution(
-                programParser,
-                expParser -> expParser.parseExpression(any()),
-                mockedExpression,
-                "[",
-                "]"
-        );
-
-        TokenQueue queue = new TokenQueueTestBuilder().build();
-        assertThat(auxiliaryParser.parseAdditionalIdentifierAccesses(queue)).isSuccessful()
-                                                                            .resultMatches(List::isEmpty);
-
-        queue = new TokenQueueTestBuilder().separator(",")
-                                           .identifier("MyIdentifier")
-                                           .separator(",")
-                                           .identifier("MyIdentifier")
-                                           .separator("[")
-                                           .operator("expression")
-                                           .separator("]")
-                                           .separator("[")
-                                           .operator("expression")
-                                           .separator("]")
-                                           .separator(";")
-                                           .build();
-        assertThat(auxiliaryParser.parseAdditionalIdentifierAccesses(queue)).isSuccessful()
-                                                                            .resultMatches(list -> list.size() == 2)
-                                                                            .resultMatches(list -> list.stream()
-                                                                                                       .allMatch(
-                                                                                                               ian -> "MyIdentifier".equals(
-                                                                                                                       ian.getIdentifier()
-                                                                                                                          .getIdentifier()
-                                                                                                                          .value())))
-                                                                            .resultMatches(list -> list.get(
-                                                                                                               0)
-                                                                                                       .getArrayIndices()
-                                                                                                       .isEmpty())
-                                                                            .resultMatches(list -> list.get(
-                                                                                                               1)
-                                                                                                       .getArrayIndices()
-                                                                                                       .size() == 2)
-                                                                            .resultMatches(list -> list.get(
-                                                                                                               1)
-                                                                                                       .getArrayIndices()
-                                                                                                       .get(0) == mockedExpression)
-                                                                            .resultMatches(list -> list.get(
-                                                                                                               1)
-                                                                                                       .getArrayIndices()
-                                                                                                       .get(1) == mockedExpression);
-        assertThat(queue).hasNextTokenValueMatch(";");
-
-        queue = new TokenQueueTestBuilder().separator(",").keyword("keyword").build();
-        assertThat(auxiliaryParser.parseAdditionalIdentifierAccesses(queue)).isPartiallyParsed()
-                                                                            .resultMatches(List::isEmpty)
-                                                                            .syntaxDiagnosticContains(
-                                                                                    "Expected an identifier");
-
-        queue = new TokenQueueTestBuilder().separator(",")
-                                           .identifier("MyIdentifier")
-                                           .separator(",")
-                                           .keyword("keyword")
-                                           .build();
-        assertThat(auxiliaryParser.parseAdditionalIdentifierAccesses(queue)).isPartiallyParsed()
-                                                                            .resultMatches(list -> list.size() == 1)
-                                                                            .syntaxDiagnosticContains(
-                                                                                    "Expected an identifier");
-        // parsing gets rolled back when the parsing of 'keyword' fails
-        assertThat(queue).hasNextTokenValueMatch(",");
+        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasSize(0);
     }
 
     @Test
@@ -614,16 +604,22 @@ class AuxiliaryParserImplTest {
                 "}"
         );
 
-        TokenQueue queue =
-                new TokenQueueTestBuilder().separator("{").keyword("statements").separator("}").separator(";").build();
+        TokenQueue queue = new TokenQueueTestBuilder().separator("{")
+                                                      .keyword("statements")
+                                                      .separator("}")
+                                                      .separator(";")
+                                                      .build();
+
         assertThat(auxiliaryParser.parseCodeBlock(queue)).isSuccessful()
-                                                         .resultMatches(node -> node == mockedStatements);
+                                                         .map(NodeAssertionFactory::create)
+                                                         .isEqualTo(mockedStatements);
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("{").keyword("statements").separator(";").separator(";").build();
         assertThat(auxiliaryParser.parseCodeBlock(queue)).isPartiallyParsed()
                                                          .syntaxDiagnosticContains("Expected '}'")
-                                                         .resultMatches(statements -> statements == mockedStatements);
+                                                         .map(NodeAssertionFactory::create)
+                                                         .isEqualTo(mockedStatements);
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator(";").keyword("statements").separator("}").build();

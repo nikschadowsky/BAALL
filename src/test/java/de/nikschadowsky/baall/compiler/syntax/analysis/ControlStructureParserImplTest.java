@@ -1,21 +1,27 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
+import de.nikschadowsky.baall.compiler._utility.BaseAssertion;
 import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
+import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
+import de.nikschadowsky.baall.compiler._utility.ast.nodes.ExpressionNodeAssertion;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
+import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.BinaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.EnsureStatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.InterceptStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+
+import java.util.List;
 
 import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,7 +81,8 @@ class ControlStructureParserImplTest {
                                                       .separator(";")
                                                       .build();
         assertThat(controlStructureParser.parseControlStructure(queue)).isSuccessful()
-                                                                       .resultMatches(node -> node instanceof ForLoopNode);
+                                                                       .map(NodeAssertionFactory::create)
+                                                                       .isForLoop();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("while")
@@ -86,7 +93,8 @@ class ControlStructureParserImplTest {
                                            .separator(";")
                                            .build();
         assertThat(controlStructureParser.parseControlStructure(queue)).isSuccessful()
-                                                                       .resultMatches(node -> node instanceof WhileLoopNode);
+                                                                       .map(NodeAssertionFactory::create)
+                                                                       .isWhileLoop();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().bool("condition1")
@@ -107,7 +115,8 @@ class ControlStructureParserImplTest {
                                            .separator(";")
                                            .build();
         assertThat(controlStructureParser.parseControlStructure(queue)).isSuccessful()
-                                                                       .resultMatches(node -> node instanceof ConditionalNode);
+                                                                       .map(NodeAssertionFactory::create)
+                                                                       .isConditional();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("try")
@@ -127,7 +136,8 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";").build();
         assertThat(controlStructureParser.parseControlStructure(queue)).isSuccessful()
-                                                                       .resultMatches(node -> node instanceof TryStatementNode);
+                                                                       .map(NodeAssertionFactory::create)
+                                                                       .isTryStatement();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("return").separator(";").build();
@@ -156,14 +166,13 @@ class ControlStructureParserImplTest {
                                                       .operator("statements")
                                                       .separator(";")
                                                       .build();
-        assertThat(controlStructureParser.parseConditional(queue)).isSuccessful()
-                                                                  .resultMatches(node -> node.getCondition() instanceof BinaryExpressionNode)
-                                                                  .resultMatches(node -> node.getConditionBranch()
-                                                                                             .equals(
-                                                                                                     ConditionalNode.ConditionBranch.IF))
-                                                                  .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .isEmpty());
+        PartialParseResult<ConditionalNode> actual = controlStructureParser.parseConditional(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(ExpressionNodeAssertion::isBinaryExpression)
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch("statements");
 
         queue = new TokenQueueTestBuilder().number("expression1")
@@ -183,24 +192,17 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseConditional(queue)).isSuccessful()
-                                                                  .resultMatches(node -> node.getCondition() instanceof BinaryExpressionNode)
-                                                                  .resultMatches(node -> ConditionalNode.ConditionBranch.IF
-                                                                          .equals(node.getConditionBranch()))
-                                                                  .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getCondition() instanceof BinaryExpressionNode)
-                                                                  .resultMatches(node -> ConditionalNode.ConditionBranch.IF.equals(
-                                                                          node.getElseBranch()
-                                                                              .orElseThrow().getConditionBranch()))
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getElseBranch()
-                                                                                             .isEmpty());
+        actual = controlStructureParser.parseConditional(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(ExpressionNodeAssertion::isBinaryExpression)
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasElseBranch()
+                          .hasConditionMatching(ExpressionNodeAssertion::isBinaryExpression)
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().number("expression1")
@@ -216,24 +218,17 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseConditional(queue)).isSuccessful()
-                                                                  .resultMatches(node -> node.getCondition() instanceof BinaryExpressionNode)
-                                                                  .resultMatches(node -> ConditionalNode.ConditionBranch.IF
-                                                                          .equals(node.getConditionBranch()))
-                                                                  .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getCondition() == null)
-                                                                  .resultMatches(node -> ConditionalNode.ConditionBranch.ELSE.equals(
-                                                                          node.getElseBranch()
-                                                                              .orElseThrow().getConditionBranch()))
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getElseBranch()
-                                                                                             .isEmpty());
+        actual = controlStructureParser.parseConditional(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(ExpressionNodeAssertion::isBinaryExpression)
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasElseBranch()
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .isElseBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().number("expression")
@@ -246,14 +241,14 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(".")
                                            .build();
-        assertThat(controlStructureParser.parseConditional(queue)).isPartiallyParsed()
-                                                                  .resultMatches(node -> node.getCondition() instanceof PrimitiveLiteralNode)
-                                                                  .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                  .resultMatches(node -> node.getElseBranch()
-                                                                                             .orElseThrow()
-                                                                                             .getCondition() == null)
-                                                                  .syntaxDiagnosticContains(
-                                                                          "Expected '{' or an expression");
+        actual = controlStructureParser.parseConditional(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{' or an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("expression"))
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasElseBranch()
+                          .hasConditionMatching(BaseAssertion::isNull);
         assertThat(queue).hasNextTokenValueMatch(".");
     }
 
@@ -274,12 +269,13 @@ class ControlStructureParserImplTest {
                                                       .separator("}")
                                                       .separator(";")
                                                       .build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isSuccessful()
-                                                                .resultMatches(node -> node.getCondition() == null)
-                                                                .resultMatches(node -> ConditionalNode.ConditionBranch.ELSE.equals(
-                                                                        node.getConditionBranch()))
-                                                                .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                .resultMatches(node -> node.getElseBranch().isEmpty());
+        PartialParseResult<ConditionalNode> actual = controlStructureParser.parseElseBlock(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .isElseBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("|")
@@ -290,17 +286,14 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isSuccessful()
-                                                                .resultMatches(node -> {
-                                                                    PrimitiveLiteralNode condition =
-                                                                            (PrimitiveLiteralNode) node.getCondition();
-                                                                    return "condition".equals(condition.getPrimitiveValue()
-                                                                                                       .value());
-                                                                })
-                                                                .resultMatches(node -> ConditionalNode.ConditionBranch.IF.equals(
-                                                                        node.getConditionBranch()))
-                                                                .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                .resultMatches(node -> node.getElseBranch().isEmpty());
+        actual = controlStructureParser.parseElseBlock(queue);
+
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition"))
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("|")
@@ -321,54 +314,21 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isSuccessful()
-                                                                .resultMatches(node -> {
-                                                                    PrimitiveLiteralNode condition =
-                                                                            (PrimitiveLiteralNode) node.getCondition();
-                                                                    return "condition1".equals(condition.getPrimitiveValue()
-                                                                                                        .value());
-                                                                })
-                                                                .resultMatches(node -> ConditionalNode.ConditionBranch.IF.equals(
-                                                                        node.getConditionBranch()))
-                                                                .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                .resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    PrimitiveLiteralNode condition =
-                                                                            (PrimitiveLiteralNode) elseIfNode.getCondition();
-                                                                    return "condition2".equals(condition.getPrimitiveValue()
-                                                                                                        .value());
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    return ConditionalNode.ConditionBranch.IF.equals(
-                                                                            elseIfNode.getConditionBranch());
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    return elseIfNode.getThenBlock() == mockedStatements;
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    ConditionalNode elseNode = elseIfNode.getElseBranch().orElseThrow();
-                                                                    return elseNode.getCondition() == null;
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    ConditionalNode elseNode = elseIfNode.getElseBranch().orElseThrow();
-                                                                    return elseNode.getConditionBranch().equals(
-                                                                            ConditionalNode.ConditionBranch.ELSE);
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    ConditionalNode elseNode = elseIfNode.getElseBranch().orElseThrow();
-                                                                    return elseNode.getThenBlock() == mockedStatements;
-                                                                }).resultMatches(node -> {
-                                                                    ConditionalNode elseIfNode =
-                                                                            node.getElseBranch().orElseThrow();
-                                                                    ConditionalNode elseNode = elseIfNode.getElseBranch().orElseThrow();
-                                                                    return elseNode.getElseBranch().isEmpty();
-                                                                });
+        actual = controlStructureParser.parseElseBlock(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition1"))
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasElseBranch()
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition2"))
+                          .isIfBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasElseBranch()
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .isElseBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("|")
@@ -381,29 +341,33 @@ class ControlStructureParserImplTest {
                                            .operator("statements")
                                            .separator("}")
                                            .build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isSuccessful()
-                                                                .resultMatches(node -> node.getCondition() == null)
-                                                                .resultMatches(node -> ConditionalNode.ConditionBranch.ELSE.equals(
-                                                                        node.getConditionBranch()))
-                                                                .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                .resultMatches(node -> node.getElseBranch().isEmpty());
+        actual = controlStructureParser.parseElseBlock(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .isElseBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("|").separator("{").operator("statements").separator(";").build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isPartiallyParsed()
-                                                                .resultMatches(node -> node.getThenBlock() == mockedStatements)
-                                                                .resultMatches(node -> node.getElseBranch().isEmpty())
-                                                                .resultMatches(node -> ConditionalNode.ConditionBranch.ELSE.equals(
-                                                                        node.getConditionBranch()))
-                                                                .syntaxDiagnosticContains("Expected '}'");
+        actual = controlStructureParser.parseElseBlock(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '}'")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .isElseBranch()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasNoElseBranch();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().operator("|").separator(";").build();
-        assertThat(controlStructureParser.parseElseBlock(queue)).isPartiallyParsed()
-                                                                .resultMatches(node -> node.getCondition() == null)
-                                                                .resultMatches(node -> node.getThenBlock() == null)
-                                                                .syntaxDiagnosticContains(
-                                                                        "Expected '{' or an expression");
+        actual = controlStructureParser.parseElseBlock(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{' or an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .hasBodyMatching(BaseAssertion::isNull);
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator(";").build();
@@ -437,9 +401,9 @@ class ControlStructureParserImplTest {
         TokenQueue queue = new TokenQueueTestBuilder().keyword("for")
                                                       .identifier("i")
                                                       .operator("=")
-                                                      .number("expression1")
+                                                      .number("expr1")
                                                       .separator("..")
-                                                      .number("expression2")
+                                                      .number("expr2")
                                                       .separator("::")
                                                       .operator("reassignment")
                                                       .separator("{")
@@ -447,57 +411,37 @@ class ControlStructureParserImplTest {
                                                       .separator("}")
                                                       .separator(";")
                                                       .build();
-        assertThat(controlStructureParser.parseForLoop(queue)).isSuccessful()
-                                                              .resultMatches(node -> "i".equals(node.getIdentifier()
-                                                                                                    .getIdentifier()
-                                                                                                    .value()))
-                                                              .resultMatches(node -> {
-                                                                  PrimitiveLiteralNode expressionNode =
-                                                                          (PrimitiveLiteralNode) (node.getStartIndexExpression());
-                                                                  return "expression1".equals(expressionNode.getPrimitiveValue()
-                                                                                                            .value());
-                                                              })
-                                                              .resultMatches(node -> {
-                                                                  PrimitiveLiteralNode expressionNode =
-                                                                          (PrimitiveLiteralNode) (node.getEndIndexExpression());
-                                                                  return "expression2".equals(expressionNode.getPrimitiveValue()
-                                                                                                            .value());
-                                                              })
-                                                              .resultMatches(node -> node.getOptionalStepperStatement()
-                                                                                         .orElseThrow() == mockedReassignment)
-                                                              .resultMatches(node -> node.getBody() == mockedStatements);
+        PartialParseResult<ForLoopNode> actual = controlStructureParser.parseForLoop(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasIdentifier("i")
+                          .hasStartIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr1").isNumber())
+                          .hasEndIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr2").isNumber())
+                          .hasOptionalStepper()
+                          .hasOptionalStepperMatching(a -> a.isEqualTo(mockedReassignment))
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
+
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("for")
                                            .identifier("i")
                                            .operator("=")
-                                           .number("expression1")
+                                           .number("expr1")
                                            .separator("..")
-                                           .number("expression2")
+                                           .number("expr2")
                                            .separator("{")
                                            .operator("statements")
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseForLoop(queue)).isSuccessful()
-                                                              .resultMatches(node -> "i".equals(node.getIdentifier()
-                                                                                                    .getIdentifier()
-                                                                                                    .value()))
-                                                              .resultMatches(node -> {
-                                                                  PrimitiveLiteralNode expressionNode =
-                                                                          (PrimitiveLiteralNode) (node.getStartIndexExpression());
-                                                                  return "expression1".equals(expressionNode.getPrimitiveValue()
-                                                                                                            .value());
-                                                              })
-                                                              .resultMatches(node -> {
-                                                                  PrimitiveLiteralNode expressionNode =
-                                                                          (PrimitiveLiteralNode) (node.getEndIndexExpression());
-                                                                  return "expression2".equals(expressionNode.getPrimitiveValue()
-                                                                                                            .value());
-                                                              })
-                                                              .resultMatches(node -> node.getOptionalStepperStatement()
-                                                                                         .isEmpty())
-                                                              .resultMatches(node -> node.getBody() == mockedStatements);
+        actual = controlStructureParser.parseForLoop(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasIdentifier("i")
+                          .hasStartIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr1").isNumber())
+                          .hasEndIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr2").isNumber())
+                          .doesNotHaveOptionalStepper()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("for")
@@ -510,10 +454,12 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseForLoop(queue)).isPartiallyParsed()
-                                                              .resultMatches(node -> node.getIdentifier() == null)
-                                                              .resultMatches(node -> node.getBody() == mockedStatements)
-                                                              .syntaxDiagnosticContains("Expected an identifier");
+        actual = controlStructureParser.parseForLoop(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected an identifier")
+                          .map(NodeAssertionFactory::create)
+                          .hasIdentifierMatching(BaseAssertion::isNull)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
@@ -539,10 +485,11 @@ class ControlStructureParserImplTest {
                                                       .separator("}")
                                                       .separator(";")
                                                       .build();
-        assertThat(controlStructureParser.parseWhileLoop(queue)).isSuccessful()
-                                                                .resultMatches(node -> "true".equals(((PrimitiveLiteralNode) node.getCondition()).getPrimitiveValue()
-                                                                                                                                                 .value()))
-                                                                .resultMatches(node -> node.getBody() == mockedStatements);
+        PartialParseResult<WhileLoopNode> actual = controlStructureParser.parseWhileLoop(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"))
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("while")
@@ -551,10 +498,13 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseWhileLoop(queue)).isPartiallyParsed()
-                                                                .resultMatches(node -> node.getCondition() == null)
-                                                                .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                .syntaxDiagnosticContains("Not an expression");
+        actual = controlStructureParser.parseWhileLoop(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Not an expression")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(BaseAssertion::isNull)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
+
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("while")
@@ -563,12 +513,12 @@ class ControlStructureParserImplTest {
                                            .operator("statements")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseWhileLoop(queue)).isPartiallyParsed()
-                                                                .resultMatches(node -> ((PrimitiveLiteralNode) node.getCondition()).getPrimitiveValue()
-                                                                                                                                   .value()
-                                                                                                                                   .equals("true"))
-                                                                .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                .syntaxDiagnosticContains("Expected '}'");
+        actual = controlStructureParser.parseWhileLoop(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '}'")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"))
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("while")
@@ -577,11 +527,11 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseWhileLoop(queue)).isPartiallyParsed()
-                                                                .resultMatches(node -> ((PrimitiveLiteralNode) node.getCondition()).getPrimitiveValue()
-                                                                                                                                   .value()
-                                                                                                                                   .equals("true"))
-                                                                .syntaxDiagnosticContains("Expected '{'");
+        actual = controlStructureParser.parseWhileLoop(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{'")
+                          .map(NodeAssertionFactory::create)
+                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
@@ -626,63 +576,38 @@ class ControlStructureParserImplTest {
                                                       .separator(";")
                                                       .build();
 
-        assertThat(controlStructureParser.parseTryStatement(queue)).isSuccessful()
-                                                                   .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .size() == 2)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getInterceptedExceptions()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> "MyException1"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(0)
-                                                                                       .getInterceptedExceptions()
-                                                                                       .get(0)
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getInterceptedExceptions()
-                                                                                              .get(0)
-                                                                                              .getArrayIndices()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> "MyIdentifier1"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(0)
-                                                                                       .getRaisedExceptionIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(1)
-                                                                                              .getBody() == mockedStatements)
-                                                                   .resultMatches(node -> "MyException2"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(1)
-                                                                                       .getInterceptedExceptions()
-                                                                                       .get(0)
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(1)
-                                                                                              .getInterceptedExceptions()
-                                                                                              .get(0)
-                                                                                              .getArrayIndices()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> "MyIdentifier2"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(1)
-                                                                                       .getRaisedExceptionIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getBody() == mockedStatements)
-                                                                   .resultMatches(node -> node.getEnsureBlock()
-                                                                                              .orElseThrow()
-                                                                                              .getBody() == mockedStatements);
+        PartialParseResult<TryStatementNode> actual = controlStructureParser.parseTryStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasInterceptBlocks(2)
+                          .hasInterceptBlockMatching(
+                                  0,
+                                  a -> a.hasInterceptedExceptions(1)
+                                        .hasExceptionMatching(
+                                                0,
+                                                a1 -> a1.isIdentifierType()
+                                                        .hasIdentifierMatching(a2 -> a2.isIdentifier()
+                                                                                       .hasName("MyException1"))
+                                        )
+                                        .hasIdentifier("MyIdentifier1")
+                                        .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
+                          )
+                          .hasInterceptBlockMatching(
+                                  1,
+                                  a -> a.hasInterceptedExceptions(1)
+                                        .hasExceptionMatching(
+                                                0,
+                                                a1 -> a1.isIdentifierType()
+                                                        .hasIdentifierMatching(a2 -> a2.isIdentifier()
+                                                                                       .hasName(
+                                                                                               "MyException2"))
+                                        )
+                                        .hasIdentifier("MyIdentifier2")
+                                        .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
+                          )
+                          .hasEnsureBlock()
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("try")
@@ -698,39 +623,23 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseTryStatement(queue)).isSuccessful()
-                                                                   .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getInterceptedExceptions()
-                                                                                              .size() == 1)
-                                                                   .resultMatches(node -> "MyException"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(0)
-                                                                                       .getInterceptedExceptions()
-                                                                                       .get(0)
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getInterceptedExceptions()
-                                                                                              .get(0)
-                                                                                              .getArrayIndices()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> "MyIdentifier"
-                                                                           .equals(node.getInterceptBlocks()
-                                                                                       .get(0)
-                                                                                       .getRaisedExceptionIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .get(0)
-                                                                                              .getBody() == mockedStatements)
-                                                                   .resultMatches(node -> node.getEnsureBlock()
-                                                                                              .isEmpty());
+        actual = controlStructureParser.parseTryStatement(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasInterceptBlocks(1)
+                          .hasInterceptBlockMatching(
+                                  0,
+                                  a -> a.hasInterceptedExceptions(1)
+                                        .hasExceptionMatching(
+                                                0,
+                                                a1 -> a1.isIdentifierType()
+                                                        .hasIdentifierMatching(a2 -> a2.isIdentifier()
+                                                                                       .hasName("MyException"))
+                                        )
+                                        .hasIdentifier("MyIdentifier")
+                                        .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
+                          )
+                          .doesNotHaveEnsureBlock();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("try")
@@ -739,19 +648,21 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseTryStatement(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .isEmpty())
-                                                                   .resultMatches(node -> node.getEnsureBlock()
-                                                                                              .isEmpty())
-                                                                   .syntaxDiagnosticContains("Expected 'intercept'");
+        actual = controlStructureParser.parseTryStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected 'intercept'")
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
+                          .hasInterceptBlocks(0)
+                          .doesNotHaveEnsureBlock();
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("try").separator(";").build();
-        assertThat(controlStructureParser.parseTryStatement(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> node.getBody() == null)
-                                                                   .syntaxDiagnosticContains("Expected '{'");
+        actual = controlStructureParser.parseTryStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{'")
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(BaseAssertion::isNull);
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("try").separator("}")
@@ -762,11 +673,12 @@ class ControlStructureParserImplTest {
                                            .separator("{")
                                            .operator("statements")
                                            .separator("}").build();
-        assertThat(controlStructureParser.parseTryStatement(queue)).isPartiallyParsed()
-                                                                   .resultMatches(node -> node.getBody() == null)
-                                                                   .resultMatches(node -> node.getInterceptBlocks()
-                                                                                              .size() == 1)
-                                                                   .syntaxDiagnosticContains("Expected '{'");
+        actual = controlStructureParser.parseTryStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{'")
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(BaseAssertion::isNull)
+                          .hasInterceptBlocks(1);
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().keyword("something").separator(";").build();
@@ -803,42 +715,26 @@ class ControlStructureParserImplTest {
                                                       .separator(";")
                                                       .build();
 
-        assertThat(controlStructureParser.parseInterceptStatements(queue)).isSuccessful()
-                                                                          .resultMatches(nodes -> nodes.size() == 2)
-                                                                          .resultMatches(nodes -> nodes.get(0)
-                                                                                                       .getInterceptedExceptions()
-                                                                                                       .size() == 1)
-                                                                          .resultMatches(nodes -> "MyException1".equals(
-                                                                                  nodes.get(0)
-                                                                                       .getInterceptedExceptions()
-                                                                                       .get(0)
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                          .resultMatches(nodes -> nodes.get(0)
-                                                                                                       .getRaisedExceptionIdentifier()
-                                                                                                       .getIdentifier()
-                                                                                                       .value()
-                                                                                                       .equals("MyIdentifier1"))
-                                                                          .resultMatches(nodes -> nodes.get(0)
-                                                                                                       .getBody() == mockedStatements)
-                                                                          .resultMatches(nodes -> nodes.get(1)
-                                                                                                       .getInterceptedExceptions()
-                                                                                                       .size() == 1)
-                                                                          .resultMatches(nodes -> "MyException2".equals(
-                                                                                  nodes.get(1)
-                                                                                       .getInterceptedExceptions()
-                                                                                       .get(0)
-                                                                                       .getIdentifier()
-                                                                                       .getIdentifier()
-                                                                                       .value()))
-                                                                          .resultMatches(nodes -> nodes.get(1)
-                                                                                                       .getRaisedExceptionIdentifier()
-                                                                                                       .getIdentifier()
-                                                                                                       .value()
-                                                                                                       .equals("MyIdentifier2"))
-                                                                          .resultMatches(nodes -> nodes.get(1)
-                                                                                                       .getBody() == mockedStatements);
+        PartialParseResult<List<InterceptStatementNode>> actual =
+                controlStructureParser.parseInterceptStatements(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasSize(2)
+                          .hasElementMatching(
+                                  0,
+                                  NodeAssertionFactory::create,
+                                  a -> a.hasInterceptedExceptions(1)
+                                        .hasIdentifier("MyIdentifier1")
+                                        .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
+                          )
+                          .hasElementMatching(
+                                  1,
+                                  NodeAssertionFactory::create,
+                                  a -> a.hasInterceptedExceptions(1)
+                                        .hasIdentifier("MyIdentifier2")
+                                        .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
+                          );
+
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("intercept")
@@ -856,10 +752,10 @@ class ControlStructureParserImplTest {
                                            .operator("statements")
                                            .separator(";")
                                            .build();
-
-        assertThat(controlStructureParser.parseInterceptStatements(queue)).isPartiallyParsed()
-                                                                          .resultMatches(nodes -> nodes.size() == 2)
-                                                                          .syntaxDiagnosticContains("Expected '}'");
+        actual = controlStructureParser.parseInterceptStatements(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '}'")
+                          .map(NodeAssertionFactory::create).hasSize(2);
         assertThat(queue).isAtEnd();
     }
 
@@ -885,20 +781,18 @@ class ControlStructureParserImplTest {
                                                       .separator(";")
                                                       .build();
 
-        assertThat(controlStructureParser.parseInterceptStatement(queue)).isSuccessful()
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .size() == 1)
-                                                                         .resultMatches(node -> "MyException".equals(
-                                                                                 node.getInterceptedExceptions()
-                                                                                     .get(0)
-                                                                                     .getIdentifier()
-                                                                                     .getIdentifier()
-                                                                                     .value()))
-                                                                         .resultMatches(node -> "MyIdentifier".equals(
-                                                                                 node.getRaisedExceptionIdentifier()
-                                                                                     .getIdentifier()
-                                                                                     .value()))
-                                                                         .resultMatches(node -> node.getBody() == mockedStatements);
+        PartialParseResult<InterceptStatementNode> actual = controlStructureParser.parseInterceptStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasInterceptedExceptions(1)
+                          .hasExceptionMatching(
+                                  0,
+                                  a -> a.isIdentifierType()
+                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
+                                                                       .hasName("MyException"))
+                          )
+                          .hasIdentifier("MyIdentifier")
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("intercept")
@@ -915,65 +809,55 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseInterceptStatement(queue)).isSuccessful()
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .size() == 2)
-                                                                         .resultMatches(node -> "MyException1".equals(
-                                                                                 node.getInterceptedExceptions()
-                                                                                     .get(0)
-                                                                                     .getIdentifier()
-                                                                                     .getIdentifier()
-                                                                                     .value()))
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .get(0)
-                                                                                                    .getArrayIndices()
-                                                                                                    .isEmpty())
-                                                                         .resultMatches(node -> "MyException2".equals(
-                                                                                 node.getInterceptedExceptions()
-                                                                                     .get(1)
-                                                                                     .getIdentifier()
-                                                                                     .getIdentifier()
-                                                                                     .value()))
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .get(1)
-                                                                                                    .getArrayIndices()
-                                                                                                    .size() == 1)
-                                                                         .resultMatches(node -> "MyIdentifier".equals(
-                                                                                 node.getRaisedExceptionIdentifier()
-                                                                                     .getIdentifier()
-                                                                                     .value()))
-                                                                         .resultMatches(node -> node.getBody() == mockedStatements);
+        actual = controlStructureParser.parseInterceptStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasInterceptedExceptions(2)
+                          .hasExceptionMatching(
+                                  0,
+                                  a -> a.isIdentifierType()
+                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
+                                                                       .hasName("MyException1"))
+                          )
+                          .hasExceptionMatching(
+                                  1,
+                                  a -> a.isIdentifierType()
+                                        .hasIdentifierMatching(a1 -> a1.isIndexedAccess()
+                                                                       .hasIndexMatching(ExpressionNodeAssertion::isPrimitiveLiteral)
+                                                                       .mapToInner()
+                                                                       .isIdentifier()
+                                                                       .hasName("MyException2")
+                                        )
+                          )
+                          .hasIdentifier("MyIdentifier")
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("intercept")
-                                           .identifier("myException")
+                                           .identifier("MyException")
                                            .separator("{")
                                            .operator("statements")
                                            .separator("}")
                                            .separator(";")
                                            .build();
-
-        assertThat(controlStructureParser.parseInterceptStatement(queue)).isPartiallyParsed()
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .size() == 1)
-                                                                         .resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                    .get(0)
-                                                                                                    .getIdentifier()
-                                                                                                    .getIdentifier()
-                                                                                                    .value()
-                                                                                                    .equals("myException")).
-                                                                         resultMatches(node -> node.getInterceptedExceptions()
-                                                                                                   .size() == 1)
-                                                                         .resultMatches(node -> node.getRaisedExceptionIdentifier() == null)
-                                                                         .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                         .syntaxDiagnosticContains("Expected ':'");
+        actual = controlStructureParser.parseInterceptStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected ':'")
+                          .map(NodeAssertionFactory::create)
+                          .hasInterceptedExceptions(1)
+                          .hasExceptionMatching(
+                                  0,
+                                  a -> a.isIdentifierType()
+                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
+                                                                       .hasName("MyException"))
+                          )
+                          .hasIdentifierMatching(BaseAssertion::isNull)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
-        queue = new TokenQueueTestBuilder().separator(";")
-                                           .build();
-        assertThat(controlStructureParser.parseInterceptStatement(queue)).isUnsuccessful()
-                                                                         .syntaxDiagnosticContains(
-                                                                                 "Expected 'intercept'");
+        queue = new TokenQueueTestBuilder().separator(";").build();
+        actual = controlStructureParser.parseInterceptStatement(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected 'intercept'");
     }
 
     @Test
@@ -995,8 +879,10 @@ class ControlStructureParserImplTest {
                                                       .separator(";")
                                                       .build();
 
-        assertThat(controlStructureParser.parseEnsureStatement(queue)).isSuccessful()
-                                                                      .resultMatches(node -> node.getBody() == mockedStatements);
+        PartialParseResult<EnsureStatementNode> actual = controlStructureParser.parseEnsureStatement(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("ensure")
@@ -1004,9 +890,12 @@ class ControlStructureParserImplTest {
                                            .separator("}")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseEnsureStatement(queue)).isPartiallyParsed()
-                                                                      .resultMatches(node -> node.getBody() == null)
-                                                                      .syntaxDiagnosticContains("Expected '{'");
+        actual = controlStructureParser.parseEnsureStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '{'")
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(BaseAssertion::isNull);
+
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("ensure")
@@ -1014,13 +903,17 @@ class ControlStructureParserImplTest {
                                            .operator("statements")
                                            .separator(";")
                                            .build();
-        assertThat(controlStructureParser.parseEnsureStatement(queue)).isPartiallyParsed()
-                                                                      .resultMatches(node -> node.getBody() == mockedStatements)
-                                                                      .syntaxDiagnosticContains("Expected '}'");
+        actual = controlStructureParser.parseEnsureStatement(queue);
+        assertThat(actual).isPartiallyParsed()
+                          .syntaxDiagnosticContains("Expected '}'")
+                          .map(NodeAssertionFactory::create)
+                          .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(controlStructureParser.parseEnsureStatement(queue)).isUnsuccessful()
-                                                                      .syntaxDiagnosticContains("Expected 'ensure'");
+        actual = controlStructureParser.parseEnsureStatement(queue);
+        assertThat(actual).isUnsuccessful()
+                          .syntaxDiagnosticContains("Expected 'ensure'");
     }
+
 }

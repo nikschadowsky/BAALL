@@ -5,8 +5,6 @@ import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 
-import java.util.function.Predicate;
-
 /**
  * @since 15.08.2024
  */
@@ -103,14 +101,7 @@ public class PartialParseResultAssertion<T> extends BaseAssertion<PartialParseRe
             );
         }
 
-        public PartiallyParsedParseResultAssertion<ACT> resultMatches(Predicate<ACT> predicate) {
-            return truthinessAssert(
-                    pr -> "Result does not match predicate!",
-                    pr -> predicate.test(pr.getParseResult())
-            );
-        }
-
-        public <ASS extends BaseAssertion<ASS, ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {
+        public <ASS extends BaseAssertion<ASS, ? super ACT>> ASS map(NodeAssertionFactory<ASS, ACT> factory) {
             return factory.map(actual.getParseResult());
         }
     }

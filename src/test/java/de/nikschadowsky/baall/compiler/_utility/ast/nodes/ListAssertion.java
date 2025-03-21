@@ -20,7 +20,7 @@ public class ListAssertion<T> extends BaseAssertion<ListAssertion<T>, List<T>> {
     }
 
     public <S extends BaseAssertion<S, T>> ListAssertion<T> hasElementMatching(int index, Function<T, S> assertionCreator, NodeAssertionBuilder<S> a) {
-        a.assertThat(assertionCreator.apply(actual.get(index)).withFailMessage("Element does not match"));
+        a.assertThat(assertionCreator.apply(actual.get(index)));
         return this;
     }
 

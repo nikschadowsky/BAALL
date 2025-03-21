@@ -15,12 +15,12 @@ public class WhileLoopNodeAssertion extends BaseAssertion<WhileLoopNodeAssertion
     }
 
     public WhileLoopNodeAssertion hasConditionMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getCondition()).withFailMessage("Condition does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getCondition()));
         return this;
     }
 
     public WhileLoopNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getBody()).withFailMessage("Body does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getBody()));
         return this;
     }
 }

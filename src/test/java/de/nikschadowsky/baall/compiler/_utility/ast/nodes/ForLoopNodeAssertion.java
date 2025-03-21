@@ -18,25 +18,23 @@ public class ForLoopNodeAssertion extends BaseAssertion<ForLoopNodeAssertion, Fo
         return hasIdentifierMatching(a -> a.hasName(expected));
     }
 
-    public ForLoopNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getIdentifier()).withFailMessage("Identifier does not match"));
+    public ForLoopNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+        a.assertThat(NodeAssertionFactory.create(actual.getIdentifier()));
         return this;
     }
 
     public ForLoopNodeAssertion hasStartIndexMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getStartIndexExpression())
-                                         .withFailMessage("Start index does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getStartIndexExpression()));
         return this;
     }
 
     public ForLoopNodeAssertion hasEndIndexMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getEndIndexExpression())
-                                         .withFailMessage("End index does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getEndIndexExpression()));
         return this;
     }
 
     public ForLoopNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getBody()).withFailMessage("Body does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getBody()));
         return this;
     }
 
@@ -55,8 +53,7 @@ public class ForLoopNodeAssertion extends BaseAssertion<ForLoopNodeAssertion, Fo
     }
 
     public ForLoopNodeAssertion hasOptionalStepperMatching(NodeAssertionBuilder<StatementNodeAssertion.ReassignmentNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getOptionalStepperStatement().orElseThrow())
-                                         .withFailMessage("OptionalStepper does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getOptionalStepperStatement().orElseThrow()));
         return this;
     }
 }

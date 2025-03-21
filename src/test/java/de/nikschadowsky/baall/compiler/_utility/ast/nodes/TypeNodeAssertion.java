@@ -29,9 +29,9 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
         return NodeAssertionFactory.create((FunctionTypeNode) actual);
     }
 
-    public NestedTypeNodeAssertion isNestedType() {
-        myself.isInstanceOf(NestedTypeNode.class);
-        return NodeAssertionFactory.create((NestedTypeNode) actual);
+    public ListTypeNodeAssertion isListType() {
+        myself.isInstanceOf(ListTypeNode.class);
+        return NodeAssertionFactory.create((ListTypeNode) actual);
     }
 
     public static class PrimitiveTypeNodeAssertion extends BaseAssertion<PrimitiveTypeNodeAssertion, PrimitiveTypeNode> {
@@ -45,8 +45,7 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
         }
 
         public PrimitiveTypeNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getType())
-                                             .withFailMessage("Primitive identifier does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getType()));
             return this;
         }
 
@@ -59,7 +58,7 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
         }
 
         public IdentifierTypeNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getType()).withFailMessage("Identifier does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getType()));
             return this;
         }
 
@@ -94,75 +93,23 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
         }
 
         public FunctionTypeNodeAssertion hasParameterTypeMatching(int index, NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getParameterTypes().get(index))
-                                             .withFailMessage("Parameter type does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getParameterTypes().get(index)));
             return this;
         }
 
-        public PrimitiveTypeNodeAssertion isInnerPrimitiveType() {
-            assertThat(actual.getInnerType()).isInstanceOf(PrimitiveTypeNode.class);
-            return NodeAssertionFactory.create((PrimitiveTypeNode) actual.getInnerType());
-        }
-
-        public IdentifierTypeNodeAssertion isInnerIdentifierType() {
-            assertThat(actual.getInnerType()).isInstanceOf(IdentifierTypeNode.class);
-            return NodeAssertionFactory.create((IdentifierTypeNode) actual.getInnerType());
-        }
-
-        public FunctionTypeNodeAssertion isInnerFunctionType() {
-            assertThat(actual.getInnerType()).isInstanceOf(FunctionTypeNode.class);
-            return NodeAssertionFactory.create((FunctionTypeNode) actual.getInnerType());
-        }
-
-        public NestedTypeNodeAssertion isInnerNestedType() {
-            assertThat(actual.getInnerType()).isInstanceOf(NestedTypeNode.class);
-            return NodeAssertionFactory.create((NestedTypeNode) actual.getInnerType());
+        public TypeNodeAssertion mapToInner() {
+            return NodeAssertionFactory.create(actual.getInnerType());
         }
     }
 
-    public static class NestedTypeNodeAssertion extends BaseAssertion<NestedTypeNodeAssertion, NestedTypeNode> {
+    public static class ListTypeNodeAssertion extends BaseAssertion<ListTypeNodeAssertion, ListTypeNode> {
 
-        public NestedTypeNodeAssertion(NestedTypeNode actual) {
-            super(actual, NestedTypeNodeAssertion.class);
+        public ListTypeNodeAssertion(ListTypeNode actual) {
+            super(actual, ListTypeNodeAssertion.class);
         }
 
-        public NestedTypeNodeAssertion doesNotHaveArrayDimension() {
-            return truthinessAssert(
-                    node -> "Node does have array dimension",
-                    node -> node.getArrayDimension().isEmpty()
-            );
-        }
-
-        public NestedTypeNodeAssertion hasArrayDimension() {
-            return truthinessAssert(
-                    node -> "Node does not have array dimension",
-                    node -> node.getArrayDimension().isPresent()
-            );
-        }
-
-        public NestedTypeNodeAssertion hasArrayDimensionMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getArrayDimension().orElseThrow()));
-            return this;
-        }
-
-        public PrimitiveTypeNodeAssertion isInnerPrimitiveType() {
-            assertThat(actual.getInnerType()).isInstanceOf(PrimitiveTypeNode.class);
-            return NodeAssertionFactory.create((PrimitiveTypeNode) actual.getInnerType());
-        }
-
-        public IdentifierTypeNodeAssertion isInnerIdentifierType() {
-            assertThat(actual.getInnerType()).isInstanceOf(IdentifierTypeNode.class);
-            return NodeAssertionFactory.create((IdentifierTypeNode) actual.getInnerType());
-        }
-
-        public FunctionTypeNodeAssertion isInnerFunctionType() {
-            assertThat(actual.getInnerType()).isInstanceOf(FunctionTypeNode.class);
-            return NodeAssertionFactory.create((FunctionTypeNode) actual.getInnerType());
-        }
-
-        public NestedTypeNodeAssertion isInnerNestedType() {
-            assertThat(actual.getInnerType()).isInstanceOf(NestedTypeNode.class);
-            return NodeAssertionFactory.create((NestedTypeNode) actual.getInnerType());
+        public TypeNodeAssertion mapToInner() {
+            return NodeAssertionFactory.create(actual.getInnerType());
         }
     }
 

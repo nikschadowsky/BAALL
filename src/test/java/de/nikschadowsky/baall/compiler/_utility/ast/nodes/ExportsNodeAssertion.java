@@ -32,9 +32,8 @@ public class ExportsNodeAssertion extends BaseAssertion<ExportsNodeAssertion, Ex
         return hasNamespaceNameMatching(a -> a.hasName(name));
     }
 
-    public ExportsNodeAssertion hasNamespaceNameMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getNamespace().orElseThrow())
-                                         .withFailMessage("Namespace does not match"));
+    public ExportsNodeAssertion hasNamespaceNameMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+        a.assertThat(NodeAssertionFactory.create(actual.getNamespace().orElseThrow()));
         return this;
     }
 
@@ -48,8 +47,7 @@ public class ExportsNodeAssertion extends BaseAssertion<ExportsNodeAssertion, Ex
     }
 
     public ExportsNodeAssertion hasExportedElementMatching(int index, NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getExportedElements().get(index))
-                                         .withFailMessage("Exported element at %s does not match", index));
+        a.assertThat(NodeAssertionFactory.create(actual.getExportedElements().get(index)));
         return this;
     }
 }

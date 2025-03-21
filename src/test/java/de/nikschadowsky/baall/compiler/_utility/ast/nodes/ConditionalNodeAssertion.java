@@ -15,7 +15,7 @@ public class ConditionalNodeAssertion extends BaseAssertion<ConditionalNodeAsser
     }
 
     public ConditionalNodeAssertion hasConditionMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getCondition()).withFailMessage("Condition does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getCondition()));
         return this;
     }
 
@@ -28,7 +28,7 @@ public class ConditionalNodeAssertion extends BaseAssertion<ConditionalNodeAsser
     }
 
     public ConditionalNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getThenBlock()).withFailMessage("Then body does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getThenBlock()));
         return this;
     }
 

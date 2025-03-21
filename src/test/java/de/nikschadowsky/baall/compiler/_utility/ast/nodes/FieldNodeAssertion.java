@@ -20,7 +20,7 @@ public class FieldNodeAssertion extends BaseAssertion<FieldNodeAssertion, FieldN
     }
 
     public FieldNodeAssertion hasTypeMatching(NodeAssertionBuilder<TypeNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getType()).withFailMessage("Type does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getType()));
         return this;
     }
 }

@@ -119,7 +119,7 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
         }
 
         public VariableDeclarationNodeAssertion hasTypeMatching(NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getType()).withFailMessage("Type does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getType()));
             return this;
         }
 
@@ -127,9 +127,8 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
             return hasIdentifierMatching(a -> a.hasName(identifier));
         }
 
-        public VariableDeclarationNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getIdentifier())
-                                             .withFailMessage("Identifier does not match"));
+        public VariableDeclarationNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getIdentifier()));
             return this;
         }
 
@@ -148,8 +147,7 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
         }
 
         public VariableDeclarationNodeAssertion hasInitializationValueMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getInitializationValue().orElseThrow())
-                                             .withFailMessage("Initialization value does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getInitializationValue().orElseThrow()));
             return this;
         }
     }
@@ -161,7 +159,7 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
         }
 
         public ConstantDeclarationNodeAssertion hasTypeMatching(NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getType()).withFailMessage("Type does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getType()));
             return this;
         }
 
@@ -169,15 +167,13 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
             return hasIdentifierMatching(a -> a.hasName(identifier));
         }
 
-        public ConstantDeclarationNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getIdentifier())
-                                             .withFailMessage("Identifier does not match"));
+        public ConstantDeclarationNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getIdentifier()));
             return this;
         }
 
         public ConstantDeclarationNodeAssertion hasInitializationValueMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getInitializationValue())
-                                             .withFailMessage("Initialization value does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getInitializationValue()));
             return this;
         }
     }
@@ -189,8 +185,7 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
         }
 
         public VariableReassignmentNodeAssertion hasElementAccessMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getElementAccess())
-                                             .withFailMessage("Element access does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getElementAccess()));
             return this;
         }
 
@@ -199,13 +194,12 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
         }
 
         public VariableReassignmentNodeAssertion hasOperatorMatching(NodeAssertionBuilder<OperatorNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getOperator()).withFailMessage("Operator does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getOperator()));
             return this;
         }
 
         public VariableReassignmentNodeAssertion hasValueMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getValueExpression())
-                                             .withFailMessage("Value does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getValueExpression()));
             return this;
         }
     }
@@ -218,8 +212,7 @@ public class StatementNodeAssertion extends BaseAssertion<StatementNodeAssertion
 
 
         public RaiseStatementNodeAssertion hasExceptionCall(NodeAssertionBuilder<ExpressionNodeAssertion.FunctionCallNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getException())
-                                             .withFailMessage("Exception call does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getException()));
             return this;
         }
 

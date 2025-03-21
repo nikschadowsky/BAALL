@@ -17,7 +17,7 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
     }
 
     public TryStatementNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getBody()).withFailMessage("Body does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getBody()));
         return this;
     }
 
@@ -26,8 +26,7 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
     }
 
     public TryStatementNodeAssertion hasInterceptBlockMatching(int index, NodeAssertionBuilder<InterceptStatementNodeAssertion> a) {
-        a.assertThat(NodeAssertionFactory.create(actual.getInterceptBlocks().get(index))
-                                         .withFailMessage("Intercept block does not match"));
+        a.assertThat(NodeAssertionFactory.create(actual.getInterceptBlocks().get(index)));
         return this;
     }
 
@@ -48,7 +47,7 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
         }
 
         public EnsureStatementNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getBody()).withFailMessage("Body does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getBody()));
             return this;
         }
     }
@@ -66,9 +65,8 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
             return hasIdentifierMatching(a -> a.hasName(identifier));
         }
 
-        public InterceptStatementNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getRaisedExceptionIdentifier())
-                                             .withFailMessage("Identifier does not match"));
+        public InterceptStatementNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getRaisedExceptionIdentifier()));
             return this;
         }
 
@@ -77,13 +75,12 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
         }
 
         public InterceptStatementNodeAssertion hasExceptionMatching(int index, NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getInterceptedExceptions().get(index))
-                                             .withFailMessage("Exception at index %s does not match", index));
+            a.assertThat(NodeAssertionFactory.create(actual.getInterceptedExceptions().get(index)));
             return this;
         }
 
         public InterceptStatementNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getBody()).withFailMessage("Body does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getBody()));
             return this;
         }
     }

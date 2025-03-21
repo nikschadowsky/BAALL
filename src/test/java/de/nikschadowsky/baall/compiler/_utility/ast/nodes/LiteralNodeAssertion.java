@@ -94,8 +94,7 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
         }
 
         public ArrayLiteralNodeAssertion hasElementMatching(int index, NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getElements().get(index))
-                                             .withFailMessage("Array element at %s does not match", index));
+            a.assertThat(NodeAssertionFactory.create(actual.getElements().get(index)));
             return this;
         }
     }
@@ -118,9 +117,8 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
             return hasFields(0);
         }
 
-        public StructDefinitionLiteralNodeAssertion hasFieldNameMatching(int index, NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getFields().get(index).getIdentifier())
-                                             .withFailMessage("Field name matching at %s does not match", index));
+        public StructDefinitionLiteralNodeAssertion hasFieldNameMatching(int index, NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getFields().get(index).getIdentifier()));
             return this;
         }
 
@@ -129,8 +127,7 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
         }
 
         public StructDefinitionLiteralNodeAssertion hasFieldTypeMatching(int index, NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getFields().get(index).getType())
-                                             .withFailMessage("Field type at index %s does not match", index));
+            a.assertThat(NodeAssertionFactory.create(actual.getFields().get(index).getType()));
             return this;
         }
     }
@@ -153,9 +150,8 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
             return hasParameters(0);
         }
 
-        public FunctionDefinitionNodeAssertion hasParameterNameMatching(int index, NodeAssertionBuilder<IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getParameters().get(index).getIdentifier())
-                                             .withFailMessage("Parameter name matching at %s does not match", index));
+        public FunctionDefinitionNodeAssertion hasParameterNameMatching(int index, NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getParameters().get(index).getIdentifier()));
             return this;
         }
 
@@ -164,13 +160,12 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
         }
 
         public FunctionDefinitionNodeAssertion hasParameterTypeMatching(int index, NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getParameters().get(index).getType())
-                                             .withFailMessage("Parameter type at index %s does not match", index));
+            a.assertThat(NodeAssertionFactory.create(actual.getParameters().get(index).getType()));
             return this;
         }
 
         public FunctionDefinitionNodeAssertion hasBodyMatching(NodeAssertionBuilder<StatementsNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getFunctionBody()).withFailMessage("Body does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getFunctionBody()));
             return this;
         }
     }

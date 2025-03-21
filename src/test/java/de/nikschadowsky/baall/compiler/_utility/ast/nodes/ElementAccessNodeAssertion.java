@@ -4,6 +4,7 @@ package de.nikschadowsky.baall.compiler._utility.ast.nodes;
 import de.nikschadowsky.baall.compiler._utility.BaseAssertion;
 import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.*;
+import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 
 /**
  * @since 13.03.2025
@@ -45,7 +46,7 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
         }
 
         public MemberReferenceNodeAssertion hasSelfMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getSelf()).withFailMessage("Self does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getSelf()));
             return this;
         }
     }
@@ -68,12 +69,30 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
         }
 
         public IndexedAccessNodeAssertion hasIndexMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getIndex()).withFailMessage("Index does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getIndex()));
             return this;
         }
 
         public ElementAccessNodeAssertion mapToInner() {
             return NodeAssertionFactory.create(actual.getInnerIdentifier());
+        }
+    }
+
+    /**
+     * @since 12.02.2025
+     */
+    public static class IdentifierNodeAssertion extends BaseAssertion<IdentifierNodeAssertion, IdentifierNode> {
+
+        public IdentifierNodeAssertion(IdentifierNode actual) {
+            super(actual, IdentifierNodeAssertion.class);
+        }
+
+        public IdentifierNodeAssertion hasName(String expected) {
+            return baseAssert("identifier", n -> n.getIdentifier().value(), expected);
+        }
+
+        public IdentifierNodeAssertion hasTokenType(TokenType expected) {
+            return baseAssert("identifier type", n -> n.getIdentifier().type(), expected);
         }
     }
 }

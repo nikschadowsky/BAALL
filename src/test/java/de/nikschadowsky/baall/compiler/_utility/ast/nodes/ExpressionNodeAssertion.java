@@ -91,8 +91,7 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public FunctionCallNodeAssertion hasFunctionNameMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getFunctionIdentifier())
-                                             .withFailMessage("Called function's name does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getFunctionIdentifier()));
             return this;
         }
 
@@ -105,8 +104,7 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public FunctionCallNodeAssertion hasArgumentMatching(int index, NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getArguments().get(index))
-                                             .withFailMessage("Argument at %s does not match", index));
+            a.assertThat(NodeAssertionFactory.create(actual.getArguments().get(index)));
             return this;
         }
     }
@@ -118,14 +116,12 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public PrefixOperationNodeAssertion hasOperator(String expected) {
-            NodeAssertionFactory.create(actual.getOperator())
-                                .withFailMessage("Operator does not match")
-                                .hasOperator(expected);
+            NodeAssertionFactory.create(actual.getOperator()).hasOperator(expected);
             return this;
         }
 
         public PrefixOperationNodeAssertion hasOperandMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getOperand()).withFailMessage("Operand does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getOperand()));
             return this;
         }
     }
@@ -137,14 +133,12 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public BinaryExpressionNodeAssertion hasLeftOperandMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getLeftOperand())
-                                             .withFailMessage("Left operand does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getLeftOperand()));
             return this;
         }
 
         public BinaryExpressionNodeAssertion hasRightOperandMatching(NodeAssertionBuilder<ExpressionNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getRightOperand())
-                                             .withFailMessage("Right operand does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getRightOperand()));
             return this;
         }
 
@@ -153,7 +147,7 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public BinaryExpressionNodeAssertion hasOperatorMatching(NodeAssertionBuilder<OperatorNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getOperator()).withFailMessage("Operator does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getOperator()));
             return this;
         }
     }
@@ -169,7 +163,7 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         }
 
         public UnaryExpressionNodeAssertion hasOperatorMatching(NodeAssertionBuilder<OperatorNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getOperator()).withFailMessage("Operator does not match"));
+            a.assertThat(NodeAssertionFactory.create(actual.getOperator()));
             return this;
         }
 

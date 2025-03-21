@@ -48,8 +48,8 @@ public interface NodeAssertionFactory<ASSERTION, ACTUAL> {
         return new TypeNodeAssertion.IdentifierTypeNodeAssertion(actual);
     }
 
-    static TypeNodeAssertion.NestedTypeNodeAssertion create(NestedTypeNode actual) {
-        return new TypeNodeAssertion.NestedTypeNodeAssertion(actual);
+    static TypeNodeAssertion.ListTypeNodeAssertion create(ListTypeNode actual) {
+        return new TypeNodeAssertion.ListTypeNodeAssertion(actual);
     }
 
     static <T> ListAssertion<T> create(List<T> actual) {
@@ -64,8 +64,8 @@ public interface NodeAssertionFactory<ASSERTION, ACTUAL> {
         return new FieldNodeAssertion(actual);
     }
 
-    static IdentifierNodeAssertion create(IdentifierNode actual) {
-        return new IdentifierNodeAssertion(actual);
+    static ElementAccessNodeAssertion.IdentifierNodeAssertion create(IdentifierNode actual) {
+        return new ElementAccessNodeAssertion.IdentifierNodeAssertion(actual);
     }
 
     static OperatorNodeAssertion create(OperatorNode actual) {

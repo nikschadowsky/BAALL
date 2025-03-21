@@ -1,16 +1,14 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
-
-import java.util.List;
 
 /**
  * @since 25.08.2024
@@ -111,7 +109,7 @@ public interface StatementParser {
      * @return partial parse result of the parsed import statements
      */
     @PartialParse
-    PartialParseResult<List<Token>> parseImports(TokenQueue queue);
+    PartialParseResult<ImportsNode> parseImports(TokenQueue queue);
 
     /**
      * Parses all exported elements. An export statement is always in the format of

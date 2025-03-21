@@ -21,8 +21,8 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
     }
 
     public ArrayLiteralNodeAssertion isArrayLiteral() {
-        myself.isInstanceOf(ArrayLiteralNode.class);
-        return NodeAssertionFactory.create((ArrayLiteralNode) actual);
+        myself.isInstanceOf(ListLiteralNode.class);
+        return NodeAssertionFactory.create((ListLiteralNode) actual);
     }
 
     public StructDefinitionLiteralNodeAssertion isStructDefinitionLiteral() {
@@ -75,9 +75,9 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
         }
     }
 
-    public static class ArrayLiteralNodeAssertion extends BaseAssertion<ArrayLiteralNodeAssertion, ArrayLiteralNode> {
+    public static class ArrayLiteralNodeAssertion extends BaseAssertion<ArrayLiteralNodeAssertion, ListLiteralNode> {
 
-        public ArrayLiteralNodeAssertion(ArrayLiteralNode actual) {
+        public ArrayLiteralNodeAssertion(ListLiteralNode actual) {
             super(actual, ArrayLiteralNodeAssertion.class);
         }
 

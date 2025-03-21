@@ -141,7 +141,7 @@ public interface NodeAssertionFactory<ASSERTION, ACTUAL> {
         return new LiteralNodeAssertion.PrimitiveLiteralNodeAssertion(actual);
     }
 
-    static LiteralNodeAssertion.ArrayLiteralNodeAssertion create(ArrayLiteralNode actual) {
+    static LiteralNodeAssertion.ArrayLiteralNodeAssertion create(ListLiteralNode actual) {
         return new LiteralNodeAssertion.ArrayLiteralNodeAssertion(actual);
     }
 

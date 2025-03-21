@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ControlStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ReturnStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructInitializationLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
@@ -55,8 +55,8 @@ public class ControlStatementParserImpl implements ControlStatementParser {
             queue.poll();
             RaiseStatementNodeImpl node = astFactory.createRaiseStatementNode();
 
-            ParseResult<StructInitializationLiteralNode> parsedExceptionCall =
-                    programParser.getLiteralParser().parseStructInitialization(queue.branchOff());
+            ParseResult<FunctionCallNode> parsedExceptionCall =
+                    programParser.getExpressionParser().parseFunctionCall(queue.branchOff());
             if (parsedExceptionCall.isSuccessful()) {
                 queue.mergeBranch(parsedExceptionCall.getTokenQueueId());
                 node.setException(parsedExceptionCall.getParseResult());

@@ -6,13 +6,13 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.*;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
@@ -467,7 +467,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
     @Override
     public PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue) {
         InterceptStatementNodeImpl node = astFactory.createInterceptStatementNode();
-        List<IdentifierAccessNode> interceptedExceptions = new LinkedList<>();
+        List<TypeNode> interceptedExceptions = new ArrayList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
@@ -478,8 +478,8 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             );
         }
         queue.poll();
-        ParseResult<IdentifierAccessNode> parsedInterceptedException =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        ParseResult<TypeNode> parsedInterceptedException =
+                programParser.getAuxiliaryParser().parseType(queue.branchOff());
         if (parsedInterceptedException.isUnsuccessful()) {
             diagnostics.add(parsedInterceptedException.getDiagnostic());
             isPartial = true;
@@ -488,16 +488,12 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             interceptedExceptions.add(parsedInterceptedException.getParseResult());
         }
 
-        PartialParseResult<List<IdentifierAccessNode>> parsedAdditionalInterceptedExceptions =
-                programParser.getAuxiliaryParser().parseAdditionalIdentifierAccesses(queue.branchOff());
+        ParseResult<List<TypeNode>> parsedAdditionalInterceptedExceptions =
+                programParser.getAuxiliaryParser().parseAdditionalTypes(queue.branchOff());
         if (parsedAdditionalInterceptedExceptions.isUnsuccessful()) {
             diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
             isPartial = true;
         } else {
-            if (parsedAdditionalInterceptedExceptions.isPartial()) {
-                diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
-                isPartial = true;
-            }
             queue.mergeBranch(parsedAdditionalInterceptedExceptions.getTokenQueueId());
             interceptedExceptions.addAll(parsedAdditionalInterceptedExceptions.getParseResult());
         }

@@ -27,6 +27,6 @@ public class BreakStatementNodeImpl extends AbstractNode implements BreakStateme
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitControlStatement(this, data);
+        return visitor.visitBreakStatement(this, data);
     }
 }

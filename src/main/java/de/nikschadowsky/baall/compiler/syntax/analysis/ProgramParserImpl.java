@@ -1,7 +1,6 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
@@ -43,12 +42,10 @@ public class ProgramParserImpl implements ProgramParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        PartialParseResult<List<Token>> parsedImports = statementParser.parseImports(queue.branchOff());
+        PartialParseResult<ImportsNode> parsedImports = statementParser.parseImports(queue.branchOff());
         if (parsedImports.isSuccessful() || parsedImports.isPartial()) {
             queue.mergeBranch(parsedImports.getTokenQueueId());
-            ImportsNodeImpl imports = astFactory.createImportNode();
-            imports.setImports(parsedImports.getParseResult());
-            node.setImports(imports);
+            node.setImports(parsedImports.getParseResult());
         }
         if (!parsedImports.isSuccessful()) {
             diagnostics.add(parsedImports.getDiagnostic());

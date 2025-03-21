@@ -4,13 +4,13 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 
@@ -97,7 +97,7 @@ public interface AuxiliaryParser {
 
     /**
      * Parses a type declaration consisting of a base or custom type and optional
-     * {@link #parseArrayTypeDefinition(TokenQueue) array type definitions}. Custom types can be flagged as none-safe.
+     * {parseArrayTypeDefinition(TokenQueue) array type definitions}. Custom types can be flagged as none-safe.
      *
      * @param queue queue of the tokens
      * @return complete parse result of the parsed type
@@ -106,15 +106,14 @@ public interface AuxiliaryParser {
     ParseResult<TypeNode> parseType(TokenQueue queue);
 
     /**
-     * Parses a list of array type definitions. Each type definition is represented either an
-     * {@link ExpressionParser#parseExpression(TokenQueue) expression} node specifying its size or {@code null} to
-     * indicate an unknown or inferred size. The list returned can be empty.
+     * Parses a comma separated list of parsed types. The first element must be preceded by a comma, or an empty list
+     * will be returned.
      *
      * @param queue queue of the tokens
-     * @return complete parse result of the array type definitions
+     * @return complete parse result of the parsed types
      */
     @CompleteParse
-    ParseResult<List<ExpressionNode>> parseArrayTypeDefinition(TokenQueue queue);
+    ParseResult<List<TypeNode>> parseAdditionalTypes(TokenQueue queue);
 
     /**
      * Parses a list of array index information. Each index information is represented by an
@@ -125,27 +124,34 @@ public interface AuxiliaryParser {
      * @return complete parse result of the array index information
      */
     @CompleteParse
-    ParseResult<List<ExpressionNode>> parseArrayIndexInformation(TokenQueue queue);
+    ParseResult<List<ExpressionNode>> parseListIndexInformation(TokenQueue queue);
 
     /**
-     * Parses access to a value referenced by an {@link #parseIdentifier(TokenQueue) identifier} and optional
-     * {@link #parseArrayIndexInformation(TokenQueue) array index information}.
-     *
+     * Parses a single list index in the format of {@code '[' EXPR ']'}.
      * @param queue queue of the tokens
-     * @return complete parse result of the identifier access
+     * @return complete parse result of the list index
      */
     @CompleteParse
-    ParseResult<IdentifierAccessNode> parseIdentifierAccess(TokenQueue queue);
+    ParseResult<ExpressionNode> parseListIndex(TokenQueue queue);
 
     /**
-     * Parses a list of accesses to values referenced by {@link #parseIdentifierAccess(TokenQueue) identifier accesses}.
-     * The list returned can be empty. The result may be partial.
+     * Parses access to an element. This method parses all element accesses, with no regards to complexity.
      *
      * @param queue queue of the tokens
-     * @return partial parse result of the list of identifier accesses
+     * @return complete parse result of the element access
+     */
+    @CompleteParse
+    ParseResult<ElementAccessNode> parseElementAccess(TokenQueue queue);
+
+    /**
+     * Parses a comma separated list of element accesses. The first element access must be preceded by a comma, or an
+     * empty list will be returned.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed element accesses
      */
     @PartialParse
-    PartialParseResult<List<IdentifierAccessNode>> parseAdditionalIdentifierAccesses(TokenQueue queue);
+    PartialParseResult<List<ElementAccessNode>> parseAdditionalElementAccesses(TokenQueue queue);
 
     /**
      * Parses a block of {@link StatementParser#parseStatements(TokenQueue) statements} surrounded by '{' curly braces

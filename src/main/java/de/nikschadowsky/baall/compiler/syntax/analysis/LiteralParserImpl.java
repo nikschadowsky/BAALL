@@ -7,7 +7,6 @@ import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
@@ -41,7 +40,7 @@ public class LiteralParserImpl implements LiteralParser {
             return ParseResult.successfulParse(parsedPrimitiveLiteral.getParseResult(), queue.getId());
         }
 
-        ParseResult<ArrayLiteralNode> parsedArrayLiteral = parseArrayLiteral(queue.branchOff());
+        ParseResult<ListLiteralNode> parsedArrayLiteral = parseListLiteral(queue.branchOff());
         if (parsedArrayLiteral.isSuccessful()) {
             queue.mergeBranch(parsedArrayLiteral.getTokenQueueId());
             return ParseResult.successfulParse(parsedArrayLiteral.getParseResult(), queue.getId());
@@ -72,8 +71,8 @@ public class LiteralParserImpl implements LiteralParser {
 
     @CompleteParse
     @Override
-    public ParseResult<ArrayLiteralNode> parseArrayLiteral(TokenQueue queue) {
-        ArrayLiteralNodeImpl node = astFactory.createArrayLiteralNode();
+    public ParseResult<ListLiteralNode> parseListLiteral(TokenQueue queue) {
+        ListLiteralNodeImpl node = astFactory.createListLiteralNode();
         List<ExpressionNode> elements = new LinkedList<>();
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("[").matches(queue.peek())) {
@@ -115,8 +114,6 @@ public class LiteralParserImpl implements LiteralParser {
     @CompleteParse
     @Override
     public ParseResult<StructDefinitionLiteralNode> parseStructDefinition(TokenQueue queue) {
-        List<TypeNode> fieldTypes = new ArrayList<>();
-        List<Token> fieldNames = new ArrayList<>();
         List<FieldNode> fields = new ArrayList<>();
 
         StructDefinitionLiteralNodeImpl node =

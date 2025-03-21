@@ -27,6 +27,6 @@ public class ContinueStatementNodeImpl extends AbstractNode implements ContinueS
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitControlStatement(this, data);
+        return visitor.visitContinueStatement(this, data);
     }
 }

@@ -15,11 +15,11 @@ import java.util.List;
 /**
  * @since 29.07.2024
  */
-public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNode {
+public class ListLiteralNodeImpl extends AbstractNode implements ListLiteralNode {
 
     private List<ExpressionNode> elements = Collections.emptyList();
 
-    public ArrayLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
+    public ListLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
@@ -39,6 +39,6 @@ public class ArrayLiteralNodeImpl extends AbstractNode implements ArrayLiteralNo
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitArrayLiteral(this, data);
+        return visitor.visitListLiteral(this, data);
     }
 }

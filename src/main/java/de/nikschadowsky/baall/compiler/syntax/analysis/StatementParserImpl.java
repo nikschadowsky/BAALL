@@ -6,6 +6,8 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ControlStructureNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
@@ -16,8 +18,6 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignmen
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ControlStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
@@ -41,14 +41,15 @@ public class StatementParserImpl implements StatementParser {
 
     @PartialParse
     @Override
-    public PartialParseResult<List<Token>> parseImports(TokenQueue queue) {
+    public PartialParseResult<ImportsNode> parseImports(TokenQueue queue) {
         ImportsNodeImpl node = astFactory.createImportNode();
         List<Token> imports = new LinkedList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("use").matches(queue.peek())) {
-            return PartialParseResult.successfulParse(new LinkedList<>(), queue.getId());
+            node.setImports(imports);
+            return PartialParseResult.successfulParse(node, queue.getId());
         }
         queue.poll();
 
@@ -65,7 +66,7 @@ public class StatementParserImpl implements StatementParser {
         }
         queue.poll();
 
-        PartialParseResult<List<Token>> parsedImports = parseImports(queue.branchOff());
+        PartialParseResult<ImportsNode> parsedImports = parseImports(queue.branchOff());
         if (parsedImports.isUnsuccessful()) {
             diagnostics.add(parsedImports.getDiagnostic());
             isPartial = true;
@@ -75,14 +76,14 @@ public class StatementParserImpl implements StatementParser {
                 isPartial = true;
             }
             queue.mergeBranch(parsedImports.getTokenQueueId());
-            imports.addAll(parsedImports.getParseResult());
+            imports.addAll(new ArrayList<>(parsedImports.getParseResult().getImports()));
         }
         node.setImports(imports);
 
         if (isPartial) {
-            return PartialParseResult.partialParse(imports, diagnostics.get(0), queue.getId());
+            return PartialParseResult.partialParse(node, diagnostics.get(0), queue.getId());
         }
-        return PartialParseResult.successfulParse(imports, queue.getId());
+        return PartialParseResult.successfulParse(node, queue.getId());
     }
 
     @PartialParse
@@ -297,7 +298,8 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
         }
 
-        ParseResult<IdentifierNode> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -354,7 +356,8 @@ public class StatementParserImpl implements StatementParser {
             queue.poll();
         }
 
-        ParseResult<IdentifierNode> parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
+        ParseResult<IdentifierNode> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             diagnostics.add(parsedIdentifier.getDiagnostic());
             isPartial = true;
@@ -427,8 +430,8 @@ public class StatementParserImpl implements StatementParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<IdentifierAccessNode> parsedIdentifier =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        ParseResult<ElementAccessNode> parsedIdentifier =
+                programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
         if (parsedIdentifier.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(
                     new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
@@ -470,7 +473,7 @@ public class StatementParserImpl implements StatementParser {
     @Override
     public PartialParseResult<ExportsNode> parseExports(TokenQueue queue) {
         ExportsNodeImpl node = astFactory.createExportNode();
-        node.setExports(new LinkedList<>());
+        node.setExports(new ArrayList<>());
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
@@ -505,9 +508,9 @@ public class StatementParserImpl implements StatementParser {
                 queue.poll();
                 return PartialParseResult.successfulParse(node, queue.getId());
             } else {
-                ParseResult<IdentifierAccessNode> parsedElement =
-                        programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
-                List<IdentifierAccessNode> elements = new LinkedList<>();
+                ParseResult<ElementAccessNode> parsedElement =
+                        programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
+                List<ElementAccessNode> elements = new LinkedList<>();
 
                 if (parsedElement.isSuccessful()) {
                     queue.mergeBranch(parsedElement.getTokenQueueId());
@@ -518,8 +521,8 @@ public class StatementParserImpl implements StatementParser {
                     isPartial = true;
                 }
 
-                PartialParseResult<List<IdentifierAccessNode>> parsedElements =
-                        programParser.getAuxiliaryParser().parseAdditionalIdentifierAccesses(queue.branchOff());
+                PartialParseResult<List<ElementAccessNode>> parsedElements =
+                        programParser.getAuxiliaryParser().parseAdditionalElementAccesses(queue.branchOff());
 
                 if (parsedElements.isUnsuccessful()) {
                     diagnostics.add(parsedElements.getDiagnostic());

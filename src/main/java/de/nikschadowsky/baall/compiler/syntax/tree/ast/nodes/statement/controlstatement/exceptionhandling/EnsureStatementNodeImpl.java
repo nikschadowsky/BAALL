@@ -34,6 +34,6 @@ public class EnsureStatementNodeImpl extends AbstractNode implements EnsureState
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitEnsure(this, data);
+        return visitor.visitEnsureStatement(this, data);
     }
 }

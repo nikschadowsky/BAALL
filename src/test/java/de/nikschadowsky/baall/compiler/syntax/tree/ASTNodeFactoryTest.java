@@ -143,8 +143,8 @@ class ASTNodeFactoryTest {
     }
 
     @Test
-    void createArrayLiteralNode() {
-        assertThat(astFactory.createArrayLiteralNode()).hasNodeType(NodeType.ARRAY_LITERAL);
+    void createListLiteralNode() {
+        assertThat(astFactory.createListLiteralNode()).hasNodeType(NodeType.ARRAY_LITERAL);
     }
 
     @Test

@@ -43,8 +43,8 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
     }
 
     public LiteralNodeAssertion.ArrayLiteralNodeAssertion isArrayLiteral() {
-        myself.isInstanceOf(ArrayLiteralNode.class);
-        return NodeAssertionFactory.create((ArrayLiteralNode) actual);
+        myself.isInstanceOf(ListLiteralNode.class);
+        return NodeAssertionFactory.create((ListLiteralNode) actual);
     }
 
     public LiteralNodeAssertion.StructDefinitionLiteralNodeAssertion isStructDefinitionLiteral() {

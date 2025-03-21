@@ -9,8 +9,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.ArrayLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.FunctionDefinitionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.ListLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructDefinitionLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
@@ -134,7 +134,7 @@ class LiteralParserImplTest {
     }
 
     @Test
-    void parseArrayLiteral() {
+    void parseListLiteral() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
@@ -146,12 +146,12 @@ class LiteralParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().separator("[").separator("]").build();
-        ParseResult<ArrayLiteralNode> actual = literalParser.parseArrayLiteral(queue);
+        ParseResult<ListLiteralNode> actual = literalParser.parseListLiteral(queue);
         assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasNoElements();
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator("[").operator("expression").separator("]").build();
-        actual = literalParser.parseArrayLiteral(queue);
+        actual = literalParser.parseListLiteral(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasElements(1)
@@ -164,7 +164,7 @@ class LiteralParserImplTest {
                                            .operator("expression")
                                            .separator("]")
                                            .build();
-        actual = literalParser.parseArrayLiteral(queue);
+        actual = literalParser.parseListLiteral(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasElements(2)
@@ -173,10 +173,10 @@ class LiteralParserImplTest {
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator("[").operator("expression").separator(";").build();
-        assertThat(literalParser.parseArrayLiteral(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected ']'");
+        assertThat(literalParser.parseListLiteral(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected ']'");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
-        assertThat(literalParser.parseArrayLiteral(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected '['");
+        assertThat(literalParser.parseListLiteral(queue)).isUnsuccessful().syntaxDiagnosticContains("Expected '['");
     }
 
     @Test

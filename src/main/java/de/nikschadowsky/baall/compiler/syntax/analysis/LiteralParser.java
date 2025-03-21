@@ -15,7 +15,7 @@ public interface LiteralParser {
 
     /**
      * Parses a literal. A literal is either a  {@link #parsePrimitiveLiteral primitive value}, an
-     * {@link #parseArrayLiteral array}, a {@link #parseStructDefinition struct definition}, a
+     * {@link #parseListLiteral array}, a {@link #parseStructDefinition struct definition}, a
      * {@link #parseStructNone struct none}, or a {@link #parseFunctionDefinition function definition}.
      *
      * @param queue queue of the tokens
@@ -25,13 +25,13 @@ public interface LiteralParser {
     ParseResult<LiteralNode> parseLiteral(TokenQueue queue);
 
     /**
-     * Parses a literal representing an array in the format of '[ element1, element2, ... ]'.
+     * Parses a literal representing a list in the format of '[ element1, element2, ... ]'.
      *
      * @param queue queue of the tokens
-     * @return complete parse result of the parsed array literal
+     * @return complete parse result of the parsed list literal
      */
     @CompleteParse
-    ParseResult<ArrayLiteralNode> parseArrayLiteral(TokenQueue queue);
+    ParseResult<ListLiteralNode> parseListLiteral(TokenQueue queue);
 
     /**
      * Parses a literal representing a definition of a struct in the format of '( type: field_name, ... )'. A struct

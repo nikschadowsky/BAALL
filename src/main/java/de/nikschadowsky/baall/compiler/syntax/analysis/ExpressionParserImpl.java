@@ -5,10 +5,10 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
@@ -101,13 +101,13 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
-        parseResult = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        parseResult = parseUnaryExpression(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch(parseResult.getTokenQueueId());
             return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
         }
 
-        parseResult = parseUnaryExpression(queue.branchOff());
+        parseResult = programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
         if (parseResult.isSuccessful()) {
             queue.mergeBranch(parseResult.getTokenQueueId());
             return ParseResult.successfulParse(parseResult.getParseResult(), queue.getId());
@@ -149,8 +149,8 @@ public class ExpressionParserImpl implements ExpressionParser {
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
-        ParseResult<IdentifierAccessNode> parsedIdentifierValueAccess =
-                programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        ParseResult<ElementAccessNode> parsedIdentifierValueAccess =
+                programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
         if (parsedIdentifierValueAccess.isUnsuccessful()) {
             return PartialParseResult.unsuccessfulParse(
                     new SyntaxDiagnostic(queue.poll(), "Not a statement!"),
@@ -211,7 +211,7 @@ public class ExpressionParserImpl implements ExpressionParser {
     @Override
     public ParseResult<UnaryExpressionNode> parseUnaryExpression(TokenQueue queue) {
         ParseResult<OperatorNode> parsedUnaryOperator;
-        ParseResult<IdentifierAccessNode> parsedIdentifier;
+        ParseResult<ElementAccessNode> parsedIdentifier;
         UnaryExpressionNodeImpl node;
 
         parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff());
@@ -221,7 +221,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             node = astFactory.createUnaryExpressionNode();
             node.setIsPrefix(true);
             node.setOperator(parsedUnaryOperator.getParseResult());
-            parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+            parsedIdentifier = programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
             if (parsedIdentifier.isSuccessful()) {
                 queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 
@@ -231,7 +231,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
         }
 
-        parsedIdentifier = programParser.getAuxiliaryParser().parseIdentifierAccess(queue.branchOff());
+        parsedIdentifier = programParser.getAuxiliaryParser().parseElementAccess(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 

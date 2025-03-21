@@ -548,7 +548,7 @@ class AuxiliaryParserImplTest {
     }
 
     @Test
-    void parseArrayIndexInformation() {
+    void parseListIndexInformation() {
         ExpressionNode mockedExpression = mock(ExpressionNode.class);
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
@@ -559,12 +559,12 @@ class AuxiliaryParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().build();
-        ParseResult<List<ExpressionNode>> actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        ParseResult<List<ExpressionNode>> actual = auxiliaryParser.parseListIndexInformation(queue);
         assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).isEmpty();
 
         queue = new TokenQueueTestBuilder().separator("[").operator("expression").separator("]").separator(";").build();
 
-        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        actual = auxiliaryParser.parseListIndexInformation(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasSize(1)
@@ -580,7 +580,7 @@ class AuxiliaryParserImplTest {
                                            .separator(";")
                                            .build();
 
-        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        actual = auxiliaryParser.parseListIndexInformation(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasSize(2)
@@ -589,7 +589,7 @@ class AuxiliaryParserImplTest {
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("[").separator(";").build();
-        actual = auxiliaryParser.parseArrayIndexInformation(queue);
+        actual = auxiliaryParser.parseListIndexInformation(queue);
         assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasSize(0);
     }
 

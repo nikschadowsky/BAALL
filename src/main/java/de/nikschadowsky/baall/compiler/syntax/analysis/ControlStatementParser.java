@@ -11,6 +11,13 @@ import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
  */
 public interface ControlStatementParser {
 
+    /**
+     * Parses a control flow statement. A control statement is either a break statement, a continue statement,
+     * or a return statement.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed control statement
+     */
     @CompleteParse
     ParseResult<ControlStatementNode> parseControlStatement(TokenQueue queue);
 }

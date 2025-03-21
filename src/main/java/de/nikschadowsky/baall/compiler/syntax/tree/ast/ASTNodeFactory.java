@@ -1,5 +1,9 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast;
 
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNodeImpl;
@@ -18,11 +22,12 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.InterceptStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.FunctionTypeNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.IdentifierTypeNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.ListTypeNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierAccessNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.IdentifierNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 
@@ -115,11 +120,6 @@ public class ASTNodeFactory {
         return new ParenthesizedExpressionNodeImpl(diagnostics);
     }
 
-    public IdentifierAccessNodeImpl createIdentifierAccessNode() {
-        return new IdentifierAccessNodeImpl(diagnostics);
-    }
-
-
     // exception handling
     public RaiseStatementNodeImpl createRaiseStatementNode() {
         return new RaiseStatementNodeImpl(diagnostics);
@@ -147,20 +147,28 @@ public class ASTNodeFactory {
         return new StructDefinitionLiteralNodeImpl(diagnostics);
     }
 
-    public StructInitializationLiteralNodeImpl createStructInitializationLiteralNode() {
-        return new StructInitializationLiteralNodeImpl(diagnostics);
-    }
-
-    public ArrayLiteralNodeImpl createArrayLiteralNode() {
-        return new ArrayLiteralNodeImpl(diagnostics);
+    public ListLiteralNodeImpl createListLiteralNode() {
+        return new ListLiteralNodeImpl(diagnostics);
     }
 
     public FunctionDefinitionNodeImpl createFunctionDefinitionNode() {
         return new FunctionDefinitionNodeImpl(diagnostics);
     }
 
-    public TypeNodeImpl createTypeNode() {
-        return new TypeNodeImpl(diagnostics);
+    public FunctionTypeNodeImpl createFunctionTypeNode() {
+        return new FunctionTypeNodeImpl(diagnostics);
+    }
+
+    public IdentifierTypeNodeImpl createIdentifierTypeNode() {
+        return new IdentifierTypeNodeImpl(diagnostics);
+    }
+
+    public PrimitiveTypeNodeImpl createPrimitiveTypeNode() {
+        return new PrimitiveTypeNodeImpl(diagnostics);
+    }
+
+    public ListTypeNodeImpl createListTypeNode() {
+        return new ListTypeNodeImpl(diagnostics);
     }
 
     public IdentifierNodeImpl createIdentifierNode() {
@@ -173,5 +181,21 @@ public class ASTNodeFactory {
 
     public OperatorNodeImpl createOperatorNode() {
         return new OperatorNodeImpl(diagnostics);
+    }
+
+    public StructNoneLiteralNodeImpl createStructNoneLiteralNode() {
+        return new StructNoneLiteralNodeImpl(diagnostics);
+    }
+
+    public IndexedAccessNodeImpl createIndexedAccessNode() {
+        return new IndexedAccessNodeImpl(diagnostics);
+    }
+
+    public MemberReferenceNodeImpl createMemberReferenceNode() {
+        return new MemberReferenceNodeImpl(diagnostics);
+    }
+
+    public ScopeElevationNodeImpl createScopeElevationNode() {
+        return new ScopeElevationNodeImpl(diagnostics);
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 29.07.2024
  */
-public interface ArrayLiteralNode extends LiteralNode {
+public interface ListLiteralNode extends LiteralNode {
 
     /**
      * Defined array elements.

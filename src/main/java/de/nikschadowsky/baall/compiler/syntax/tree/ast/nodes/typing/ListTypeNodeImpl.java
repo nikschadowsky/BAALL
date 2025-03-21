@@ -3,23 +3,18 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnmodifiableView;
-
-import java.util.Optional;
 
 /**
  * @since 09.03.2025
  */
-public class NestedTypeNodeImpl extends AbstractNode implements NestedTypeNode {
+public class ListTypeNodeImpl extends AbstractNode implements ListTypeNode {
 
-    private ExpressionNode arrayDimension;
     private TypeNode inner;
 
-    public NestedTypeNodeImpl(NodeDiagnosticCollector diagnostics) {
+    public ListTypeNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
@@ -30,15 +25,6 @@ public class NestedTypeNodeImpl extends AbstractNode implements NestedTypeNode {
 
     public void setInner(TypeNode inner) {
         this.inner = inner;
-    }
-
-    @Override
-    public @NotNull @UnmodifiableView Optional<ExpressionNode> getArrayDimension() {
-        return Optional.ofNullable(arrayDimension);
-    }
-
-    public void setArrayDimension(ExpressionNode arrayDimension) {
-        this.arrayDimension = arrayDimension;
     }
 
     @Override
@@ -53,6 +39,6 @@ public class NestedTypeNodeImpl extends AbstractNode implements NestedTypeNode {
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {
-        return visitor.visitNestedType(this, data);
+        return visitor.visitListType(this, data);
     }
 }

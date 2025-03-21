@@ -1,8 +1,5 @@
 package de.nikschadowsky.baall.compiler;
 
-import de.nikschadowsky.baall.compiler.lexer.Lexer;
-import de.nikschadowsky.baall.compiler.util.FileLoader;
-
 import java.nio.file.Path;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -12,7 +9,6 @@ public class Compiler {
     private final Logger logger = Logger.getLogger("Compiler");
 
     public static void main(String[] args) {
-        new Lexer(FileLoader.getPathFromFileSystem(getInputPath(args)));
 
     }
 

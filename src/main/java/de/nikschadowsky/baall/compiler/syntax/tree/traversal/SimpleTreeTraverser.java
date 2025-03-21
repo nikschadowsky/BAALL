@@ -2,8 +2,11 @@ package de.nikschadowsky.baall.compiler.syntax.tree.traversal;
 
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ControlStructureNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.WhileLoopNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
@@ -11,17 +14,22 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ExportsNode
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.*;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ControlStatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.LoopControlStatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ConstantDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.BreakStatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ContinueStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.ReturnStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.EnsureStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.InterceptStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.TryStatementNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.FunctionTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.IdentifierTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.ListTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 
 /**
@@ -54,13 +62,10 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     }
 
     @Override
-    public R visitDeclaration(DeclarationNode that, D data) {
-        return scan(that.getType(), data);
-    }
-
-    @Override
     public R visitConstantDeclaration(ConstantDeclarationNode that, D data) {
-        return scan(that.getType(), data);
+        R r = scan(that.getType(), data);
+        r = scanAndReduce(that.getIdentifier(), data, r);
+        return scanAndReduce(that.getInitializationValue(), data, r);
     }
 
     @Override
@@ -68,25 +73,10 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
         return scan(that.getType(), data);
     }
 
-    @Override
-    public R visitReassignment(ReassignmentNode that, D data) {
-        return scan(that.getIdentifierAccess(), data);
-    }
 
     @Override
     public R visitVariableReassignment(VariableReassignmentNode that, D data) {
-        return scan(that.getIdentifierAccess(), data);
-    }
-
-    @Override
-    public R visitType(TypeNode that, D data) {
-        return scan(that.getArrayDimensionDefinitions(), data);
-    }
-
-    @Override
-    public R visitControlStructure(ControlStructureNode that, D data) {
-        // empty implementation
-        return null;
+        return scan(that.getElementAccess(), data);
     }
 
     @Override
@@ -116,12 +106,6 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     }
 
     @Override
-    public R visitExpression(ExpressionNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    @Override
     public R visitBinaryExpression(BinaryExpressionNode that, D data) {
         R r = scan(that.getLeftOperand(), data);
         return scanAndReduce(that.getRightOperand(), data, r);
@@ -139,27 +123,27 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
     public R visitUnaryExpression(UnaryExpressionNode that, D data) {
-        return scan(that.getIdentifierAccess(), data);
+        return scan(that.getElementAccess(), data);
     }
 
     @Override
-    public R visitEnsure(EnsureStatementNode that, D data) {
+    public R visitEnsureStatement(EnsureStatementNode that, D data) {
         return scan(that.getBody(), data);
     }
 
     @Override
-    public R visitIntercept(InterceptStatementNode that, D data) {
+    public R visitInterceptStatement(InterceptStatementNode that, D data) {
         R r = scan(that.getInterceptedExceptions(), data);
         return scanAndReduce(that.getBody(), data, r);
     }
 
     @Override
-    public R visitRaise(RaiseStatementNode that, D data) {
+    public R visitRaiseStatement(RaiseStatementNode that, D data) {
         return scan(that.getException(), data);
     }
 
     @Override
-    public R visitTry(TryStatementNode that, D data) {
+    public R visitTryStatement(TryStatementNode that, D data) {
         R r = scan(that.getBody(), data);
         r = scanAndReduce(that.getInterceptBlocks(), data, r);
         if (that.getEnsureBlock().isPresent()) {
@@ -169,30 +153,12 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     }
 
     @Override
-    public R visitControlStatement(ControlStatementNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    @Override
-    public R visitLoopControlStatement(LoopControlStatementNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    @Override
     public R visitReturnStatement(ReturnStatementNode that, D data) {
         return scan(that.getReturnExpression(), data);
     }
 
     @Override
-    public R visitStatement(StatementNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    @Override
-    public R visitArrayLiteral(ArrayLiteralNode that, D data) {
+    public R visitListLiteral(ListLiteralNode that, D data) {
         return scan(that.getElements(), data);
     }
 
@@ -214,9 +180,9 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     }
 
     @Override
-    public R visitStructInitializationLiteral(StructInitializationLiteralNode that, D data) {
-        R r = scan(that.getIdentifier(), data);
-        return scanAndReduce(that.getArguments(), data, r);
+    public R visitStructNoneLiteral(StructNoneLiteralNode that, D data) {
+        // empty implementation
+        return null;
     }
 
     @Override
@@ -225,24 +191,6 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
         return scanAndReduce(that.getArguments(), data, r);
     }
 
-    @Override
-    public R visitIdentifierAccess(IdentifierAccessNode that, D data) {
-        return scan(that.getArrayIndices(), data);
-    }
-
-    @Override
-    public R visitLiteral(LiteralNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    @Override
-    public R visitTerm(TermNode that, D data) {
-        // empty implementation
-        return null;
-    }
-
-    //todo
     @Override
     public R visitField(FieldNode that, D data) {
         R r = scan(that.getType(), data);
@@ -259,6 +207,59 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     public R visitOperator(OperatorNode that, D data) {
         // empty implementation
         return null;
+    }
+
+    @Override
+    public R visitBreakStatement(BreakStatementNode that, D data) {
+        // empty implementation
+        return null;
+    }
+
+    @Override
+    public R visitContinueStatement(ContinueStatementNode that, D data) {
+        // empty implementation
+        return null;
+    }
+
+    @Override
+    public R visitFunctionType(FunctionTypeNode that, D data) {
+        R r = scan(that.getParameterTypes(), data);
+        r = scanAndReduce(that.getInnerType(), data, r);
+        return r;
+    }
+
+    @Override
+    public R visitListType(ListTypeNode that, D data) {
+        return scan(that.getInnerType(), data);
+    }
+
+    @Override
+    public R visitIdentifierType(IdentifierTypeNode that, D data) {
+        return scan(that.getType(), data);
+    }
+
+    @Override
+    public R visitPrimitiveType(PrimitiveTypeNode that, D data) {
+        return scan(that.getType(), data);
+    }
+
+    @Override
+    public R visitIndexedAccess(IndexedAccessNode that, D data) {
+        R r = scan(that.getIndex(), data);
+        r = scanAndReduce(that.getInnerIdentifier(), data, r);
+        return r;
+    }
+
+    @Override
+    public R visitMemberReference(MemberReferenceNode that, D data) {
+        R r = scan(that.getSelf(), data);
+        r = scanAndReduce(that.getInnerIdentifier(), data, r);
+        return r;
+    }
+
+    @Override
+    public R visitScopeElevation(ScopeElevationNode that, D data) {
+        return scan(that.getInnerIdentifier(), data);
     }
 
     /*

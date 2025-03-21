@@ -15,9 +15,12 @@ public class BaallFile {
 
     private final ProgramNode program;
 
-    public BaallFile(@NotNull String fileName, @NotNull ProgramNode program) {
+    private final SymbolTable symbolTable;
+
+    public BaallFile(@NotNull String fileName, @NotNull ProgramNode program, @NotNull SymbolTable symbolTable) {
         this.fileName = fileName;
         this.program = program;
+        this.symbolTable = symbolTable;
     }
 
     public String getFileName() {
@@ -33,6 +36,6 @@ public class BaallFile {
     }
 
     public List<BaallFileReference> getImports() {
-        return program.getImports().getImports();
+        return program.getImports().getImports().stream().map(token -> new BaallFileReference(token.value())).toList();
     }
 }

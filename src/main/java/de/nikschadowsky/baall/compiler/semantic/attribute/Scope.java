@@ -11,8 +11,9 @@ import java.util.Optional;
  */
 public class Scope {
 
-    // todo does this need to be a function to create a new root? it would seem reasonable to have a new root for each baall file
-    public static final Scope ROOT = new Scope();
+    public static final Scope IMPORTS = new Scope();
+
+    public static final Scope ROOT = new Scope(IMPORTS);
 
     private final @Nullable Scope parent;
 
@@ -29,7 +30,11 @@ public class Scope {
     }
 
     public boolean isRoot() {
-        return parent == null;
+        return this == ROOT;
+    }
+
+    public boolean isImport() {
+        return this == IMPORTS;
     }
 
     public boolean canAccess(@NotNull Scope scope) {
@@ -42,4 +47,5 @@ public class Scope {
 
         return false;
     }
+
 }

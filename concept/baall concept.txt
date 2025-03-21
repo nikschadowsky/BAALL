@@ -9,7 +9,7 @@ comment */
 string: a = "GRRRRRR";
 number: b = 3;
 char: c = 'A';
-myStructure: grr := (a,b,c);
+myStructure: grr := myStructure(a,b,c);
 number[]: arr2 = [3,2,1]; // array infers size to be 3
 number[9]: arr = [1,2,3,4,5]; // additional elements initialized to '0'
 number[9]: arr3 = []; // array of numbers with size 9, all elements initialized to '0'
@@ -30,6 +30,10 @@ string: function1 := (number: a, bool: b, char: c) {
 	}
 	return "Hehehehoar";
 }
+
+(1) <- wrapped value expression or struct initializer?
+myStruct[1]: init = myStruct[1](1,2,3,4)
+struct[]: myStruct = [(string: a), (number: a, number: b, number: c, number: d)]
 
 while a<b {
 	// while loop
@@ -60,4 +64,4 @@ try {
     alwaysExecuteThisFunction("help");
 }
 
-export {b,c,arr,arr2, function1}
+export {b,c,arr,arr2, function1} as ConceptNamespace;

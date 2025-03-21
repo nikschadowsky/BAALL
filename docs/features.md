@@ -1,0 +1,7 @@
+- none-safe struct types: **MyStruct!: myStructField = MyStruct(1,2,3)**
+- export of imported elements
+- pattern matching on intercepted exceptions ```intercept (MyException e) {...} -> intercept (MyException (field_a, field_b)) {...}```
+- use-before-declaration functions
+- higher order functions: ```string<> myStringFunction := () {return "";}```; 
+- ```number<string<>> myStringFunction := (string: param) {return toNumber(param);}```
+- ```struct~a,b``` 

@@ -106,7 +106,7 @@ class LiteralParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isStructDefinitionLiteral()
                           .hasFields(1)
-                          .hasFieldTypeMatching(0, a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasFieldTypeMatching(0, a -> a.isPrimitiveType().isString())
                           .hasFieldName(0, "MyIdentifier");
         assertThat(queue).isAtEnd();
 
@@ -124,7 +124,7 @@ class LiteralParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isFunctionDefinition()
                           .hasParameters(1)
-                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().isString())
                           .hasParameterName(0, "MyIdentifier")
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).isAtEnd();
@@ -289,7 +289,7 @@ class LiteralParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasParameters(1)
-                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().isString())
                           .hasParameterName(0, "MyIdentifier")
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).isAtEnd();

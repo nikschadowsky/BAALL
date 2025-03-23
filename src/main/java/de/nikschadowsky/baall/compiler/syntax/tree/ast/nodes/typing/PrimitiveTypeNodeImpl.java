@@ -13,19 +13,19 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PrimitiveTypeNodeImpl extends AbstractNode implements PrimitiveTypeNode {
 
-    private IdentifierNode type;
+    private PrimitiveTypeKind kind;
 
     public PrimitiveTypeNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public IdentifierNode getType() {
-        return type;
+    public PrimitiveTypeKind getKind() {
+        return kind;
     }
 
-    public void setType(IdentifierNode type) {
-        this.type = type;
+    public void setKind(PrimitiveTypeKind kind) {
+        this.kind = kind;
     }
 
     @Override

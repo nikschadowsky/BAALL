@@ -86,7 +86,7 @@ class AuxiliaryParserImplTest {
                           .hasElementMatching(
                                   0,
                                   NodeAssertionFactory::create,
-                                  a -> a.hasTypeMatching(a1 -> a1.isPrimitiveType().hasIdentifier("number"))
+                                  a -> a.hasTypeMatching(a1 -> a1.isPrimitiveType().isNumber())
                                         .hasName("MyIdentifier")
                           )
                           .hasElementMatching(
@@ -109,7 +109,7 @@ class AuxiliaryParserImplTest {
                                                                  .hasNoParameterTypes()
                                                                  .mapToInner()
                                                                  .isPrimitiveType()
-                                                                 .hasIdentifier("struct")
+                                                                 .isStruct()
                                         )
                           );
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -337,7 +337,7 @@ class AuxiliaryParserImplTest {
                           .isListType()
                           .mapToInner()
                           .isPrimitiveType()
-                          .hasIdentifier("string");
+                          .isString();
 
         assertThat(queue).hasNextTokenValueMatch(";");
 
@@ -388,10 +388,10 @@ class AuxiliaryParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isFunctionType()
                           .hasParameterTypes(1)
-                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasParameterTypeMatching(0, a -> a.isPrimitiveType().isString())
                           .mapToInner()
                           .isPrimitiveType()
-                          .hasIdentifier("number");
+                          .isNumber();
 
         // myType![]<>[]<string<boolean>,number>
         queue = new TokenQueueTestBuilder().identifier("myType")

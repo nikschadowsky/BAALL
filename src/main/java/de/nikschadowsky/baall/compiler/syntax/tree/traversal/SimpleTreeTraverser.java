@@ -240,7 +240,7 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
     public R visitPrimitiveType(PrimitiveTypeNode that, D data) {
-        return scan(that.getType(), data);
+        return null;
     }
 
     @Override
@@ -266,14 +266,14 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     UTILITY
      */
 
-    protected R scan(Node node, D data) {
+    protected final R scan(Node node, D data) {
         if (node != null) {
             return node.accept(this, data);
         }
         return null;
     }
 
-    protected R scan(Iterable<? extends Node> nodes, D data) {
+    protected final R scan(Iterable<? extends Node> nodes, D data) {
         R r = null;
         if (nodes != null) {
             boolean first = true;
@@ -285,15 +285,15 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
         return r;
     }
 
-    protected R scanAndReduce(Node node, D data, R r) {
+    protected final R scanAndReduce(Node node, D data, R r) {
         return reduce(scan(node, data), r);
     }
 
-    protected R scanAndReduce(Iterable<? extends Node> nodes, D data, R r) {
+    protected final R scanAndReduce(Iterable<? extends Node> nodes, D data, R r) {
         return reduce(scan(nodes, data), r);
     }
 
-    protected R reduce(R r1, R r2) {
+    protected final R reduce(R r1, R r2) {
         return r1;
     }
 

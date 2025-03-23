@@ -40,15 +40,26 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
             super(actual, PrimitiveTypeNodeAssertion.class);
         }
 
-        public PrimitiveTypeNodeAssertion hasIdentifier(String identifier) {
-            return hasIdentifierMatching(a -> a.isIdentifier().hasName(identifier));
+        public PrimitiveTypeNodeAssertion isString() {
+            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.STRING);
         }
 
-        public PrimitiveTypeNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getType()));
-            return this;
+        public PrimitiveTypeNodeAssertion isNumber() {
+            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.NUMBER);
+        }
+        public PrimitiveTypeNodeAssertion isBoolean() {
+            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.BOOLEAN);
+        }
+        public PrimitiveTypeNodeAssertion isStruct() {
+            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.STRUCT);
+        }
+        public PrimitiveTypeNodeAssertion isException() {
+            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.EXCEPTION);
         }
 
+        public PrimitiveTypeNodeAssertion isOfKind(PrimitiveTypeNode.PrimitiveTypeKind expected) {
+            return baseAssert("kind", PrimitiveTypeNode::getKind, expected);
+        }
     }
 
     public static class IdentifierTypeNodeAssertion extends BaseAssertion<IdentifierTypeNodeAssertion, IdentifierTypeNode> {

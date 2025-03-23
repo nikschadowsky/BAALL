@@ -400,7 +400,7 @@ class StatementParserImplTest {
         PartialParseResult<VariableDeclarationNode> actual = statementParser.parseVariableDeclaration(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasTypeMatching(a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasTypeMatching(a -> a.isPrimitiveType().isString())
                           .hasIdentifierName("MyIdentifier")
                           .hasInitializationValue()
                           .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
@@ -458,7 +458,7 @@ class StatementParserImplTest {
         PartialParseResult<ConstantDeclarationNode> actual = statementParser.parseConstantDeclaration(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasTypeMatching(a -> a.isPrimitiveType().hasIdentifier("string"))
+                          .hasTypeMatching(a -> a.isPrimitiveType().isString())
                           .hasIdentifierName("MyIdentifier")
                           .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");

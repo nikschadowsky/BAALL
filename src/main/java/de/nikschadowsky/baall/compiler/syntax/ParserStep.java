@@ -9,6 +9,7 @@ import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.ProgramParser;
 import de.nikschadowsky.baall.compiler.syntax.analysis.ProgramParserImpl;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
+import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxException;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @since 14.01.2025
  */
-public class ParserStep extends Step<TokenQueue, ProgramNode> {
+public class ParserStep extends Step<TokenQueue, ProgramNode, SyntaxDiagnostic> {
 
     public ParserStep(@Nullable StepOptions options) {
         super(options);

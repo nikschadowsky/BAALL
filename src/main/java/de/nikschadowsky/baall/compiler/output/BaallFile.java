@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.output;
 
 
+import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import org.jetbrains.annotations.NotNull;
 

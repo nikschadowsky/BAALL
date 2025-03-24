@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.StepOptions;
 import de.nikschadowsky.baall.compiler.output.BaallFile;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
+import de.nikschadowsky.baall.compiler.output.error.Diagnostic;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
@@ -17,7 +18,7 @@ import java.util.Map;
 /**
  * @since 22.01.2025
  */
-public class SemanticAnalysisStep extends Step<ProgramNode, BaallFile> {
+public class SemanticAnalysisStep extends Step<ProgramNode, BaallFile, SemanticDiagnostic> {
 
     public SemanticAnalysisStep(@Nullable StepOptions options) {
         super(options);

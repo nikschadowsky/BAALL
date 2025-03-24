@@ -5,6 +5,7 @@ import de.nikschadowsky.baall.compiler.CompileInformation;
 import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.StepOptions;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
+import de.nikschadowsky.baall.compiler.output.error.DiagnosticCollector;
 import de.nikschadowsky.baall.compiler.util.FileLoader;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ import java.util.List;
 /**
  * @since 11.01.2025
  */
-public class FileLineReaderStep extends Step<Path, List<String>> {
+public class FileLineReaderStep extends Step<Path, List<String>, FileLineReaderDiagnostic> {
 
     public FileLineReaderStep(@Nullable StepOptions options) {
         super(options);

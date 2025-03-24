@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class LexerStep extends Step<List<String>, List<LexerRow>> {
+public class LexerStep extends Step<List<String>, List<LexerRow>, LexerDiagnostic> {
 
     /**
      * Blocks used to preprocess source code

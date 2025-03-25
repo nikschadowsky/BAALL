@@ -6,6 +6,8 @@ import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.StepOptions;
 import de.nikschadowsky.baall.compiler.lexer.LexerRow;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
+import de.nikschadowsky.baall.compiler.output.error.Diagnostic;
+import de.nikschadowsky.baall.compiler.symbol.LineInformation;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueueId;
@@ -22,7 +24,7 @@ import java.util.regex.Pattern;
 /**
  * @since 11.01.2025
  */
-public class BetterTokenizerStep extends Step<List<LexerRow>, TokenQueue> {
+public class BetterTokenizerStep extends Step<List<LexerRow>, TokenQueue, Diagnostic> {
 
     private static final Map<Pattern, TokenType> PATTERN_MAP = new LinkedHashMap<>();
 
@@ -78,7 +80,7 @@ public class BetterTokenizerStep extends Step<List<LexerRow>, TokenQueue> {
             }
 
             String group = m.group();
-            tokens.add(new Token(type, group, row.rowIndex(), currentTokenIndex++));
+            tokens.add(new Token(type, group, new LineInformation(row.rowIndex(), currentTokenIndex++)));
 
             if (content.length() > group.length()) {
                 content = content.substring(group.length()).stripLeading();

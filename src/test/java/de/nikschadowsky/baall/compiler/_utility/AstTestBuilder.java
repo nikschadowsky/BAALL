@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler._utility;
 
 
+import de.nikschadowsky.baall.compiler.symbol.LineInformation;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
@@ -39,7 +40,7 @@ public class AstTestBuilder {
 
     public static ImportsNode newImportsNode(String... imports) {
         ImportsNodeImpl node = astNodeFactory.createImportNode();
-        node.setImports(Arrays.stream(imports).map(s -> new Token(TokenType.STRING, s, 0, 0)).toList());
+        node.setImports(Arrays.stream(imports).map(s -> new Token(TokenType.STRING, s, new LineInformation(0, 0))).toList());
         return node;
     }
 
@@ -53,7 +54,7 @@ public class AstTestBuilder {
         ConstantDeclarationNodeImpl declarationNode = astNodeFactory.createConstantDeclarationNode();
         declarationNode.setType(returnType);
         IdentifierNodeImpl functionNameNode = astNodeFactory.createIdentifierNode();
-        functionNameNode.setName(new Token(TokenType.IDENTIFIER, functionName, 0, 0));
+        functionNameNode.setName(new Token(TokenType.IDENTIFIER, functionName, new LineInformation(0, 0)));
         declarationNode.setIdentifier(functionNameNode);
 
         FunctionDefinitionNodeImpl functionDefinitionNode = astNodeFactory.createFunctionDefinitionNode();
@@ -67,7 +68,7 @@ public class AstTestBuilder {
     public static ExportsNode newExportsNode(String namespace, ElementAccessNode... exports) {
         ExportsNodeImpl node = astNodeFactory.createExportNode();
         IdentifierNodeImpl namespaceNode = astNodeFactory.createIdentifierNode();
-        namespaceNode.setName(new Token(TokenType.STRING, namespace, 0, 0));
+        namespaceNode.setName(new Token(TokenType.STRING, namespace, new LineInformation(0, 0)));
         node.setNamespace(namespaceNode);
         node.setExports(Arrays.stream(exports).toList());
         return node;
@@ -76,7 +77,7 @@ public class AstTestBuilder {
     public static ExpressionNode newNumberExpression(int number) {
         PrimitiveLiteralNodeImpl node = astNodeFactory.createPrimitiveLiteralNode();
         node.setPrimitiveType(PrimitiveLiteralNode.PrimitiveType.NUMBER);
-        node.setPrimitiveValue(new Token(TokenType.NUMBER, String.valueOf(number), 0, 0));
+        node.setPrimitiveValue(new Token(TokenType.NUMBER, String.valueOf(number), new LineInformation(0, 0)));
 
         return node;
     }

@@ -3,6 +3,8 @@ package de.nikschadowsky.baall.compiler.tokenizer;
 import de.nikschadowsky.baall.compiler.CompileInformation;
 import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
+import de.nikschadowsky.baall.compiler.output.error.Diagnostic;
+import de.nikschadowsky.baall.compiler.symbol.LineInformation;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.util.RegexFactory;
 
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Tokenizer extends Step<String, List<Token>> {
+public class Tokenizer extends Step<String, List<Token>, Diagnostic> {
 
     private String preprocessedCode;
 
@@ -69,8 +71,8 @@ public class Tokenizer extends Step<String, List<Token>> {
             } else {
                 throw new UnrecognizedTokenException(lastCheckedIndex);
             }
-            // fixme line number and index information!
-            tokens.add(new Token(type, m.group(), 0 ,0));
+            // fixme lineInformation number and index information!
+            tokens.add(new Token(type, m.group(), new LineInformation(0, 0)));
             builder.delete(0, m.end());
             lastCheckedIndex += m.end();
 

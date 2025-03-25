@@ -4,11 +4,11 @@ import de.nikschadowsky.baall.compiler.tokenizer.TokenType;
 
 import java.util.Objects;
 
-public record Token(TokenType type, String value, int line, int index) {
+public record Token(TokenType type, String value, LineInformation lineInformation) {
 
     @Override
     public String toString() {
-        return "Token{type=%s, value='%s', at:%s:%s}".formatted(type, value, line, index);
+        return "Token{type=%s, value='%s', at:%s}".formatted(type, value, lineInformation);
     }
 
     @Override

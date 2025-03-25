@@ -127,7 +127,7 @@ public class LexerStep extends Step<List<String>, List<LexerRow>, LexerDiagnosti
         endIndex = end.index();
 
         if (!start.block().keepInInput()) {
-            // edit last line's content
+            // edit last lineInformation's content
             LexerRow firstRow = preprocessedRows.get(startRow);
             LexerRow lastRow = preprocessedRows.get(endRow);
 

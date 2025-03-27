@@ -225,7 +225,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             if (parsedIdentifier.isSuccessful()) {
                 queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 
-                node.setIdentifierAccess(parsedIdentifier.getParseResult());
+                node.setElement(parsedIdentifier.getParseResult());
                 return ParseResult.successfulParse(node, queue.getId());
             }
             return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
@@ -236,7 +236,7 @@ public class ExpressionParserImpl implements ExpressionParser {
             queue.mergeBranch(parsedIdentifier.getTokenQueueId());
 
             node = astFactory.createUnaryExpressionNode();
-            node.setIdentifierAccess(parsedIdentifier.getParseResult());
+            node.setElement(parsedIdentifier.getParseResult());
             parsedUnaryOperator = programParser.getAuxiliaryParser().parseUnaryOperator(queue.branchOff());
             if (parsedUnaryOperator.isSuccessful()) {
                 queue.mergeBranch(parsedUnaryOperator.getTokenQueueId());

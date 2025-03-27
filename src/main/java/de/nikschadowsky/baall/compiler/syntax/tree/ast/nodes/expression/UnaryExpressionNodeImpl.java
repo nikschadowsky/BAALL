@@ -25,7 +25,7 @@ public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpres
         return identifierAccess;
     }
 
-    public void setIdentifierAccess(ElementAccessNode identifier) {
+    public void setElement(ElementAccessNode identifier) {
         this.identifierAccess = identifier;
     }
 

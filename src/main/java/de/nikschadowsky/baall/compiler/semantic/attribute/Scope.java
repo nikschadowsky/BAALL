@@ -11,6 +11,9 @@ import java.util.Optional;
  */
 public class Scope {
 
+    /**
+     * Constant to be used for all symbols that are imported from other sources. In the scope hierarchy it is placed above the program root.
+     */
     public static final Scope IMPORTS = new Scope();
 
     public static final Scope ROOT = new Scope(IMPORTS);

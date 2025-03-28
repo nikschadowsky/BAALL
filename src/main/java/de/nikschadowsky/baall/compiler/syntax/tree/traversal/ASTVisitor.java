@@ -88,7 +88,11 @@ public interface ASTVisitor<D, R> {
 
     R visitFunctionCall(FunctionCallNode that, D data);
 
-    R visitPrimitiveLiteral(PrimitiveLiteralNode that, D data);
+    R visitNumberLiteral(NumberLiteralNode that, D data);
+
+    R visitStringLiteral(StringLiteralNode that, D data);
+
+    R visitBooleanLiteral(BooleanLiteralNode that, D data);
 
     R visitStructDefinitionLiteral(StructDefinitionLiteralNode that, D data);
 

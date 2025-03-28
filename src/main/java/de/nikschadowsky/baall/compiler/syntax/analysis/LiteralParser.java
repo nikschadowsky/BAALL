@@ -6,7 +6,6 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.util.CompleteParse;
-import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 
 /**
  * @since 25.08.2024
@@ -14,8 +13,9 @@ import de.nikschadowsky.baall.compiler.util.SyntaxSet;
 public interface LiteralParser {
 
     /**
-     * Parses a literal. A literal is either a  {@link #parsePrimitiveLiteral primitive value}, an
-     * {@link #parseListLiteral array}, a {@link #parseStructDefinition struct definition}, a
+     * Parses a literal. A literal is either a {@link #parseBooleanLiteral(TokenQueue) boolean literal}, a
+     * {@link #parseStringLiteral(TokenQueue) string literal}, a {@link #parseNumberLiteral(TokenQueue) number literal},
+     * an {@link #parseListLiteral array}, a {@link #parseStructDefinition struct definition}, a
      * {@link #parseStructNone struct none}, or a {@link #parseFunctionDefinition function definition}.
      *
      * @param queue queue of the tokens
@@ -65,21 +65,29 @@ public interface LiteralParser {
     ParseResult<FunctionDefinitionNode> parseFunctionDefinition(TokenQueue queue);
 
     /**
-     * Parses a literal of a primitive value. A primitive value can be a string, a number, a boolean or a character as
-     * specified by {@link SyntaxSet}.
+     * Parses a literal of a boolean value.
      *
      * @param queue queue of the tokens
-     * @return complete parse result of the parsed primitive
+     * @return complete parse result of the parsed boolean literal
      */
-    //@CompleteParse
-    //ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue);
-
     @CompleteParse
     ParseResult<BooleanLiteralNode> parseBooleanLiteral(TokenQueue queue);
 
+    /**
+     * Parses a literal of a number value.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed number literal
+     */
     @CompleteParse
     ParseResult<NumberLiteralNode> parseNumberLiteral(TokenQueue queue);
 
+    /**
+     * Parses a literal of a string value.
+     *
+     * @param queue queue of the tokens
+     * @return complete parse result of the parsed string literal
+     */
     @CompleteParse
     ParseResult<StringLiteralNode> parseStringLiteral(TokenQueue queue);
 }

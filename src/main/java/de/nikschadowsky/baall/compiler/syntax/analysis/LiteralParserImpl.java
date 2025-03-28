@@ -1,6 +1,5 @@
 package de.nikschadowsky.baall.compiler.syntax.analysis;
 
-import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
@@ -33,11 +32,22 @@ public class LiteralParserImpl implements LiteralParser {
     @CompleteParse
     @Override
     public ParseResult<LiteralNode> parseLiteral(TokenQueue queue) {
-        ParseResult<PrimitiveLiteralNode> parsedPrimitiveLiteral =
-                parsePrimitiveLiteral(queue.branchOff());
-        if (parsedPrimitiveLiteral.isSuccessful()) {
-            queue.mergeBranch(parsedPrimitiveLiteral.getTokenQueueId());
-            return ParseResult.successfulParse(parsedPrimitiveLiteral.getParseResult(), queue.getId());
+        ParseResult<BooleanLiteralNode> parsedBooleanLiteral = parseBooleanLiteral(queue.branchOff());
+        if (parsedBooleanLiteral.isSuccessful()) {
+            queue.mergeBranch(parsedBooleanLiteral.getTokenQueueId());
+            return ParseResult.successfulParse(parsedBooleanLiteral.getParseResult(), queue.getId());
+        }
+
+        ParseResult<NumberLiteralNode> parsedNumberLiteral = parseNumberLiteral(queue.branchOff());
+        if (parsedNumberLiteral.isSuccessful()) {
+            queue.mergeBranch(parsedNumberLiteral.getTokenQueueId());
+            return ParseResult.successfulParse(parsedNumberLiteral.getParseResult(), queue.getId());
+        }
+
+        ParseResult<StringLiteralNode> parsedStringLiteral = parseStringLiteral(queue.branchOff());
+        if (parsedStringLiteral.isSuccessful()) {
+            queue.mergeBranch(parsedStringLiteral.getTokenQueueId());
+            return ParseResult.successfulParse(parsedStringLiteral.getParseResult(), queue.getId());
         }
 
         ParseResult<ListLiteralNode> parsedArrayLiteral = parseListLiteral(queue.branchOff());
@@ -208,28 +218,44 @@ public class LiteralParserImpl implements LiteralParser {
         return ParseResult.successfulParse(node, queue.getId());
     }
 
-    @CompleteParse
     @Override
-    public ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue) {
-        Token nextToken = queue.peek();
-
-        if (SyntaxSet.PRIMITIVES.stream().anyMatch(e -> e.matches(nextToken))) {
-            queue.poll();
-            PrimitiveLiteralNodeImpl node = astFactory.createPrimitiveLiteralNode();
-            node.setPrimitiveValue(nextToken);
-            node.setPrimitiveType(
-                    switch (nextToken.type()) {
-                        case NUMBER -> PrimitiveLiteralNode.PrimitiveType.NUMBER;
-                        case STRING -> PrimitiveLiteralNode.PrimitiveType.STRING;
-                        case BOOLEAN -> PrimitiveLiteralNode.PrimitiveType.BOOLEAN;
-                        default -> throw new IllegalStateException("Unexpected value: " + nextToken.type());
-                    });
-
+    public ParseResult<BooleanLiteralNode> parseBooleanLiteral(TokenQueue queue) {
+        BooleanLiteralNodeImpl node = astFactory.createBooleanLiteralNode();
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("boolean_primitive").matches(queue.peek())) {
+            node.setValue(queue.poll());
             return ParseResult.successfulParse(node, queue.getId());
         }
 
         return ParseResult.unsuccessfulParse(
-                new SyntaxDiagnostic(queue.poll(), "Expected a primitive literal"),
+                new SyntaxDiagnostic(queue.peek(), "Expected a boolean primitive"),
+                queue.getId()
+        );
+    }
+
+    @Override
+    public ParseResult<NumberLiteralNode> parseNumberLiteral(TokenQueue queue) {
+        NumberLiteralNodeImpl node = astFactory.createNumberLiteralNode();
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("number_primitive").matches(queue.peek())) {
+            node.setValue(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
+        }
+
+        return ParseResult.unsuccessfulParse(
+                new SyntaxDiagnostic(queue.peek(), "Expected a number primitive"),
+                queue.getId()
+        );
+    }
+
+    @Override
+    public ParseResult<StringLiteralNode> parseStringLiteral(TokenQueue queue) {
+        StringLiteralNodeImpl node = astFactory.createStringLiteralNode();
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get("string_primitive").matches(queue.peek())) {
+            node.setValue(queue.poll());
+            return ParseResult.successfulParse(node, queue.getId());
+        }
+
+        return ParseResult.unsuccessfulParse(
+                new SyntaxDiagnostic(queue.peek(), "Expected a string primitive"),
                 queue.getId()
         );
     }

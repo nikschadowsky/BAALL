@@ -133,11 +133,6 @@ class ASTNodeFactoryTest {
     }
 
     @Test
-    void createPrimitiveLiteralNode() {
-        assertThat(astFactory.createPrimitiveLiteralNode()).hasNodeType(NodeType.PRIMITIVE);
-    }
-
-    @Test
     void createStructDefinitionLiteralNode() {
         assertThat(astFactory.createStructDefinitionLiteralNode()).hasNodeType(NodeType.STRUCT_DEFINITION);
     }

@@ -169,7 +169,19 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     }
 
     @Override
-    public R visitPrimitiveLiteral(PrimitiveLiteralNode that, D data) {
+    public R visitNumberLiteral(NumberLiteralNode that, D data) {
+        // empty implementation
+        return null;
+    }
+
+    @Override
+    public R visitStringLiteral(StringLiteralNode that, D data) {
+        // empty implementation
+        return null;
+    }
+
+    @Override
+    public R visitBooleanLiteral(BooleanLiteralNode that, D data) {
         // empty implementation
         return null;
     }

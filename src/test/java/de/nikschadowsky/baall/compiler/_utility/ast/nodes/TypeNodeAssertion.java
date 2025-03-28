@@ -41,23 +41,23 @@ public class TypeNodeAssertion extends BaseAssertion<TypeNodeAssertion, TypeNode
         }
 
         public PrimitiveTypeNodeAssertion isString() {
-            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.STRING);
+            return isOfKind(PrimitiveTypeNode.Kind.STRING);
         }
 
         public PrimitiveTypeNodeAssertion isNumber() {
-            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.NUMBER);
+            return isOfKind(PrimitiveTypeNode.Kind.NUMBER);
         }
         public PrimitiveTypeNodeAssertion isBoolean() {
-            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.BOOLEAN);
+            return isOfKind(PrimitiveTypeNode.Kind.BOOLEAN);
         }
         public PrimitiveTypeNodeAssertion isStruct() {
-            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.STRUCT);
+            return isOfKind(PrimitiveTypeNode.Kind.STRUCT);
         }
         public PrimitiveTypeNodeAssertion isException() {
-            return isOfKind(PrimitiveTypeNode.PrimitiveTypeKind.EXCEPTION);
+            return isOfKind(PrimitiveTypeNode.Kind.EXCEPTION);
         }
 
-        public PrimitiveTypeNodeAssertion isOfKind(PrimitiveTypeNode.PrimitiveTypeKind expected) {
+        public PrimitiveTypeNodeAssertion isOfKind(PrimitiveTypeNode.Kind expected) {
             return baseAssert("kind", PrimitiveTypeNode::getKind, expected);
         }
     }

@@ -23,7 +23,6 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlst
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.FunctionDefinitionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.ListLiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructDefinitionLiteralNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.SimpleTreeTraverser;
 
@@ -222,12 +221,6 @@ public class TreeTraverserFactory {
             scan(that.getFunctionBody(), new Scope(parameterScope));
 
             return true;
-        }
-
-        @Override
-        public Boolean visitPrimitiveLiteral(PrimitiveLiteralNode that, Scope scope) {
-            scopes.put(that, scope);
-            return super.visitPrimitiveLiteral(that, scope);
         }
 
         @Override

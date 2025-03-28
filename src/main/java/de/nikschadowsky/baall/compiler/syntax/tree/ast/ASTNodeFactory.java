@@ -139,8 +139,16 @@ public class ASTNodeFactory {
 
     // literals
 
-    public PrimitiveLiteralNodeImpl createPrimitiveLiteralNode() {
-        return new PrimitiveLiteralNodeImpl(diagnostics);
+    public BooleanLiteralNodeImpl createBooleanLiteralNode() {
+        return new BooleanLiteralNodeImpl(diagnostics);
+    }
+
+    public NumberLiteralNodeImpl createNumberLiteralNode() {
+        return new NumberLiteralNodeImpl(diagnostics);
+    }
+
+    public StringLiteralNodeImpl createStringLiteralNode() {
+        return new StringLiteralNodeImpl(diagnostics);
     }
 
     public StructDefinitionLiteralNodeImpl createStructDefinitionLiteralNode() {

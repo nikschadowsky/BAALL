@@ -15,9 +15,19 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
         super(actual, LiteralNodeAssertion.class);
     }
 
-    public PrimitiveLiteralNodeAssertion isPrimitiveLiteral() {
-        myself.isInstanceOf(PrimitiveLiteralNode.class);
-        return NodeAssertionFactory.create((PrimitiveLiteralNode) actual);
+    public BooleanLiteralNodeAssertion isBooleanLiteral() {
+        myself.isInstanceOf(BooleanLiteralNode.class);
+        return NodeAssertionFactory.create((BooleanLiteralNode) actual);
+    }
+
+    public StringLiteralNodeAssertion isStringLiteral() {
+        myself.isInstanceOf(StringLiteralNode.class);
+        return NodeAssertionFactory.create((StringLiteralNode) actual);
+    }
+
+    public NumberLiteralNodeAssertion isNumberLiteral() {
+        myself.isInstanceOf(NumberLiteralNode.class);
+        return NodeAssertionFactory.create((NumberLiteralNode) actual);
     }
 
     public ArrayLiteralNodeAssertion isArrayLiteral() {
@@ -38,41 +48,6 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
     public StructNoneLiteralNodeAssertion isStructNoneLiteral() {
         myself.isInstanceOf(StructNoneLiteralNode.class);
         return NodeAssertionFactory.create(((StructNoneLiteralNode) actual));
-    }
-
-    public static class PrimitiveLiteralNodeAssertion extends BaseAssertion<PrimitiveLiteralNodeAssertion, PrimitiveLiteralNode> {
-
-        public PrimitiveLiteralNodeAssertion(PrimitiveLiteralNode actual) {
-            super(actual, PrimitiveLiteralNodeAssertion.class);
-        }
-
-        public PrimitiveLiteralNodeAssertion isNumber() {
-            return baseAssert(
-                    "primitive type",
-                    PrimitiveLiteralNode::getPrimitiveType,
-                    PrimitiveLiteralNode.PrimitiveType.NUMBER
-            );
-        }
-
-        public PrimitiveLiteralNodeAssertion isBoolean() {
-            return baseAssert(
-                    "primitive type",
-                    PrimitiveLiteralNode::getPrimitiveType,
-                    PrimitiveLiteralNode.PrimitiveType.BOOLEAN
-            );
-        }
-
-        public PrimitiveLiteralNodeAssertion isString() {
-            return baseAssert(
-                    "primitive type",
-                    PrimitiveLiteralNode::getPrimitiveType,
-                    PrimitiveLiteralNode.PrimitiveType.STRING
-            );
-        }
-
-        public PrimitiveLiteralNodeAssertion hasPrimitiveValue(String expected) {
-            return baseAssert("primitive value", node -> node.getPrimitiveValue().value(), expected);
-        }
     }
 
     public static class ArrayLiteralNodeAssertion extends BaseAssertion<ArrayLiteralNodeAssertion, ListLiteralNode> {
@@ -174,6 +149,39 @@ public class LiteralNodeAssertion extends BaseAssertion<LiteralNodeAssertion, Li
 
         public StructNoneLiteralNodeAssertion(StructNoneLiteralNode actual) {
             super(actual, StructNoneLiteralNodeAssertion.class);
+        }
+    }
+
+    public static class BooleanLiteralNodeAssertion extends BaseAssertion<BooleanLiteralNodeAssertion, BooleanLiteralNode> {
+
+        public BooleanLiteralNodeAssertion(BooleanLiteralNode actual) {
+            super(actual, BooleanLiteralNodeAssertion.class);
+        }
+
+        public BooleanLiteralNodeAssertion hasValue(String expected) {
+            return baseAssert("value", n -> n.getValue().value(), expected);
+        }
+    }
+
+    public static class StringLiteralNodeAssertion extends BaseAssertion<StringLiteralNodeAssertion, StringLiteralNode> {
+
+        public StringLiteralNodeAssertion(StringLiteralNode actual) {
+            super(actual, StringLiteralNodeAssertion.class);
+        }
+
+        public StringLiteralNodeAssertion hasValue(String expected) {
+            return baseAssert("value", n -> n.getValue().value(), expected);
+        }
+    }
+
+    public static class NumberLiteralNodeAssertion extends BaseAssertion<NumberLiteralNodeAssertion, NumberLiteralNode> {
+
+        public NumberLiteralNodeAssertion(NumberLiteralNode actual) {
+            super(actual, NumberLiteralNodeAssertion.class);
+        }
+
+        public NumberLiteralNodeAssertion hasValue(String expected) {
+            return baseAssert("value", n -> n.getValue().value(), expected);
         }
     }
 

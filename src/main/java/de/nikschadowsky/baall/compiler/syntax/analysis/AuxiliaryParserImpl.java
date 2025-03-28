@@ -212,7 +212,7 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         Token nextToken = queue.peek();
         if (SyntaxSet.PRIMITIVE_TYPES.stream().anyMatch(e -> e.matches(nextToken))) {
             PrimitiveTypeNodeImpl node = astFactory.createPrimitiveTypeNode();
-            node.setKind(PrimitiveTypeNode.PrimitiveTypeKind.findMapping(queue.poll()));
+            node.setKind(PrimitiveTypeNode.Kind.findMapping(queue.poll()));
             inner = node;
         } else {
             ElementAccessNode identifier;

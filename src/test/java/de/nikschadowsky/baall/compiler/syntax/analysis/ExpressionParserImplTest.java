@@ -50,9 +50,8 @@ class ExpressionParserImplTest {
         ParseResult<ExpressionNode> actual = expressionParser.parseExpression(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .isPrimitiveLiteral()
-                          .hasPrimitiveValue("value")
-                          .isNumber();
+                          .isNumberLiteral()
+                          .hasValue("value");
 
         queue = new TokenQueueTestBuilder().separator("(")
                                            .identifier("MyIdentifier")
@@ -70,7 +69,7 @@ class ExpressionParserImplTest {
                           .isFunctionCall()
                           .hasFunctionNameMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
                           .hasArguments(1)
-                          .hasArgumentMatching(0, a -> a.isPrimitiveLiteral().isNumber());
+                          .hasArgumentMatching(0, a -> a.isNumberLiteral().hasValue("struct_initializer"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("(")
@@ -87,9 +86,8 @@ class ExpressionParserImplTest {
                           .mapToInner()
                           .isParenthesizedExpression()
                           .mapToInner()
-                          .isPrimitiveLiteral()
-                          .isNumber()
-                          .hasPrimitiveValue("value");
+                          .isNumberLiteral()
+                          .hasValue("value");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("!").number("prefixed").separator(";").build();
@@ -98,7 +96,7 @@ class ExpressionParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isPrefixOperation()
                           .hasOperator("!")
-                          .hasOperandMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("prefixed"));
+                          .hasOperandMatching(a -> a.isNumberLiteral().hasValue("prefixed"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().number("operand1").operator("+").number("operand2").separator(";").build();
@@ -106,20 +104,17 @@ class ExpressionParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .isBinaryExpression()
-                          .hasLeftOperandMatching(a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("operand1"))
+                          .hasLeftOperandMatching(a -> a.isNumberLiteral().hasValue("operand1"))
                           .hasOperator("+")
-                          .hasRightOperandMatching(a -> a.isPrimitiveLiteral()
-                                                         .isNumber()
-                                                         .hasPrimitiveValue("operand2"));
+                          .hasRightOperandMatching(a -> a.isNumberLiteral().hasValue("operand2"));
 
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().number("value").separator(";").build();
         assertThat(expressionParser.parseExpression(queue)).isSuccessful()
                                                            .map(NodeAssertionFactory::create)
-                                                           .isPrimitiveLiteral()
-                                                           .isNumber()
-                                                           .hasPrimitiveValue("value");
+                                                           .isNumberLiteral()
+                                                           .hasValue("value");
 
         queue = new TokenQueueTestBuilder().separator("(")
                                            .number("operand1")
@@ -144,13 +139,11 @@ class ExpressionParserImplTest {
                                                         .mapToInner()
                                                         .isBinaryExpression()
                                                         .hasOperator("<<")
-                                                        .hasLeftOperandMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                                        .isNumber()
-                                                                                        .hasPrimitiveValue("operand1")
+                                                        .hasLeftOperandMatching(a1 -> a1.isNumberLiteral()
+                                                                                        .hasValue("operand1")
                                                         )
-                                                        .hasRightOperandMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                                         .isNumber()
-                                                                                         .hasPrimitiveValue("operand2")
+                                                        .hasRightOperandMatching(a1 -> a1.isNumberLiteral()
+                                                                                         .hasValue("operand2")
                                                         )
                           )
                           .hasRightOperandMatching(a -> a.isBinaryExpression()
@@ -184,7 +177,7 @@ class ExpressionParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isElementAccess()
                           .isIndexedAccess()
-                          .hasIndexMatching(a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("index"))
+                          .hasIndexMatching(a -> a.isNumberLiteral().hasValue("index"))
                           .mapToInner()
                           .isIdentifier()
                           .hasName("MyIdentifier");
@@ -196,7 +189,7 @@ class ExpressionParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .isArrayLiteral()
                           .hasElements(1)
-                          .hasElementMatching(0, a -> a.isPrimitiveLiteral().hasPrimitiveValue("index"));
+                          .hasElementMatching(0, a -> a.isNumberLiteral().hasValue("index"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -229,9 +222,8 @@ class ExpressionParserImplTest {
                                                      .map(NodeAssertionFactory::create)
                                                      .isParenthesizedExpression()
                                                      .mapToInner()
-                                                     .isPrimitiveLiteral()
-                                                     .isNumber()
-                                                     .hasPrimitiveValue("expression");
+                                                     .isNumberLiteral()
+                                                     .hasValue("expression");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
@@ -250,9 +242,8 @@ class ExpressionParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .mapToInner()
-                          .isPrimitiveLiteral()
-                          .isNumber()
-                          .hasPrimitiveValue("expression");
+                          .isNumberLiteral()
+                          .hasValue("expression");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator("(").number("expression").separator(";").build();
@@ -293,15 +284,12 @@ class ExpressionParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasFunctionNameMatching(a -> a.isIndexedAccess()
-                                                         .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                                   .isNumber()
-                                                                                   .hasPrimitiveValue("index")
-                                                         )
+                                                         .hasIndexMatching(a1 -> a1.isNumberLiteral().hasValue("index"))
                                                          .mapToInner()
                                                          .isIdentifier()
                                                          .hasName("MyIdentifier"))
                           .hasArguments(2)
-                          .hasArgumentMatching(0, a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("value"))
+                          .hasArgumentMatching(0, a -> a.isNumberLiteral().hasValue("value"))
                           .hasArgumentMatching(1, a -> a.isElementAccess().isIdentifier().hasName("IdentifierAccess"));
 
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -334,10 +322,10 @@ class ExpressionParserImplTest {
                                   a -> a.isFunctionCall()
                                         .hasFunctionNameMatching(a1 -> a1.isIdentifier().hasName("MyStruct"))
                                         .hasArguments(2)
-                                        .hasArgumentMatching(0, a1 -> a1.isPrimitiveLiteral().isNumber())
+                                        .hasArgumentMatching(0, a1 -> a1.isNumberLiteral().hasValue("StructArgument1"))
                                         .hasArgumentMatching(1, a1 -> a1.isElementAccess().isIdentifier())
                           )
-                          .hasArgumentMatching(1, a1 -> a1.isPrimitiveLiteral().hasPrimitiveValue("Argument2"))
+                          .hasArgumentMatching(1, a1 -> a1.isStringLiteral().hasValue("Argument2"))
                           .hasArgumentMatching(2, a1 -> a1.isArrayLiteral().hasElements(2));
         assertThat(queue).hasNextTokenValueMatch(";");
 
@@ -356,10 +344,7 @@ class ExpressionParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .hasFunctionNameMatching(
                                   a -> a.isIndexedAccess()
-                                        .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                  .isNumber()
-                                                                  .hasPrimitiveValue("1")
-                                        )
+                                        .hasIndexMatching(a1 -> a1.isNumberLiteral().hasValue("1"))
                                         .mapToInner()
                                         .isIdentifier()
                                         .hasName("MyIdentifier"))

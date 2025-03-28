@@ -245,7 +245,7 @@ class ControlStructureParserImplTest {
         assertThat(actual).isPartiallyParsed()
                           .syntaxDiagnosticContains("Expected '{' or an expression")
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("expression"))
+                          .hasConditionMatching(a -> a.isNumberLiteral().hasValue("expression"))
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
                           .hasElseBranch()
                           .hasConditionMatching(BaseAssertion::isNull);
@@ -290,7 +290,7 @@ class ControlStructureParserImplTest {
 
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition"))
+                          .hasConditionMatching(a -> a.isNumberLiteral().hasValue("condition"))
                           .isIfBranch()
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
                           .hasNoElseBranch();
@@ -317,11 +317,11 @@ class ControlStructureParserImplTest {
         actual = controlStructureParser.parseElseBlock(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition1"))
+                          .hasConditionMatching(a -> a.isNumberLiteral().hasValue("condition1"))
                           .isIfBranch()
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
                           .hasElseBranch()
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("condition2"))
+                          .hasConditionMatching(a -> a.isNumberLiteral().hasValue("condition2"))
                           .isIfBranch()
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements))
                           .hasElseBranch()
@@ -415,8 +415,8 @@ class ControlStructureParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasIdentifier("i")
-                          .hasStartIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr1").isNumber())
-                          .hasEndIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr2").isNumber())
+                          .hasStartIndexMatching(a -> a.isNumberLiteral().hasValue("expr1"))
+                          .hasEndIndexMatching(a -> a.isNumberLiteral().hasValue("expr2"))
                           .hasOptionalStepper()
                           .hasOptionalStepperMatching(a -> a.isEqualTo(mockedReassignment))
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
@@ -438,8 +438,8 @@ class ControlStructureParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .hasIdentifier("i")
-                          .hasStartIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr1").isNumber())
-                          .hasEndIndexMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expr2").isNumber())
+                          .hasStartIndexMatching(a -> a.isNumberLiteral().hasValue("expr1"))
+                          .hasEndIndexMatching(a -> a.isNumberLiteral().hasValue("expr2"))
                           .doesNotHaveOptionalStepper()
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
@@ -488,7 +488,7 @@ class ControlStructureParserImplTest {
         PartialParseResult<WhileLoopNode> actual = controlStructureParser.parseWhileLoop(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"))
+                          .hasConditionMatching(a -> a.isBooleanLiteral().hasValue("true"))
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
@@ -517,7 +517,7 @@ class ControlStructureParserImplTest {
         assertThat(actual).isPartiallyParsed()
                           .syntaxDiagnosticContains("Expected '}'")
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"))
+                          .hasConditionMatching(a -> a.isBooleanLiteral().hasValue("true"))
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).isAtEnd();
 
@@ -531,7 +531,7 @@ class ControlStructureParserImplTest {
         assertThat(actual).isPartiallyParsed()
                           .syntaxDiagnosticContains("Expected '{'")
                           .map(NodeAssertionFactory::create)
-                          .hasConditionMatching(a -> a.isPrimitiveLiteral().isBoolean().hasPrimitiveValue("true"));
+                          .hasConditionMatching(a -> a.isBooleanLiteral().hasValue("true"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();
@@ -823,7 +823,7 @@ class ControlStructureParserImplTest {
                                   1,
                                   a -> a.isIdentifierType()
                                         .hasIdentifierMatching(a1 -> a1.isIndexedAccess()
-                                                                       .hasIndexMatching(ExpressionNodeAssertion::isPrimitiveLiteral)
+                                                                       .hasIndexMatching(ExpressionNodeAssertion::isNumberLiteral)
                                                                        .mapToInner()
                                                                        .isIdentifier()
                                                                        .hasName("MyException2")

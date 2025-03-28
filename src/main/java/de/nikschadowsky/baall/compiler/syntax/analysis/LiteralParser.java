@@ -71,7 +71,15 @@ public interface LiteralParser {
      * @param queue queue of the tokens
      * @return complete parse result of the parsed primitive
      */
-    @CompleteParse
-    ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue);
+    //@CompleteParse
+    //ParseResult<PrimitiveLiteralNode> parsePrimitiveLiteral(TokenQueue queue);
 
+    @CompleteParse
+    ParseResult<BooleanLiteralNode> parseBooleanLiteral(TokenQueue queue);
+
+    @CompleteParse
+    ParseResult<NumberLiteralNode> parseNumberLiteral(TokenQueue queue);
+
+    @CompleteParse
+    ParseResult<StringLiteralNode> parseStringLiteral(TokenQueue queue);
 }

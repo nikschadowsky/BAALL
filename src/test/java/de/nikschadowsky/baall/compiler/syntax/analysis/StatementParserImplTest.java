@@ -403,7 +403,7 @@ class StatementParserImplTest {
                           .hasTypeMatching(a -> a.isPrimitiveType().isString())
                           .hasIdentifierName("MyIdentifier")
                           .hasInitializationValue()
-                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
+                          .hasInitializationValueMatching(a -> a.isNumberLiteral().hasValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyType")
@@ -460,7 +460,7 @@ class StatementParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .hasTypeMatching(a -> a.isPrimitiveType().isString())
                           .hasIdentifierName("MyIdentifier")
-                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
+                          .hasInitializationValueMatching(a -> a.isNumberLiteral().hasValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
         queue = new TokenQueueTestBuilder().identifier("MyType")
                                            .separator("[")
@@ -503,7 +503,7 @@ class StatementParserImplTest {
                                                                                 .hasName("MyType"))
                           )
                           .hasIdentifierName("MyIdentifier")
-                          .hasInitializationValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
+                          .hasInitializationValueMatching(a -> a.isNumberLiteral().hasValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("something else").separator(";").build();
@@ -563,7 +563,7 @@ class StatementParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .hasElementAccessMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
                           .hasOperator("+=")
-                          .hasValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression"));
+                          .hasValueMatching(a -> a.isNumberLiteral().hasValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -579,10 +579,7 @@ class StatementParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .hasElementAccessMatching(
                                   a -> a.isIndexedAccess()
-                                        .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                  .isNumber()
-                                                                  .hasPrimitiveValue("index")
-                                        )
+                                        .hasIndexMatching(a1 -> a1.isNumberLiteral().hasValue("index"))
                                         .mapToInner()
                                         .isIdentifier()
                                         .hasName("MyIdentifier")
@@ -602,7 +599,7 @@ class StatementParserImplTest {
                           .map(NodeAssertionFactory::create)
                           .hasElementAccessMatching(a -> a.isIdentifier().hasName("MyIdentifier"))
                           .hasOperatorMatching(BaseAssertion::isNull)
-                          .hasValueMatching(a -> a.isPrimitiveLiteral().hasPrimitiveValue("expression").isNumber());
+                          .hasValueMatching(a -> a.isNumberLiteral().hasValue("expression"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().identifier("MyIdentifier")
@@ -645,10 +642,7 @@ class StatementParserImplTest {
                           .hasExportedElementMatching(
                                   0,
                                   a -> a.isIndexedAccess()
-                                        .hasIndexMatching(a1 -> a1.isPrimitiveLiteral()
-                                                                  .hasPrimitiveValue("index")
-                                                                  .isNumber()
-                                        )
+                                        .hasIndexMatching(a1 -> a1.isNumberLiteral().hasValue("index"))
                                         .mapToInner()
                                         .isIdentifier().hasName("MyIdentifier")
                           ).hasNamespace()

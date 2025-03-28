@@ -336,7 +336,29 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
      * @return true
      */
     @Override
-    public Boolean visitPrimitiveLiteral(PrimitiveLiteralNode that, Scope data) {
+    public Boolean visitNumberLiteral(NumberLiteralNode that, Scope data) {
+        scopes.put(that, data);
+        return true;
+    }
+
+    /**
+     * @param that node
+     * @param data own scope
+     * @return true
+     */
+    @Override
+    public Boolean visitStringLiteral(StringLiteralNode that, Scope data) {
+        scopes.put(that, data);
+        return true;
+    }
+
+    /**
+     * @param that node
+     * @param data own scope
+     * @return true
+     */
+    @Override
+    public Boolean visitBooleanLiteral(BooleanLiteralNode that, Scope data) {
         scopes.put(that, data);
         return true;
     }

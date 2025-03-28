@@ -9,10 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.FunctionDefinitionNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.ListLiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.PrimitiveLiteralNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructDefinitionLiteralNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,13 +67,27 @@ class LiteralParserImplTest {
         );
 
         TokenQueue queue = new TokenQueueTestBuilder().string("primitive").build();
-
         ParseResult<LiteralNode> actual = literalParser.parseLiteral(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .isPrimitiveLiteral()
-                          .hasPrimitiveValue("primitive")
-                          .isString();
+                          .isStringLiteral()
+                          .hasValue("primitive");
+        assertThat(queue).isAtEnd();
+
+        queue = new TokenQueueTestBuilder().number("12345").build();
+        actual = literalParser.parseLiteral(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isNumberLiteral()
+                          .hasValue("12345");
+        assertThat(queue).isAtEnd();
+
+        queue = new TokenQueueTestBuilder().bool("false").build();
+        actual = literalParser.parseLiteral(queue);
+        assertThat(actual).isSuccessful()
+                          .map(NodeAssertionFactory::create)
+                          .isBooleanLiteral()
+                          .hasValue("false");
         assertThat(queue).isAtEnd();
 
         queue = new TokenQueueTestBuilder().separator("[").separator("]").build();
@@ -225,10 +236,11 @@ class LiteralParserImplTest {
                           .hasFields(2)
                           .hasFieldTypeMatching(0, a -> a.isListType().mapToInner().isPrimitiveType())
                           .hasFieldName(0, "MyIdentifier1")
-                          .hasFieldTypeMatching(1,
-                                                a -> a.isIdentifierType()
-                                                      .isNotNoneSafe()
-                                                      .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType"))
+                          .hasFieldTypeMatching(
+                                  1,
+                                  a -> a.isIdentifierType()
+                                        .isNotNoneSafe()
+                                        .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyType"))
                           )
                           .hasFieldName(1, "MyIdentifier2");
         assertThat(queue).isAtEnd();
@@ -327,27 +339,39 @@ class LiteralParserImplTest {
     }
 
     @Test
-    void parsePrimitiveLiteral() {
-        TokenQueue queue = new TokenQueueTestBuilder().number("12345").string("StringValue").bool("True").build();
-        ParseResult<PrimitiveLiteralNode> actual = literalParser.parsePrimitiveLiteral(queue);
-        assertThat(actual).isSuccessful()
-                          .map(NodeAssertionFactory::create)
-                          .hasPrimitiveValue("12345")
-                          .isNumber();
-        actual = literalParser.parsePrimitiveLiteral(queue);
-        assertThat(actual).isSuccessful()
-                          .map(NodeAssertionFactory::create)
-                          .hasPrimitiveValue("StringValue")
-                          .isString();
-        actual = literalParser.parsePrimitiveLiteral(queue);
-        assertThat(actual).isSuccessful()
-                          .map(NodeAssertionFactory::create)
-                          .hasPrimitiveValue("True")
-                          .isBoolean();
+    void parseBooleanLiteral() {
+        TokenQueue queue = new TokenQueueTestBuilder().bool("true").build();
+        ParseResult<BooleanLiteralNode> actual = literalParser.parseBooleanLiteral(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasValue("true");
+        assertThat(queue).isAtEnd();
 
-        queue = new TokenQueueTestBuilder().keyword("Keyword").build();
-        assertThat(literalParser.parsePrimitiveLiteral(queue)).isUnsuccessful()
-                                                              .syntaxDiagnosticContains("Expected a primitive");
+        queue = new TokenQueueTestBuilder().identifier("identifier").build();
+        actual = literalParser.parseBooleanLiteral(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected").syntaxDiagnosticContains("boolean");
+    }
+
+    @Test
+    void parseNumberLiteral() {
+        TokenQueue queue = new TokenQueueTestBuilder().number("12345").build();
+        ParseResult<NumberLiteralNode> actual = literalParser.parseNumberLiteral(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasValue("12345");
+        assertThat(queue).isAtEnd();
+
+        queue = new TokenQueueTestBuilder().identifier("identifier").build();
+        actual = literalParser.parseNumberLiteral(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected").syntaxDiagnosticContains("number");
+    }
+
+    @Test
+    void parseStringLiteral() {
+        TokenQueue queue = new TokenQueueTestBuilder().string("MyStringValue").build();
+        ParseResult<StringLiteralNode> actual = literalParser.parseStringLiteral(queue);
+        assertThat(actual).isSuccessful().map(NodeAssertionFactory::create).hasValue("MyStringValue");
+        assertThat(queue).isAtEnd();
+
+        queue = new TokenQueueTestBuilder().identifier("identifier").build();
+        actual = literalParser.parseStringLiteral(queue);
+        assertThat(actual).isUnsuccessful().syntaxDiagnosticContains("Expected").syntaxDiagnosticContains("string");
     }
 
 }

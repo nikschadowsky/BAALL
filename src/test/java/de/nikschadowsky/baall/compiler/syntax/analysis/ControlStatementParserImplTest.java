@@ -67,7 +67,7 @@ class ControlStatementParserImplTest {
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
                           .isReturnStatement()
-                          .hasExpressionMatching(a -> a.isPrimitiveLiteral().isNumber().hasPrimitiveValue("number"));
+                          .hasExpressionMatching(a -> a.isNumberLiteral().hasValue("number"));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("raise")
@@ -86,10 +86,9 @@ class ControlStatementParserImplTest {
                                                   .hasArguments(1)
                                                   .hasArgumentMatching(
                                                           0,
-                                                          a1 -> a1.isPrimitiveLiteral()
-                                                                  .isNumber()
-                                                                  .hasPrimitiveValue("number")
-                                                  ));
+                                                          a1 -> a1.isNumberLiteral().hasValue("number")
+                                                  )
+                          );
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().separator(";").build();

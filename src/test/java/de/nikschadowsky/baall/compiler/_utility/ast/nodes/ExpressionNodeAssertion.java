@@ -37,9 +37,19 @@ public class ExpressionNodeAssertion extends BaseAssertion<ExpressionNodeAsserti
         return NodeAssertionFactory.create((BinaryExpressionNode) actual);
     }
 
-    public LiteralNodeAssertion.PrimitiveLiteralNodeAssertion isPrimitiveLiteral() {
-        myself.isInstanceOf(PrimitiveLiteralNode.class);
-        return NodeAssertionFactory.create((PrimitiveLiteralNode) actual);
+    public LiteralNodeAssertion.BooleanLiteralNodeAssertion isBooleanLiteral() {
+        myself.isInstanceOf(BooleanLiteralNode.class);
+        return NodeAssertionFactory.create((BooleanLiteralNode) actual);
+    }
+
+    public LiteralNodeAssertion.StringLiteralNodeAssertion isStringLiteral() {
+        myself.isInstanceOf(StringLiteralNode.class);
+        return NodeAssertionFactory.create((StringLiteralNode) actual);
+    }
+
+    public LiteralNodeAssertion.NumberLiteralNodeAssertion isNumberLiteral() {
+        myself.isInstanceOf(NumberLiteralNode.class);
+        return NodeAssertionFactory.create((NumberLiteralNode) actual);
     }
 
     public LiteralNodeAssertion.ArrayLiteralNodeAssertion isArrayLiteral() {

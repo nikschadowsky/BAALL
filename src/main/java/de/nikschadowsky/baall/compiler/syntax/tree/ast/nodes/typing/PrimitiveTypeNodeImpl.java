@@ -3,7 +3,6 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -13,18 +12,18 @@ import org.jetbrains.annotations.NotNull;
  */
 public class PrimitiveTypeNodeImpl extends AbstractNode implements PrimitiveTypeNode {
 
-    private PrimitiveTypeKind kind;
+    private Kind kind;
 
     public PrimitiveTypeNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public PrimitiveTypeKind getKind() {
+    public Kind getKind() {
         return kind;
     }
 
-    public void setKind(PrimitiveTypeKind kind) {
+    public void setKind(Kind kind) {
         this.kind = kind;
     }
 

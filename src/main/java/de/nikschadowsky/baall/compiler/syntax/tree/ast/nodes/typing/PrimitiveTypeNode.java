@@ -11,9 +11,9 @@ import java.util.Arrays;
  */
 public interface PrimitiveTypeNode extends SimpleTypeNode {
 
-    PrimitiveTypeKind getKind();
+    Kind getKind();
 
-    enum PrimitiveTypeKind {
+    enum Kind {
         STRING(SyntaxSet.LANGUAGE_ELEMENTS.get("string")),
         NUMBER(SyntaxSet.LANGUAGE_ELEMENTS.get("number")),
         BOOLEAN(SyntaxSet.LANGUAGE_ELEMENTS.get("boolean")),
@@ -22,11 +22,11 @@ public interface PrimitiveTypeNode extends SimpleTypeNode {
 
         private final LanguageElement mapping;
 
-        PrimitiveTypeKind(LanguageElement mapping) {
+        Kind(LanguageElement mapping) {
             this.mapping = mapping;
         }
 
-        public static PrimitiveTypeKind findMapping(Token token) {
+        public static Kind findMapping(Token token) {
             return Arrays.stream(values()).filter(kind -> kind.mapping.matches(token)).findFirst().orElseThrow();
         }
     }

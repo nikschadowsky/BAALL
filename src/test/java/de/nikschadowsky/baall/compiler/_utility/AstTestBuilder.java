@@ -5,10 +5,7 @@ import de.nikschadowsky.baall.compiler.symbol.LineInformation;
 import de.nikschadowsky.baall.compiler.symbol.Token;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.*;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
@@ -78,7 +75,7 @@ public class AstTestBuilder {
         return node;
     }
 
-    public static ConstantDeclarationNode constantDeclaration(TypeNode type, String name, @Nullable ExpressionNode initialNode) {
+    public static ConstantDeclarationNode constantDeclaration(TypeNode type, String name, ExpressionNode initialNode) {
         ConstantDeclarationNodeImpl node = astNodeFactory.createConstantDeclarationNode();
         node.setType(type);
         node.setIdentifier(identifier(name));
@@ -140,6 +137,13 @@ public class AstTestBuilder {
     public static PrimitiveTypeNode primitiveType(PrimitiveTypeNode.Kind kind) {
         PrimitiveTypeNodeImpl node = astNodeFactory.createPrimitiveTypeNode();
         node.setKind(kind);
+        return node;
+    }
+
+    public static IdentifierTypeNode identifierType(ElementAccessNode element, boolean isNonesafe) {
+        IdentifierTypeNodeImpl node = astNodeFactory.createIdentifierTypeNode();
+        node.setType(element);
+        node.setNoneSafe(isNonesafe);
         return node;
     }
 
@@ -276,6 +280,13 @@ public class AstTestBuilder {
         node.setEndIndex(end);
         node.setBody(body);
         node.setOptionalStepperStatement(stepper);
+        return node;
+    }
+
+    public static WhileLoopNode whileLoop(ExpressionNode condition, StatementsNode body) {
+        WhileLoopNodeImpl node = astNodeFactory.createWhileLoopNode();
+        node.setCondition(condition);
+        node.setBody(body);
         return node;
     }
 

@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler._utility;
 
 import de.nikschadowsky.baall.compiler.lexer.LexerRow;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
+import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
@@ -84,5 +85,9 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
 
     public static ScopeAssertion assertThat(Scope actual) {
         return new ScopeAssertion(actual);
+    }
+
+    public static SymbolTableAssertion assertThat(SymbolTable actual) {
+        return new SymbolTableAssertion(actual);
     }
 }

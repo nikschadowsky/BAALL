@@ -45,15 +45,16 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
      * @param data initial scope
      * @return true
      * @implNote The program node is assigned the passed scope. Imports are assigned the same scope as the program node.
-     * Every other child element of a program node operates in a child scope of the parents scope, but in the same
-     * scope.
+     * The statements of this program node are at a scope inside the passed scope with the exports being a sub scope of
+     * the statements.
      */
     @Override
     public Boolean visitProgram(ProgramNode that, Scope data) {
         scopes.put(that, data);
         scan(that.getImports(), data);
-        scan(that.getStatements(), new Scope(data));
-        scan(that.getExports(), new Scope(data));
+        Scope bodyScope = Scope.create(data);
+        scan(that.getStatements(), bodyScope);
+        scan(that.getExports(), Scope.create(bodyScope));
         return true;
     }
 

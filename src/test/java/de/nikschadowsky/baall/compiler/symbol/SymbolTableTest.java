@@ -25,7 +25,7 @@ class SymbolTableTest {
         // registering a symbol with the same name but with another type is valid
         assertThatCode(() -> symbolTable.registerSymbol(
                 "identifier",
-                new Scope(Scope.ROOT),
+                Scope.create(Scope.ROOT),
                 new LineInformation(100, 4)
         )).doesNotThrowAnyException();
 
@@ -52,7 +52,7 @@ class SymbolTableTest {
     @Test
     void hasSymbolRegisteredInScope() throws SymbolAlreadyExistsException {
         SymbolTable symbolTable = new SymbolTable();
-        Scope scope = new Scope(Scope.ROOT);
+        Scope scope = Scope.create(Scope.ROOT);
         symbolTable.registerSymbol("identifier", scope, new LineInformation(0, 0));
 
         assertThat(symbolTable.hasSymbolRegisteredInScope("identifier", scope)).isTrue();

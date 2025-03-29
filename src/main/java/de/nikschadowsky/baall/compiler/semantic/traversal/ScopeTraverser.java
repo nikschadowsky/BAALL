@@ -79,8 +79,8 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitExports(ExportsNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getExportedElements(), new Scope(data));
-        that.getNamespace().ifPresent(n -> scan(n, new Scope(data)));
+        scan(that.getExportedElements(), Scope.create(data));
+        that.getNamespace().ifPresent(n -> scan(n, Scope.create(data)));
         return true;
     }
 
@@ -136,9 +136,9 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitConditional(ConditionalNode that, Scope data) {
         scopes.put(that, data);
-        Scope conditionScope = new Scope(data);
+        Scope conditionScope = Scope.create(data);
         scan(that.getCondition(), conditionScope);
-        scan(that.getThenBlock(), new Scope(conditionScope));
+        scan(that.getThenBlock(), Scope.create(conditionScope));
         that.getElseBranch().ifPresent(e -> scan(e, data));
         return true;
     }
@@ -154,13 +154,13 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitForLoop(ForLoopNode that, Scope data) {
         scopes.put(that, data);
-        Scope forIdentifierScope = new Scope(data);
+        Scope forIdentifierScope = Scope.create(data);
 
         scan(that.getIdentifier(), forIdentifierScope);
-        scan(that.getStartIndexExpression(), new Scope(forIdentifierScope));
-        scan(that.getEndIndexExpression(), new Scope(forIdentifierScope));
-        that.getOptionalStepperStatement().ifPresent(e -> scan(e, new Scope(forIdentifierScope)));
-        scan(that.getBody(), new Scope(forIdentifierScope));
+        scan(that.getStartIndexExpression(), Scope.create(forIdentifierScope));
+        scan(that.getEndIndexExpression(), Scope.create(forIdentifierScope));
+        that.getOptionalStepperStatement().ifPresent(e -> scan(e, Scope.create(forIdentifierScope)));
+        scan(that.getBody(), Scope.create(forIdentifierScope));
         return true;
     }
 
@@ -173,9 +173,9 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitWhileLoop(WhileLoopNode that, Scope data) {
         scopes.put(that, data);
-        Scope whileConditionScope = new Scope(data);
+        Scope whileConditionScope = Scope.create(data);
         scan(that.getCondition(), whileConditionScope);
-        scan(that.getBody(), new Scope(whileConditionScope));
+        scan(that.getBody(), Scope.create(whileConditionScope));
         return true;
     }
 
@@ -202,7 +202,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitParenthesizedExpression(ParenthesizedExpressionNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getInnerExpressionNode(), new Scope(data));
+        scan(that.getInnerExpressionNode(), Scope.create(data));
         return true;
     }
 
@@ -241,7 +241,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitEnsureStatement(EnsureStatementNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getBody(), new Scope(data));
+        scan(that.getBody(), Scope.create(data));
         return true;
     }
 
@@ -254,10 +254,10 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitInterceptStatement(InterceptStatementNode that, Scope data) {
         scopes.put(that, data);
-        Scope interceptHeaderScope = new Scope(data);
+        Scope interceptHeaderScope = Scope.create(data);
         scan(that.getInterceptedExceptions(), interceptHeaderScope);
         scan(that.getRaisedExceptionIdentifier(), interceptHeaderScope);
-        scan(that.getBody(), new Scope(interceptHeaderScope));
+        scan(that.getBody(), Scope.create(interceptHeaderScope));
         return true;
     }
 
@@ -283,7 +283,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitTryStatement(TryStatementNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getBody(), new Scope(data));
+        scan(that.getBody(), Scope.create(data));
         scan(that.getInterceptBlocks(), data);
         that.getEnsureBlock().ifPresent(e -> scan(e, data));
         return true;
@@ -310,7 +310,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitListLiteral(ListLiteralNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getElements(), new Scope(data));
+        scan(that.getElements(), Scope.create(data));
         return true;
     }
 
@@ -324,9 +324,9 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitFunctionDefinition(FunctionDefinitionNode that, Scope data) {
         scopes.put(that, data);
-        Scope functionHeaderScope = new Scope(data);
+        Scope functionHeaderScope = Scope.create(data);
         scan(that.getParameters(), functionHeaderScope);
-        scan(that.getFunctionBody(), new Scope(data));
+        scan(that.getFunctionBody(), Scope.create(data));
         return true;
     }
 
@@ -372,7 +372,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitStructDefinitionLiteral(StructDefinitionLiteralNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getFields(), new Scope(data));
+        scan(that.getFields(), Scope.create(data));
         return true;
     }
 
@@ -397,7 +397,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     public Boolean visitFunctionCall(FunctionCallNode that, Scope data) {
         scopes.put(that, data);
         scan(that.getFunctionIdentifier(), data);
-        scan(that.getArguments(), new Scope(data));
+        scan(that.getArguments(), Scope.create(data));
         return true;
     }
 
@@ -469,7 +469,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     public Boolean visitFunctionType(FunctionTypeNode that, Scope data) {
         scopes.put(that, data);
         scan(that.getInnerType(), data);
-        scan(that.getParameterTypes(), new Scope(data));
+        scan(that.getParameterTypes(), Scope.create(data));
         return true;
     }
 
@@ -518,7 +518,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     public Boolean visitIndexedAccess(IndexedAccessNode that, Scope data) {
         scopes.put(that, data);
         scan(that.getInnerIdentifier(), data);
-        scan(that.getInnerIdentifier(), new Scope(data));
+        scan(that.getInnerIdentifier(), Scope.create(data));
         return true;
     }
 

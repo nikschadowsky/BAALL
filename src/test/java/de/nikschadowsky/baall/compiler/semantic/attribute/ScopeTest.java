@@ -11,17 +11,17 @@ class ScopeTest {
 
     @Test
     void canAccess() {
-        Scope a = new Scope(Scope.ROOT);
+        Scope a = Scope.create(Scope.ROOT);
 
         assertThat(a).canAccess(Scope.ROOT);
         assertThat(a).canAccess(a);
 
-        Scope b = new Scope(a);
+        Scope b = Scope.create(a);
         assertThat(b).canAccess(Scope.ROOT);
         assertThat(b).canAccess(a);
         assertThat(a).cannotAccess(b);
 
-        Scope c = new Scope(a);
+        Scope c = Scope.create(a);
         assertThat(c).canAccess(Scope.ROOT);
         assertThat(c).cannotAccess(b);
     }

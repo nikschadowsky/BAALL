@@ -67,7 +67,7 @@ public class TreeTraverserFactory {
             scopes.put(that, scope);
 
             scan(that.getImports(), scope);
-            Scope bodyScope = new Scope(scope);
+            Scope bodyScope = Scope.create(scope);
             scan(that.getStatements(), bodyScope);
             scan(that.getExports(), bodyScope);
 
@@ -89,7 +89,7 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitExports(ExportsNode that, Scope scope) {
             scopes.put(that, scope);
-            scan(that.getExportedElements(), new Scope(scope));
+            scan(that.getExportedElements(), Scope.create(scope));
             return true;
         }
 
@@ -120,9 +120,9 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitConditional(ConditionalNode that, Scope scope) {
             scopes.put(that, scope);
-            Scope conditionScope = new Scope(scope);
+            Scope conditionScope = Scope.create(scope);
             scan(that.getCondition(), conditionScope);
-            scan(that.getThenBlock(), new Scope(conditionScope));
+            scan(that.getThenBlock(), Scope.create(conditionScope));
             scan(that.getElseBranch().orElse(null), scope);
             return true;
         }
@@ -130,13 +130,13 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitForLoop(ForLoopNode that, Scope scope) {
             scopes.put(that, scope);
-            Scope forScope = new Scope(scope);
+            Scope forScope = Scope.create(scope);
             scan(that.getIdentifier(), forScope);
             scan(that.getStartIndexExpression(), forScope);
             scan(that.getEndIndexExpression(), forScope);
             scan(that.getOptionalStepperStatement().orElse(null), forScope);
             // body is an inner scope to prevent access to functions declared in body in the for header
-            scan(that.getBody(), new Scope(forScope));
+            scan(that.getBody(), Scope.create(forScope));
 
             return true;
         }
@@ -144,10 +144,10 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitWhileLoop(WhileLoopNode that, Scope scope) {
             scopes.put(that, scope);
-            Scope conditionScope = new Scope(scope);
+            Scope conditionScope = Scope.create(scope);
             scan(that.getCondition(), conditionScope);
             // body is an inner scope to prevent access to functions declared in body in the while header
-            scan(that.getBody(), new Scope(conditionScope));
+            scan(that.getBody(), Scope.create(conditionScope));
 
             return true;
         }
@@ -179,17 +179,17 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitEnsureStatement(EnsureStatementNode that, Scope scope) {
             scopes.put(that, scope);
-            scan(that.getBody(), new Scope(scope));
+            scan(that.getBody(), Scope.create(scope));
             return true;
         }
 
         @Override
         public Boolean visitInterceptStatement(InterceptStatementNode that, Scope scope) {
             scopes.put(that, scope);
-            Scope interceptedScope = new Scope(scope);
+            Scope interceptedScope = Scope.create(scope);
             scan(that.getInterceptedExceptions(), interceptedScope);
             // body should access raised exception but not vice versa
-            scan(that.getBody(), new Scope(interceptedScope));
+            scan(that.getBody(), Scope.create(interceptedScope));
             return true;
         }
 
@@ -202,7 +202,7 @@ public class TreeTraverserFactory {
         @Override
         public Boolean visitTryStatement(TryStatementNode that, Scope scope) {
             scopes.put(that, scope);
-            scan(that.getBody(), new Scope(scope));
+            scan(that.getBody(), Scope.create(scope));
             return true;
         }
 
@@ -216,9 +216,9 @@ public class TreeTraverserFactory {
         public Boolean visitFunctionDefinition(FunctionDefinitionNode that, Scope scope) {
             scopes.put(that, scope);
             functions.add(that);
-            Scope parameterScope = new Scope(scope);
+            Scope parameterScope = Scope.create(scope);
             scan(that.getParameters(), parameterScope);
-            scan(that.getFunctionBody(), new Scope(parameterScope));
+            scan(that.getFunctionBody(), Scope.create(parameterScope));
 
             return true;
         }

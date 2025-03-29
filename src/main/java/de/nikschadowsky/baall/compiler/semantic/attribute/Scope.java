@@ -2,7 +2,6 @@ package de.nikschadowsky.baall.compiler.semantic.attribute;
 
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -12,19 +11,20 @@ import java.util.Optional;
 public class Scope {
 
     /**
-     * Constant to be used for all symbols that are imported from other sources. In the scope hierarchy it is placed above the program root.
+     * Constant to be used for all symbols that are imported from other sources. In the scope hierarchy it is placed
+     * above the program root.
      */
-    public static final Scope IMPORTS = new Scope();
+    public static final Scope IMPORTS = new Scope(null);
 
     public static final Scope ROOT = new Scope(IMPORTS);
 
-    private final @Nullable Scope parent;
+    private final Scope parent;
 
-    private Scope() {
-        parent = null;
+    public static Scope create(@NotNull Scope parent) {
+        return new Scope(parent);
     }
 
-    public Scope(@NotNull Scope parent) {
+    private Scope(Scope parent) {
         this.parent = parent;
     }
 
@@ -51,4 +51,15 @@ public class Scope {
         return false;
     }
 
+    @Override
+    public String toString() {
+        if (isRoot()) {
+            return "ROOT";
+        }
+        if (isImport()) {
+            return "IMPORTS";
+        }
+
+        return super.toString();
+    }
 }

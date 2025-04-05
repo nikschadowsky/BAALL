@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 09.03.2025
  */
-public class ListTypeNodeImpl extends AbstractNode implements ListTypeNode {
+public final class ListTypeNodeImpl extends AbstractNode implements ListTypeNode {
 
     private TypeNode inner;
 

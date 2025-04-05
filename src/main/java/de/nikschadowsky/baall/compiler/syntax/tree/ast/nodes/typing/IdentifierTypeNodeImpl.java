@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 09.03.2025
  */
-public class IdentifierTypeNodeImpl extends AbstractNode implements IdentifierTypeNode {
+public final class IdentifierTypeNodeImpl extends AbstractNode implements IdentifierTypeNode {
 
     private ElementAccessNode type;
     private boolean noneSafe;

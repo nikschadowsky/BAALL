@@ -6,7 +6,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAcces
 /**
  * @since 08.03.2025
  */
-public interface IdentifierTypeNode extends SimpleTypeNode {
+public sealed interface IdentifierTypeNode extends SimpleTypeNode permits IdentifierTypeNodeImpl {
 
     ElementAccessNode getType();
 }

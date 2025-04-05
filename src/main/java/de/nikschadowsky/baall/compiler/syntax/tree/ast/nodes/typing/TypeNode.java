@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
  *
  * @since 29.07.2024
  */
-public interface TypeNode extends Node {
+public sealed interface TypeNode extends Node permits CompositionTypeNode, SimpleTypeNode {
 
     /**
      * Is the type none-safe? BAALL base types are always none-safe.

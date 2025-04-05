@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @since 04.03.2025
  */
-public interface FunctionTypeNode extends CompositionTypeNode {
+public sealed interface FunctionTypeNode extends CompositionTypeNode permits FunctionTypeNodeImpl {
 
     @NotNull
     @UnmodifiableView

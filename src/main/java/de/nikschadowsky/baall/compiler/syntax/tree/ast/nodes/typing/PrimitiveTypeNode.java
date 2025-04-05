@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * @since 09.03.2025
  */
-public interface PrimitiveTypeNode extends SimpleTypeNode {
+public sealed interface PrimitiveTypeNode extends SimpleTypeNode permits PrimitiveTypeNodeImpl {
 
     Kind getKind();
 

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 09.03.2025
  */
-public class PrimitiveTypeNodeImpl extends AbstractNode implements PrimitiveTypeNode {
+public final class PrimitiveTypeNodeImpl extends AbstractNode implements PrimitiveTypeNode {
 
     private Kind kind;
 

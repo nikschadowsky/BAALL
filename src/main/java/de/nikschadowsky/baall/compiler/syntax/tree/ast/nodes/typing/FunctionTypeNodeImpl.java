@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @since 04.03.2025
  */
-public class FunctionTypeNodeImpl extends AbstractNode implements FunctionTypeNode {
+public final class FunctionTypeNodeImpl extends AbstractNode implements FunctionTypeNode {
 
     private List<TypeNode> parameterTypes = Collections.emptyList();
     private TypeNode innerType;

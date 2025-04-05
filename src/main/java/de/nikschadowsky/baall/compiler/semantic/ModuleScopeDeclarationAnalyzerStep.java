@@ -5,6 +5,7 @@ import de.nikschadowsky.baall.compiler.CompileInformation;
 import de.nikschadowsky.baall.compiler.Step;
 import de.nikschadowsky.baall.compiler.StepOptions;
 import de.nikschadowsky.baall.compiler.output.error.CompileException;
+import de.nikschadowsky.baall.compiler.output.error.Diagnostic;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import de.nikschadowsky.baall.compiler.util.Pair;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * @since 19.01.2025
  */
-public class ModuleScopeDeclarationAnalyzerStep extends Step<ProgramNode, Pair<ProgramNode, SymbolTable>> {
+public class ModuleScopeDeclarationAnalyzerStep extends Step<ProgramNode, Pair<ProgramNode, SymbolTable>, Diagnostic> {
 
     public ModuleScopeDeclarationAnalyzerStep(@Nullable StepOptions options) {
         super(options);

@@ -133,7 +133,7 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
 
     @Override
     public R visitInterceptStatement(InterceptStatementNode that, D data) {
-        R r = scan(that.getInterceptedExceptions(), data);
+        R r = scan(that.getCaughtException(), data);
         return scanAndReduce(that.getBody(), data, r);
     }
 

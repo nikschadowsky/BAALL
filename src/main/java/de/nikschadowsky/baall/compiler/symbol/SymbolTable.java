@@ -4,53 +4,75 @@ import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 public class SymbolTable {
 
-    private final Map<SymbolTableEntry, BaallType> table = new HashMap<>();
+    private static final String NO_SYMBOL_EXCEPTION_TEMPLATE =
+            "There is no symbol with the provided identifier '%s' in the provided scope '%s'";
+    private static final String SYMBOL_ALREADY_REGISTERED_TEMPLATE =
+            "There is already a symbol registered with identifier '%s'";
 
-    public void registerSymbol(String identifier, Scope scope, LineInformation lineInformation) throws SymbolAlreadyExistsException {
-        if (table.keySet().stream().anyMatch(containsFilter(identifier, scope))) {
-            throw new SymbolAlreadyExistsException("There is already a symbol registered with identifier '%s'".formatted(
-                    identifier));
+    private final Map<SymbolTableKey, SymbolTableValue> table = new HashMap<>();
+
+    public void registerSymbol(String identifier, BaallType type, Scope scope, boolean isConstant, LineInformation lineInformation) throws SymbolAlreadyExistsException {
+        if (hasSymbolRegisteredInScope(identifier, scope)) {
+            throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
         }
-        table.put(new SymbolTableEntry(identifier, scope, lineInformation), null);
+        table.put(new SymbolTableKey(identifier, scope), new SymbolTableValue(type, lineInformation, isConstant));
     }
 
     public boolean hasSymbolRegisteredInScope(String identifier, Scope scope) {
-        return table.keySet().stream().anyMatch(containsFilter(identifier, scope));
+        return table.containsKey(new SymbolTableKey(identifier, scope));
     }
 
-    public void updateTypeInformation(String identifier, Scope scope, BaallType type) throws NoSymbolFoundException {
-        SymbolTableEntry key = table.keySet()
-                                    .stream()
-                                    .filter(containsFilter(identifier, scope))
-                                    .findFirst()
-                                    .orElseThrow(() -> new NoSymbolFoundException(
-                                            "There is no symbol with the provided identifier '%s' in the provided scope '%s'".formatted(
-                                                    identifier,
-                                                    scope
-                                            )));
-
-        table.replace(key, type);
+    public boolean isConstant(String identifier, Scope scope) throws NoSymbolFoundException {
+        return table.keySet()
+                    .stream()
+                    .filter(equalsKey(identifier, scope))
+                    .map(table::get)
+                    .map(SymbolTableValue::isConstant)
+                    .findFirst()
+                    .orElseThrow(() -> new NoSymbolFoundException(
+                            NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope))
+                    );
     }
 
     public Optional<BaallType> getTypeInformation(String identifier, Scope scope) {
         return table.keySet()
                     .stream()
-                    .filter(containsFilter(identifier, scope))
+                    .filter(equalsKey(identifier, scope))
                     .findFirst()
-                    .map(table::get);
+                    .map(table::get)
+                    .map(SymbolTableValue::type);
     }
 
-    private Predicate<SymbolTableEntry> containsFilter(String identifier, Scope scope) {
-        return e -> e.scope().equals(scope) && e.symbol.equals(identifier);
+    private Predicate<SymbolTableKey> equalsKey(String identifier, Scope scope) {
+        return k -> k.symbol.equals(identifier) && k.scope.equals(scope);
     }
 
-    private record SymbolTableEntry(String symbol, Scope scope, LineInformation lineInformation) {
+    private record SymbolTableKey(String symbol, Scope scope) {
+    }
+
+    private record SymbolTableValue(BaallType type, LineInformation lineInformation, boolean isConstant) {
+    }
+
+    private final HashMap<Scope, Node> nodes = new HashMap<>();
+
+    private static class Node {
+
+        private HashMap<SymbolTableKey, SymbolTableValue> declaredFunctions;
+
+        private LinkedHashMap<SymbolTableKey, SymbolTableValue> symbols;
+
+        private final Node parent;
+
+        private Node(Node parent) {
+            this.parent = parent;
+        }
     }
 
 }

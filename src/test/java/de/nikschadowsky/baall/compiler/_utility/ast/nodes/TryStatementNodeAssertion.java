@@ -62,20 +62,16 @@ public class TryStatementNodeAssertion extends BaseAssertion<TryStatementNodeAss
         }
 
         public InterceptStatementNodeAssertion hasIdentifier(String identifier) {
-            return hasIdentifierMatching(a -> a.hasName(identifier));
+            return hasIdentifierMatching(a -> a.hasIdentifierName(identifier));
         }
 
-        public InterceptStatementNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getRaisedExceptionIdentifier()));
+        public InterceptStatementNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<StatementNodeAssertion.VariableDeclarationNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getCaughtException()));
             return this;
         }
 
-        public InterceptStatementNodeAssertion hasInterceptedExceptions(int expected) {
-            return baseAssert("intercepted exception count", n -> n.getInterceptedExceptions().size(), expected);
-        }
-
-        public InterceptStatementNodeAssertion hasExceptionMatching(int index, NodeAssertionBuilder<TypeNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getInterceptedExceptions().get(index)));
+        public InterceptStatementNodeAssertion hasExceptionMatching(NodeAssertionBuilder<TypeNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getCaughtException().getType()));
             return this;
         }
 

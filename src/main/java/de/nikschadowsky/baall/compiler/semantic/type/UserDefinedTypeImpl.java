@@ -1,4 +1,4 @@
 package de.nikschadowsky.baall.compiler.semantic.type;
 
-final class UserDefinedTypeImpl implements UserDefinedType {
+record UserDefinedTypeImpl(TypeReference reference) implements UserDefinedType {
 }

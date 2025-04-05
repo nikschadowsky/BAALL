@@ -15,10 +15,10 @@ public class ForLoopNodeAssertion extends BaseAssertion<ForLoopNodeAssertion, Fo
     }
 
     public ForLoopNodeAssertion hasIdentifier(String expected) {
-        return hasIdentifierMatching(a -> a.hasName(expected));
+        return hasIdentifierMatching(a -> a.hasIdentifierName(expected));
     }
 
-    public ForLoopNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<ElementAccessNodeAssertion.IdentifierNodeAssertion> a) {
+    public ForLoopNodeAssertion hasIdentifierMatching(NodeAssertionBuilder<StatementNodeAssertion.VariableDeclarationNodeAssertion> a) {
         a.assertThat(NodeAssertionFactory.create(actual.getIdentifier()));
         return this;
     }

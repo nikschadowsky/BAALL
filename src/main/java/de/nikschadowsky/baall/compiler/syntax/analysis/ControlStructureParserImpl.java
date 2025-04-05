@@ -11,7 +11,10 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.*
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
 import de.nikschadowsky.baall.compiler.syntax.util.PartialParse;
 import de.nikschadowsky.baall.compiler.util.SyntaxSet;
@@ -227,7 +230,12 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 programParser.getAuxiliaryParser().parseIdentifier(queue.branchOff());
         if (parsedIdentifier.isSuccessful()) {
             queue.mergeBranch(parsedIdentifier.getTokenQueueId());
-            node.setIdentifier(parsedIdentifier.getParseResult());
+            VariableDeclarationNodeImpl identifierNode = astFactory.createVariableDeclarationNode();
+            PrimitiveTypeNodeImpl primitiveTypeNode = astFactory.createPrimitiveTypeNode();
+            primitiveTypeNode.setKind(PrimitiveTypeNode.Kind.NUMBER);
+            identifierNode.setType(primitiveTypeNode);
+            identifierNode.setIdentifier(parsedIdentifier.getParseResult());
+            node.setIdentifier(identifierNode);
         } else {
             diagnostics.add(new SyntaxDiagnostic(queue.poll(), "Expected an identifier!"));
             isPartiallyParsed = true;
@@ -467,7 +475,6 @@ public class ControlStructureParserImpl implements ControlStructureParser {
     @Override
     public PartialParseResult<InterceptStatementNode> parseInterceptStatement(TokenQueue queue) {
         InterceptStatementNodeImpl node = astFactory.createInterceptStatementNode();
-        List<TypeNode> interceptedExceptions = new ArrayList<>();
         List<SyntaxDiagnostic> diagnostics = new ArrayList<>();
         boolean isPartial = false;
 
@@ -485,19 +492,7 @@ public class ControlStructureParserImpl implements ControlStructureParser {
             isPartial = true;
         } else {
             queue.mergeBranch(parsedInterceptedException.getTokenQueueId());
-            interceptedExceptions.add(parsedInterceptedException.getParseResult());
         }
-
-        ParseResult<List<TypeNode>> parsedAdditionalInterceptedExceptions =
-                programParser.getAuxiliaryParser().parseAdditionalTypes(queue.branchOff());
-        if (parsedAdditionalInterceptedExceptions.isUnsuccessful()) {
-            diagnostics.add(parsedAdditionalInterceptedExceptions.getDiagnostic());
-            isPartial = true;
-        } else {
-            queue.mergeBranch(parsedAdditionalInterceptedExceptions.getTokenQueueId());
-            interceptedExceptions.addAll(parsedAdditionalInterceptedExceptions.getParseResult());
-        }
-        node.setInterceptedExceptions(interceptedExceptions);
 
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get(":").matches(queue.peek())) {
             diagnostics.add(new SyntaxDiagnostic(queue.peek(), "Expected ':'!"));
@@ -512,8 +507,12 @@ public class ControlStructureParserImpl implements ControlStructureParser {
                 isPartial = true;
             } else {
                 queue.mergeBranch(parsedExceptionIdentifier.getTokenQueueId());
-                node.setRaisedExceptionIdentifier(parsedExceptionIdentifier.getParseResult());
             }
+
+            VariableDeclarationNodeImpl caughtException = astFactory.createVariableDeclarationNode();
+            caughtException.setType(parsedInterceptedException.getParseResult());
+            caughtException.setIdentifier(parsedExceptionIdentifier.getParseResult());
+            node.setCaughtException(caughtException);
         }
 
         PartialParseResult<StatementsNode> parsedBody =

@@ -2,10 +2,10 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
 
-    private IdentifierNode identifier;
+    private VariableDeclarationNode identifier;
     private ExpressionNode startIndex;
     private ExpressionNode endIndex;
     private ReassignmentNode optionalStepperStatement;
@@ -28,11 +28,11 @@ public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
     }
 
     @Override
-    public IdentifierNode getIdentifier() {
+    public VariableDeclarationNode getIdentifier() {
         return identifier;
     }
 
-    public void setIdentifier(IdentifierNode identifier) {
+    public void setIdentifier(VariableDeclarationNode identifier) {
         this.identifier = identifier;
     }
 

@@ -275,7 +275,7 @@ public class AstTestBuilder {
 
     public static ForLoopNode forLoop(String identifier, ExpressionNode start, ExpressionNode end, StatementsNode body, @Nullable ReassignmentNode stepper) {
         ForLoopNodeImpl node = astNodeFactory.createForLoopNode();
-        node.setIdentifier(identifier(identifier));
+        node.setIdentifier(variableDeclaration(primitiveType(PrimitiveTypeNode.Kind.NUMBER), identifier, null));
         node.setStartIndex(start);
         node.setEndIndex(end);
         node.setBody(body);
@@ -300,13 +300,10 @@ public class AstTestBuilder {
         return node;
     }
 
-    public static InterceptStatementNode interceptStatementNode(String identifier, StatementsNode body, TypeNode... interceptedTypes) {
+    public static InterceptStatementNode interceptStatementNode(String identifier, StatementsNode body, TypeNode interceptedTypes) {
         InterceptStatementNodeImpl node = astNodeFactory.createInterceptStatementNode();
         node.setBody(body);
-        node.setRaisedExceptionIdentifier(identifier(identifier));
-        if (interceptedTypes != null) {
-            node.setInterceptedExceptions(Arrays.stream(interceptedTypes).toList());
-        }
+        node.setCaughtException(variableDeclaration(interceptedTypes, identifier, null));
         return node;
     }
 

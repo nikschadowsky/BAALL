@@ -583,9 +583,7 @@ class ControlStructureParserImplTest {
                           .hasInterceptBlocks(2)
                           .hasInterceptBlockMatching(
                                   0,
-                                  a -> a.hasInterceptedExceptions(1)
-                                        .hasExceptionMatching(
-                                                0,
+                                  a -> a.hasExceptionMatching(
                                                 a1 -> a1.isIdentifierType()
                                                         .hasIdentifierMatching(a2 -> a2.isIdentifier()
                                                                                        .hasName("MyException1"))
@@ -595,9 +593,7 @@ class ControlStructureParserImplTest {
                           )
                           .hasInterceptBlockMatching(
                                   1,
-                                  a -> a.hasInterceptedExceptions(1)
-                                        .hasExceptionMatching(
-                                                0,
+                                  a -> a.hasExceptionMatching(
                                                 a1 -> a1.isIdentifierType()
                                                         .hasIdentifierMatching(a2 -> a2.isIdentifier()
                                                                                        .hasName(
@@ -629,9 +625,7 @@ class ControlStructureParserImplTest {
                           .hasInterceptBlocks(1)
                           .hasInterceptBlockMatching(
                                   0,
-                                  a -> a.hasInterceptedExceptions(1)
-                                        .hasExceptionMatching(
-                                                0,
+                                  a -> a.hasExceptionMatching(
                                                 a1 -> a1.isIdentifierType()
                                                         .hasIdentifierMatching(a2 -> a2.isIdentifier()
                                                                                        .hasName("MyException"))
@@ -723,15 +717,13 @@ class ControlStructureParserImplTest {
                           .hasElementMatching(
                                   0,
                                   NodeAssertionFactory::create,
-                                  a -> a.hasInterceptedExceptions(1)
-                                        .hasIdentifier("MyIdentifier1")
+                                  a -> a.hasIdentifier("MyIdentifier1")
                                         .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
                           )
                           .hasElementMatching(
                                   1,
                                   NodeAssertionFactory::create,
-                                  a -> a.hasInterceptedExceptions(1)
-                                        .hasIdentifier("MyIdentifier2")
+                                  a -> a.hasIdentifier("MyIdentifier2")
                                         .hasBodyMatching(a1 -> a1.isEqualTo(mockedStatements))
                           );
 
@@ -784,20 +776,15 @@ class ControlStructureParserImplTest {
         PartialParseResult<InterceptStatementNode> actual = controlStructureParser.parseInterceptStatement(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasInterceptedExceptions(1)
                           .hasExceptionMatching(
-                                  0,
                                   a -> a.isIdentifierType()
-                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
-                                                                       .hasName("MyException"))
+                                        .hasIdentifierMatching(a1 -> a1.isIdentifier().hasName("MyException"))
                           )
                           .hasIdentifier("MyIdentifier")
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().keyword("intercept")
-                                           .identifier("MyException1")
-                                           .separator(",")
                                            .identifier("MyException2")
                                            .separator("[")
                                            .number("index")
@@ -812,15 +799,7 @@ class ControlStructureParserImplTest {
         actual = controlStructureParser.parseInterceptStatement(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)
-                          .hasInterceptedExceptions(2)
                           .hasExceptionMatching(
-                                  0,
-                                  a -> a.isIdentifierType()
-                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
-                                                                       .hasName("MyException1"))
-                          )
-                          .hasExceptionMatching(
-                                  1,
                                   a -> a.isIdentifierType()
                                         .hasIdentifierMatching(a1 -> a1.isIndexedAccess()
                                                                        .hasIndexMatching(ExpressionNodeAssertion::isNumberLiteral)
@@ -844,13 +823,6 @@ class ControlStructureParserImplTest {
         assertThat(actual).isPartiallyParsed()
                           .syntaxDiagnosticContains("Expected ':'")
                           .map(NodeAssertionFactory::create)
-                          .hasInterceptedExceptions(1)
-                          .hasExceptionMatching(
-                                  0,
-                                  a -> a.isIdentifierType()
-                                        .hasIdentifierMatching(a1 -> a1.isIdentifier()
-                                                                       .hasName("MyException"))
-                          )
                           .hasIdentifierMatching(BaseAssertion::isNull)
                           .hasBodyMatching(a -> a.isEqualTo(mockedStatements));
         assertThat(queue).hasNextTokenValueMatch(";");

@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler._utility;
 
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
+import de.nikschadowsky.baall.compiler.symbol.NoSymbolFoundException;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 
 /**
@@ -18,6 +19,26 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
         return truthinessAssert(
                 a -> "Symbol '%s' is not registered in scope '%s'".formatted(identifier, scope),
                 a -> a.hasSymbolRegisteredInScope(identifier, scope)
+        );
+    }
+
+    public SymbolTableAssertion doesNotHaveSymbolRegistered(String identifier, Scope scope) {
+        return falsenessAssert(
+                a -> "Symbol '%s' is registered in scope '%s'".formatted(identifier, scope),
+                a -> a.hasSymbolRegisteredInScope(identifier, scope)
+        );
+    }
+
+    public SymbolTableAssertion isConstant(String identifier, Scope scope) {
+        return truthinessAssert(
+                a -> "Symbol '%s' in scope '%s' is not constant".formatted(identifier, scope),
+                a -> {
+                    try {
+                        return a.isConstant(identifier, scope);
+                    } catch (NoSymbolFoundException e) {
+                        throw failure(e.getMessage());
+                    }
+                }
         );
     }
 

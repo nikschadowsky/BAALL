@@ -1,9 +1,11 @@
 package de.nikschadowsky.baall.compiler.semantic.traversal;
 
+import de.nikschadowsky.baall.compiler._utility.AstTestBuilder;
+import de.nikschadowsky.baall.compiler._utility.TypeTableAssertion;
 import de.nikschadowsky.baall.compiler.output.error.DiagnosticCollector;
 import de.nikschadowsky.baall.compiler.semantic.SemanticDiagnostic;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
-import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
+import de.nikschadowsky.baall.compiler.semantic.type.TypeTable;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ProgramNode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.nikschadowsky.baall.compiler._utility.AstTestBuilder.*;
-import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
 import static de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNode.Kind.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -79,15 +80,15 @@ class TypeScannerTest {
 
     @Test
     void scanTypes() {
-        SymbolTable table = new SymbolTable();
+        TypeTable table = new TypeTable(AstTestBuilder.imports());
         DiagnosticCollectorMock diagnosticCollector = new DiagnosticCollectorMock();
         TypeScanner scanner = new TypeScanner(table, diagnosticCollector);
 
         scanner.visitProgram(program, Scope.ROOT);
 
-        assertThat(table).hasSymbolRegistered("MyStruct", first)
-                         .hasSymbolRegistered("MyException", first)
-                         .hasSymbolRegistered("MyInnerScope", second);
+        TypeTableAssertion.assertThat(table).hasTypeRegistered("MyStruct", first)
+                                            .hasTypeRegistered("MyException", first)
+                                            .hasTypeRegistered("MyInnerScope", second);
         assertThat(diagnosticCollector.errors).hasSize(2);
         assertThat(diagnosticCollector.warnings).hasSize(0);
         assertThat(diagnosticCollector.information).hasSize(0);

@@ -187,7 +187,7 @@ public class TreeTraverserFactory {
         public Boolean visitInterceptStatement(InterceptStatementNode that, Scope scope) {
             scopes.put(that, scope);
             Scope interceptedScope = Scope.create(scope);
-            scan(that.getInterceptedExceptions(), interceptedScope);
+            scan(that.getCaughtException(), interceptedScope);
             // body should access raised exception but not vice versa
             scan(that.getBody(), Scope.create(interceptedScope));
             return true;

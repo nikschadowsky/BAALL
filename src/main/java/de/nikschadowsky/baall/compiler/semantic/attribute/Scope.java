@@ -24,6 +24,10 @@ public class Scope {
         return new Scope(parent);
     }
 
+    public static Scope createLogicalScope(@NotNull Scope parent) {
+        return new LogicalScope(parent);
+    }
+
     private Scope(Scope parent) {
         this.parent = parent;
     }
@@ -61,5 +65,12 @@ public class Scope {
         }
 
         return super.toString();
+    }
+
+    private static class LogicalScope extends Scope {
+
+        private LogicalScope(Scope parent) {
+            super(parent);
+        }
     }
 }

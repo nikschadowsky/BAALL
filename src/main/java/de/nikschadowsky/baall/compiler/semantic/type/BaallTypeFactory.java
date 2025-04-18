@@ -32,7 +32,7 @@ public class BaallTypeFactory {
     }
 
     public FunctionType createFunctionType(BaallType returnType, List<BaallType> parameterTypes) {
-        return new FunctionTypeImpl();
+        return new FunctionTypeImpl(returnType, parameterTypes);
     }
 
     public ListType createListType(BaallType elementType) {

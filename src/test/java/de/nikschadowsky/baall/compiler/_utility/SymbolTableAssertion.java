@@ -42,6 +42,19 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
         );
     }
 
+    public SymbolTableAssertion isNotConstant(String identifier, Scope scope) {
+        return falsenessAssert(
+                a -> "Symbol '%s' in scope '%s' is constant".formatted(identifier, scope),
+                a -> {
+                    try {
+                        return a.isConstant(identifier, scope);
+                    } catch (NoSymbolFoundException e) {
+                        throw failure(e.getMessage());
+                    }
+                }
+        );
+    }
+
     public SymbolTableAssertion hasTypeForSymbol(String identifier, Scope scope, BaallType expectedType) {
         return baseAssert("symbol type", a -> a.getTypeInformation(identifier, scope), expectedType);
     }

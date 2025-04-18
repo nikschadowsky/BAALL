@@ -2,12 +2,14 @@ package de.nikschadowsky.baall.compiler.symbol;
 
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
+import de.nikschadowsky.baall.compiler.semantic.type.FunctionType;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class SymbolTable {
 
@@ -16,63 +18,129 @@ public class SymbolTable {
     private static final String SYMBOL_ALREADY_REGISTERED_TEMPLATE =
             "There is already a symbol registered with identifier '%s'";
 
-    private final Map<SymbolTableKey, SymbolTableValue> table = new HashMap<>();
-
-    public void registerSymbol(String identifier, BaallType type, Scope scope, boolean isConstant, LineInformation lineInformation) throws SymbolAlreadyExistsException {
+    public void registerSymbol(
+            String identifier,
+            Scope scope,
+            BaallType type,
+            boolean isConstant,
+            LineInformation lineInformation
+    ) throws SymbolAlreadyExistsException {
         if (hasSymbolRegisteredInScope(identifier, scope)) {
             throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
         }
-        table.put(new SymbolTableKey(identifier, scope), new SymbolTableValue(type, lineInformation, isConstant));
+        findOrCreateNode(scope).symbols.add(new SymbolImpl(identifier, scope, type, isConstant, lineInformation));
+    }
+
+    public void registerFunction(
+            String identifier,
+            Scope scope,
+            FunctionType type,
+            boolean isConstant,
+            LineInformation lineInformation
+    ) throws SymbolAlreadyExistsException {
+        if (hasSymbolRegisteredInScope(identifier, scope)) {
+            throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
+        }
+        findOrCreateNode(scope).functionDeclarations.add(new Function(
+                identifier,
+                scope,
+                type,
+                isConstant,
+                lineInformation
+        ));
     }
 
     public boolean hasSymbolRegisteredInScope(String identifier, Scope scope) {
-        return table.containsKey(new SymbolTableKey(identifier, scope));
+        Node node = nodes.get(scope);
+        if (node == null) {
+            return false;
+        }
+        if (node.functionDeclarations.stream().anyMatch(symbol -> symbol.identifier().equals(identifier))) {
+            return true;
+        }
+        return node.symbols.stream()
+                           .filter(e -> e instanceof Symbol)
+                           .anyMatch(e -> ((Symbol) e).identifier().equals(identifier));
     }
 
     public boolean isConstant(String identifier, Scope scope) throws NoSymbolFoundException {
-        return table.keySet()
-                    .stream()
-                    .filter(equalsKey(identifier, scope))
-                    .map(table::get)
-                    .map(SymbolTableValue::isConstant)
-                    .findFirst()
-                    .orElseThrow(() -> new NoSymbolFoundException(
-                            NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope))
-                    );
+        Node node = nodes.get(scope);
+        if (node == null) {
+            throw new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope));
+        }
+
+        return node.stream()
+                   .filter(s -> s.identifier().equals(identifier) && s.scope().equals(scope))
+                   .findFirst()
+                   .map(Symbol::isConstant)
+                   .orElseThrow(() -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(
+                           identifier,
+                           scope
+                   )));
     }
 
     public Optional<BaallType> getTypeInformation(String identifier, Scope scope) {
-        return table.keySet()
-                    .stream()
-                    .filter(equalsKey(identifier, scope))
-                    .findFirst()
-                    .map(table::get)
-                    .map(SymbolTableValue::type);
+        // todo implement
+        return Optional.empty();
     }
 
-    private Predicate<SymbolTableKey> equalsKey(String identifier, Scope scope) {
-        return k -> k.symbol.equals(identifier) && k.scope.equals(scope);
+    private Node findOrCreateNode(Scope scope) {
+        return Optional.ofNullable(nodes.get(scope)).orElseGet(() -> {
+            Node parent = findOrCreateParentNode(scope);
+            Node node = new Node(scope, parent);
+            if (parent != null) {
+                parent.symbols.add(node);
+            }
+            nodes.put(scope, node);
+            return node;
+        });
     }
 
-    private record SymbolTableKey(String symbol, Scope scope) {
+    private @Nullable Node findOrCreateParentNode(Scope scope) {
+        Optional<Scope> parent = scope.getParent();
+        // create or find the all parent nodes recursively
+        return parent.map(this::findOrCreateNode).orElse(null);
     }
 
-    private record SymbolTableValue(BaallType type, LineInformation lineInformation, boolean isConstant) {
+    private final LinkedHashMap<Scope, Node> nodes = new LinkedHashMap<>();
+
+    private sealed interface Symbol permits Function, SymbolImpl {
+        String identifier();
+
+        Scope scope();
+
+        BaallType type();
+
+        boolean isConstant();
     }
 
-    private final HashMap<Scope, Node> nodes = new HashMap<>();
+    private sealed interface SymbolTableEntry permits SymbolImpl, Node {
+    }
 
-    private static class Node {
+    private record Function(String identifier, Scope scope, FunctionType type, boolean isConstant,
+                            LineInformation lineInformation) implements Symbol {
+    }
 
-        private HashMap<SymbolTableKey, SymbolTableValue> declaredFunctions;
+    private record SymbolImpl(String identifier, Scope scope, BaallType type, boolean isConstant,
+                              LineInformation lineInformation) implements SymbolTableEntry, Symbol {
+    }
 
-        private LinkedHashMap<SymbolTableKey, SymbolTableValue> symbols;
+    private final static class Node implements SymbolTableEntry {
 
-        private final Node parent;
+        private final Scope own;
+        private final @Nullable Node parent;
+        private final List<Function> functionDeclarations = new ArrayList<>();
+        private final List<SymbolTableEntry> symbols = new ArrayList<>();
 
-        private Node(Node parent) {
+        private Node(Scope own, @Nullable Node parent) {
+            this.own = own;
             this.parent = parent;
         }
-    }
 
+        Stream<Symbol> stream() {
+            return Stream.concat(functionDeclarations.stream(), symbols.stream())
+                         .filter(Symbol.class::isInstance)
+                         .map(Symbol.class::cast);
+        }
+    }
 }

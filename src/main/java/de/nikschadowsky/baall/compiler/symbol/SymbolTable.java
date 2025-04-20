@@ -3,6 +3,8 @@ package de.nikschadowsky.baall.compiler.symbol;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
 import de.nikschadowsky.baall.compiler.semantic.type.FunctionType;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNode;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -41,33 +43,26 @@ public class SymbolTable {
         if (hasSymbolRegisteredInScope(identifier, scope)) {
             throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
         }
-        findOrCreateNode(scope).functionDeclarations.add(new Function(
-                identifier,
-                scope,
-                type,
-                isConstant,
-                lineInformation
-        ));
+        Node node = findOrCreateNode(scope);
+        if (isConstant) {
+            node.functionDeclarations.add(new Function(identifier, scope, type, true, lineInformation));
+        } else {
+            node.symbols.add(new SymbolImpl(identifier, scope, type, false, lineInformation));
+        }
     }
 
     public boolean hasSymbolRegisteredInScope(String identifier, Scope scope) {
-        Node node = nodes.get(scope);
-        if (node == null) {
-            return false;
-        }
-        if (node.functionDeclarations.stream().anyMatch(symbol -> symbol.identifier().equals(identifier))) {
-            return true;
-        }
-        return node.symbols.stream()
-                           .filter(e -> e instanceof Symbol)
-                           .anyMatch(e -> ((Symbol) e).identifier().equals(identifier));
+        return findNode(scope).map(node -> node.stream()
+                                               .filter(s -> scope.canAccess(s.scope()))
+                                               .anyMatch(s -> s.identifier().equals(identifier)))
+                              .orElse(false);
     }
 
+
     public boolean isConstant(String identifier, Scope scope) throws NoSymbolFoundException {
-        Node node = nodes.get(scope);
-        if (node == null) {
-            throw new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope));
-        }
+        Node node = findNode(scope).orElseThrow(
+                () -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope))
+        );
 
         return node.stream()
                    .filter(s -> s.identifier().equals(identifier) && s.scope().equals(scope))
@@ -79,27 +74,54 @@ public class SymbolTable {
                    )));
     }
 
-    public Optional<BaallType> getTypeInformation(String identifier, Scope scope) {
+    public Optional<BaallType> resolveSymbol(ElementAccessNode elementAccess, Scope scope) {
+        /*
+         * todo register fields and parameters!
+         * todo change "id" from string to complex datatype. field access of structs and lists require this change
+         * scope elevation restricts scope.
+         * member select can either be struct access or namespace access
+         * search from current scope upwards until a symbol is found.
+         */
+
+
+
         // todo implement
         return Optional.empty();
     }
 
+    private Scope resolveScope(Scope base, ScopeElevationNode scopeElevationNode) throws OutOfScopeException{
+        Scope major
+    }
+
     private Node findOrCreateNode(Scope scope) {
-        return Optional.ofNullable(nodes.get(scope)).orElseGet(() -> {
-            Node parent = findOrCreateParentNode(scope);
-            Node node = new Node(scope, parent);
+        Scope major = getMajor(scope);
+        return findNode(major).orElseGet(() -> {
+            Node parent = findOrCreateParentNode(major);
+            Node node = new Node(major, parent);
             if (parent != null) {
                 parent.symbols.add(node);
             }
-            nodes.put(scope, node);
+            nodes.put(major, node);
             return node;
         });
+    }
+
+    private Optional<Node> findNode(Scope scope) {
+        Scope major = getMajor(scope);
+        return Optional.ofNullable(nodes.get(major));
     }
 
     private @Nullable Node findOrCreateParentNode(Scope scope) {
         Optional<Scope> parent = scope.getParent();
         // create or find the all parent nodes recursively
         return parent.map(this::findOrCreateNode).orElse(null);
+    }
+
+    private Scope getMajor(Scope scope) {
+        if (scope.isMajor()) {
+            return scope;
+        }
+        return getMajor(scope.getParent().orElseThrow());
     }
 
     private final LinkedHashMap<Scope, Node> nodes = new LinkedHashMap<>();
@@ -127,8 +149,18 @@ public class SymbolTable {
 
     private final static class Node implements SymbolTableEntry {
 
+        /**
+         * major scope. todo better typing?
+         */
         private final Scope own;
+        /*
+        Node represents a major scope. Finding or creating a node uses a major scope.
+        Has symbol registered looks at a node and to find the symbol
+         */
         private final @Nullable Node parent;
+        /**
+         * use-before-declare
+         */
         private final List<Function> functionDeclarations = new ArrayList<>();
         private final List<SymbolTableEntry> symbols = new ArrayList<>();
 

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 27.01.2025
  */
-public class IdentifierNodeImpl extends AbstractNode implements IdentifierNode {
+public final class IdentifierNodeImpl extends AbstractNode implements IdentifierNode {
 
     private Token name;
 

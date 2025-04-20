@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.symbol.Token;
  *
  * @since 27.01.2025
  */
-public interface IdentifierNode extends ElementAccessNode {
+public sealed interface IdentifierNode extends ElementAccessNode permits IdentifierNodeImpl{
 
     /**
      * Token representing the identifier in the source code.

@@ -55,6 +55,10 @@ public class Scope {
         return false;
     }
 
+    public boolean isMajor() {
+        return true;
+    }
+
     @Override
     public String toString() {
         if (isRoot()) {
@@ -71,6 +75,11 @@ public class Scope {
 
         private LogicalScope(Scope parent) {
             super(parent);
+        }
+
+        @Override
+        public boolean isMajor() {
+            return false;
         }
     }
 }

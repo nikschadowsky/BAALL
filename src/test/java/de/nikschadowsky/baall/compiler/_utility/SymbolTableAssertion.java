@@ -55,7 +55,7 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
         );
     }
 
-    public SymbolTableAssertion hasTypeForSymbol(String identifier, Scope scope, BaallType expectedType) {
-        return baseAssert("symbol type", a -> a.getTypeInformation(identifier, scope), expectedType);
-    }
+    /*public SymbolTableAssertion hasTypeForSymbol(String identifier, Scope scope, BaallType expectedType) {
+        return baseAssert("symbol type", a -> a.resolveSymbol(identifier, scope), expectedType);
+    }*/
 }

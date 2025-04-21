@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallN
  *
  * @since 11.08.2024
  */
-public interface RaiseStatementNode extends ControlStatementNode {
+public sealed interface RaiseStatementNode extends ControlStatementNode permits RaiseStatementNodeImpl {
 
     /**
      * Created exception.

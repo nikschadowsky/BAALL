@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 29.07.2024
  */
-public class PrefixOperationNodeImpl extends AbstractNode implements PrefixOperationNode {
+public final class PrefixOperationNodeImpl extends AbstractNode implements PrefixOperationNode {
 
     private OperatorNode operator;
     private ExpressionNode operand;

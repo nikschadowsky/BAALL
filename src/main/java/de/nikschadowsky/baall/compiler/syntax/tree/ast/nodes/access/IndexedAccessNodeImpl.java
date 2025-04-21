@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.03.2025
  */
-public class IndexedAccessNodeImpl extends AbstractNode implements IndexedAccessNode {
+public final class IndexedAccessNodeImpl extends AbstractNode implements IndexedAccessNode {
 
     private ElementAccessNode inner;
     private ExpressionNode index;

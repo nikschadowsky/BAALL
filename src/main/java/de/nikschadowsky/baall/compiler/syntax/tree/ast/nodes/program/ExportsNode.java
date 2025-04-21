@@ -14,7 +14,7 @@ import java.util.Optional;
  *
  * @since 30.07.2024
  */
-public interface ExportsNode extends Node {
+public sealed interface ExportsNode extends Node permits ExportsNodeImpl {
 
     /**
      * Exported elements referenced by their identifier access nodes.

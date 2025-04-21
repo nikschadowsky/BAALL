@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @since 30.07.2024
  */
-public interface ProgramNode extends Node {
+public sealed interface ProgramNode extends Node permits ProgramNodeImpl {
 
     /**
      * Imports of this program.

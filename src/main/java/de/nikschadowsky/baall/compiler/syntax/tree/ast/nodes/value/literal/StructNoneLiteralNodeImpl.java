@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 03.03.2025
  */
-public class StructNoneLiteralNodeImpl extends AbstractNode implements StructNoneLiteralNode {
+public final class StructNoneLiteralNodeImpl extends AbstractNode implements StructNoneLiteralNode {
 
     public StructNoneLiteralNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);

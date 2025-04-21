@@ -6,7 +6,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
 /**
  * @since 11.03.2025
  */
-public interface IndexedAccessNode extends CompositeIdentifierNode{
+public sealed interface IndexedAccessNode extends CompositeIdentifierNode permits IndexedAccessNodeImpl {
 
     ExpressionNode getIndex();
 

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 30.07.2024
  */
-public interface ImportsNode extends Node {
+public sealed interface ImportsNode extends Node permits ImportsNodeImpl {
 
     /**
      * Imported elements referenced by BAALL file references.

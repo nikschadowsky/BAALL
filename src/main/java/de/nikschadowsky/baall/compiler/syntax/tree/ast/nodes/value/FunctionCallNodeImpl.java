@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @since 25.07.2024
  */
-public class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNode {
+public final class FunctionCallNodeImpl extends AbstractNode implements FunctionCallNode {
 
     private ElementAccessNode functionIdentifier;
     private List<ExpressionNode> arguments = Collections.emptyList();

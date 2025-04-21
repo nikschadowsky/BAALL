@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.LiteralNode;
 /**
  * @since 28.03.2025
  */
-public interface StringLiteralNode extends LiteralNode {
+public sealed interface StringLiteralNode extends LiteralNode permits StringLiteralNodeImpl {
 
     Token getValue();
 

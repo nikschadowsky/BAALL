@@ -90,7 +90,7 @@ public class SymbolTable {
     }
 
     private Scope resolveScope(Scope base, ScopeElevationNode scopeElevationNode) throws OutOfScopeException{
-        Scope major
+        return null;
     }
 
     private Node findOrCreateNode(Scope scope) {

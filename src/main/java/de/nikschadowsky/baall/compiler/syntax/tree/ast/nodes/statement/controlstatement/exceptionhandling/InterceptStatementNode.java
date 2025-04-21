@@ -9,7 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignmen
  *
  * @since 11.08.2024
  */
-public interface InterceptStatementNode extends Node {
+public sealed interface InterceptStatementNode extends Node permits InterceptStatementNodeImpl {
 
     /**
      * Binding variable of the exceptions.

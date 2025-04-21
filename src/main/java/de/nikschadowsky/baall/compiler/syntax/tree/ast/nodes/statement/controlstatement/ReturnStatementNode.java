@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
  *
  * @since 30.07.2024
  */
-public interface ReturnStatementNode extends ControlStatementNode {
+public sealed interface ReturnStatementNode extends ControlStatementNode permits ReturnStatementNodeImpl {
 
     /**
      * Value to be returned.

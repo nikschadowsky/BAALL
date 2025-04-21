@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsN
  *
  * @since 11.08.2024
  */
-public interface EnsureStatementNode extends Node {
+public sealed interface EnsureStatementNode extends Node permits EnsureStatementNodeImpl {
 
     /**
      * Body of the ensure statement.

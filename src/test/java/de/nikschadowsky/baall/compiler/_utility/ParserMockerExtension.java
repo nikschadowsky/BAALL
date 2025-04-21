@@ -9,7 +9,13 @@ import de.nikschadowsky.baall.compiler.syntax.analysis.StatementParser;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.PartialParseResult;
 import de.nikschadowsky.baall.compiler.syntax.error.SyntaxDiagnostic;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.ASTNodeFactory;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.ExpressionNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ReassignmentNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.NumberLiteralNodeImpl;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
@@ -25,9 +31,21 @@ import static org.mockito.Mockito.when;
 /**
  * @since 24.08.2024
  */
-public class ParserMockerExtension implements AfterEachCallback {
+public class ParserMockerExtension implements BeforeEachCallback, AfterEachCallback {
 
     private final Map<Class<?>, Object> mockedParsers = new HashMap<>();
+
+    private final ASTNodeFactory astFactory = new ASTNodeFactory(null);
+    private NumberLiteralNodeImpl numberLiteralNode;
+    private StatementsNode statementsNode;
+    private ReassignmentNode reassignmentNode;
+
+    @Override
+    public void beforeEach(ExtensionContext context) throws Exception {
+        numberLiteralNode = astFactory.createNumberLiteralNode();
+        statementsNode = astFactory.createStatementsNode();
+        reassignmentNode = astFactory.createVariableReassignmentNode();
+    }
 
     private static <T> Answer<ParseResult<T>> getAnswer(T answer, String[] returnUnsuccessfulOn, boolean returnPartial) {
         return invocationOnMock -> {
@@ -83,6 +101,18 @@ public class ParserMockerExtension implements AfterEachCallback {
         T mockObject = Mockito.mock(clazz);
         mockedParsers.put(clazz, mockObject);
         return mockObject;
+    }
+
+    public ExpressionNode mockExpressionNode() {
+        return numberLiteralNode;
+    }
+
+    public StatementsNode mockStatementsNode() {
+        return statementsNode;
+    }
+
+    public ReassignmentNode mockReassignmentNode() {
+        return reassignmentNode;
     }
 
     @Override

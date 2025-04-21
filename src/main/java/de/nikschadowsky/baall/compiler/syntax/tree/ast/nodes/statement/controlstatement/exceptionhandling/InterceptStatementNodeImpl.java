@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.08.2024
  */
-public class InterceptStatementNodeImpl extends AbstractNode implements InterceptStatementNode {
+public final class InterceptStatementNodeImpl extends AbstractNode implements InterceptStatementNode {
 
     private VariableDeclarationNode caughtException;
     private StatementsNode body;

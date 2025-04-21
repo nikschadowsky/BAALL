@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * @since 21.04.2024
  */
-public class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
+public final class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
 
     private VariableDeclarationNode identifier;
     private ExpressionNode startIndex;

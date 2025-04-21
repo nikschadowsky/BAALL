@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 30.07.2024
  */
-public class ReturnStatementNodeImpl extends AbstractNode implements ReturnStatementNode {
+public final class ReturnStatementNodeImpl extends AbstractNode implements ReturnStatementNode {
 
     private ExpressionNode returnExpression;
 

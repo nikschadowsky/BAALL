@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @since 29.07.2024
  */
-public class StructDefinitionLiteralNodeImpl extends AbstractNode implements StructDefinitionLiteralNode {
+public final class StructDefinitionLiteralNodeImpl extends AbstractNode implements StructDefinitionLiteralNode {
 
     private List<FieldNode> fields = Collections.emptyList();
 

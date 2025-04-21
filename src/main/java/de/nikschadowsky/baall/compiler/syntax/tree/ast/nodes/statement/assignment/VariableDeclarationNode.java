@@ -9,7 +9,7 @@ import java.util.Optional;
  *
  * @since 30.07.2024
  */
-public interface VariableDeclarationNode extends DeclarationNode {
+public sealed interface VariableDeclarationNode extends DeclarationNode permits VariableDeclarationNodeImpl {
 
     /**
      * Optional initialization value.

@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsN
  *
  * @since 30.07.2024
  */
-public interface WhileLoopNode extends ControlStructureNode {
+public sealed interface WhileLoopNode extends ControlStructureNode permits WhileLoopNodeImpl {
 
     /**
      * Evaluable expression for this while loop.

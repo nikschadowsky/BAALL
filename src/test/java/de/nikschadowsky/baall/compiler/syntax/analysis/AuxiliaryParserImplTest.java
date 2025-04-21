@@ -46,7 +46,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseFieldDeclarations() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -122,7 +122,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseFieldDeclaration() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -171,7 +171,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseArgumentList() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -304,7 +304,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseType() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -433,7 +433,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseElementAccess() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 expParser -> expParser.parseExpression(any()),
@@ -549,7 +549,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseListIndexInformation() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 expParser -> expParser.parseExpression(any()),
@@ -595,7 +595,7 @@ class AuxiliaryParserImplTest {
 
     @Test
     void parseCodeBlock() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 parser -> parser.parseStatements(any()),

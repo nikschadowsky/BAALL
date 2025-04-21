@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 30.07.2024
  */
-public interface LoopControlStatementNode extends ControlStatementNode {
+public sealed interface LoopControlStatementNode extends ControlStatementNode permits BreakStatementNode, ContinueStatementNode {
 
     enum StatementType {
         BREAK, CONTINUE

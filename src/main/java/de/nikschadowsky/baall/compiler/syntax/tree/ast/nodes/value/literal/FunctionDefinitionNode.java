@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @since 29.07.2024
  */
-public interface FunctionDefinitionNode extends LiteralNode {
+public sealed interface FunctionDefinitionNode extends LiteralNode permits FunctionDefinitionNodeImpl {
 
     /**
      * Declared parameters of the function.

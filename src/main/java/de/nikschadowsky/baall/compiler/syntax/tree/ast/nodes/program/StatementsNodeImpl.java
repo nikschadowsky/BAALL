@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @since 14.04.2024
  */
-public class StatementsNodeImpl extends AbstractNode implements StatementsNode {
+public final class StatementsNodeImpl extends AbstractNode implements StatementsNode {
 
     private List<StatementNode> statements = Collections.emptyList();
 

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * @since 29.07.2024
  */
-public class ListLiteralNodeImpl extends AbstractNode implements ListLiteralNode {
+public final class ListLiteralNodeImpl extends AbstractNode implements ListLiteralNode {
 
     private List<ExpressionNode> elements = Collections.emptyList();
 

@@ -8,7 +8,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
  *
  * @since 29.07.2024
  */
-public interface UnaryExpressionNode extends TermNode, ReassignmentNode {
+public sealed interface UnaryExpressionNode extends TermNode, ReassignmentNode permits UnaryExpressionNodeImpl {
 
     /**
      * Is the operator pre- or postfix?

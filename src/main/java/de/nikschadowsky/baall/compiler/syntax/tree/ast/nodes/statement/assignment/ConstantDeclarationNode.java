@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
  *
  * @since 30.07.2024
  */
-public interface ConstantDeclarationNode extends DeclarationNode {
+public sealed interface ConstantDeclarationNode extends DeclarationNode permits ConstantDeclarationNodeImpl {
 
     /**
      * Initialization value of the constant.

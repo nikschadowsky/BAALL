@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 28.03.2025
  */
-public class BooleanLiteralNodeImpl extends AbstractNode implements BooleanLiteralNode {
+public final class BooleanLiteralNodeImpl extends AbstractNode implements BooleanLiteralNode {
 
     private Token value;
 

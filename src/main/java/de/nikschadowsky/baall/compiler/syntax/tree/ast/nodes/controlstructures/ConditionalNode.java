@@ -10,7 +10,7 @@ import java.util.Optional;
  *
  * @since 30.07.2024
  */
-public interface ConditionalNode extends ControlStructureNode {
+public sealed interface ConditionalNode extends ControlStructureNode permits ConditionalNodeImpl {
 
     /**
      * Evaluable condition for this conditional.

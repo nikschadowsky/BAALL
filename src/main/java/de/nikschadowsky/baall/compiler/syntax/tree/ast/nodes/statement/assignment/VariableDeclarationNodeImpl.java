@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @since 30.07.2024
  */
-public class VariableDeclarationNodeImpl extends AbstractNode implements VariableDeclarationNode {
+public final class VariableDeclarationNodeImpl extends AbstractNode implements VariableDeclarationNode {
 
     private TypeNode type;
     private IdentifierNode identifier;

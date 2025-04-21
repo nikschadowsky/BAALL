@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 29.07.2024
  */
-public interface StructDefinitionLiteralNode extends LiteralNode {
+public sealed interface StructDefinitionLiteralNode extends LiteralNode permits StructDefinitionLiteralNodeImpl {
 
     /**
      * Fields of the struct type.

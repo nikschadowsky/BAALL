@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.03.2025
  */
-public class MemberReferenceNodeImpl extends AbstractNode implements MemberReferenceNode {
+public final class MemberReferenceNodeImpl extends AbstractNode implements MemberReferenceNode {
 
     private ElementAccessNode inner;
     private ElementAccessNode self;

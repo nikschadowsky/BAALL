@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 27.01.2025
  */
-public class OperatorNodeImpl extends AbstractNode implements OperatorNode {
+public final class OperatorNodeImpl extends AbstractNode implements OperatorNode {
 
     private Token operator;
 

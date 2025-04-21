@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.Expressi
  *
  * @since 30.07.2024
  */
-public interface VariableReassignmentNode extends ReassignmentNode {
+public sealed interface VariableReassignmentNode extends ReassignmentNode permits VariableReassignmentNodeImpl {
 
     /**
      * Updated value of the variable.

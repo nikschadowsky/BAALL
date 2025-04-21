@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controlstatement.exceptionhandling.RaiseStatementNode;
 
 /**
  * Represents a control statement. A control statement is one of the following:
@@ -12,5 +13,5 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.Statement
  *
  * @since 29.07.2024
  */
-public interface ControlStatementNode extends StatementNode {
+public sealed interface ControlStatementNode extends StatementNode permits LoopControlStatementNode, ReturnStatementNode, RaiseStatementNode {
 }

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.03.2025
  */
-public class ScopeElevationNodeImpl extends AbstractNode implements ScopeElevationNode {
+public final class ScopeElevationNodeImpl extends AbstractNode implements ScopeElevationNode {
 
     private ElementAccessNode inner;
 

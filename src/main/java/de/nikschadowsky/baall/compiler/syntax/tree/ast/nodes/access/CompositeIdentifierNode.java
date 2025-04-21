@@ -4,7 +4,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access;
 /**
  * @since 11.03.2025
  */
-public interface CompositeIdentifierNode extends ElementAccessNode {
+public sealed interface CompositeIdentifierNode extends ElementAccessNode permits IndexedAccessNode, MemberReferenceNode, ScopeElevationNode {
 
     ElementAccessNode getInnerIdentifier();
 

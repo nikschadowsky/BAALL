@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 30.07.2024
  */
-public class VariableReassignmentNodeImpl extends AbstractNode implements VariableReassignmentNode {
+public final class VariableReassignmentNodeImpl extends AbstractNode implements VariableReassignmentNode {
 
     private ElementAccessNode identifier;
     private OperatorNode operator;

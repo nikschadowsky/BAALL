@@ -13,7 +13,7 @@ import java.util.Optional;
  *
  * @since 11.08.2024
  */
-public interface TryStatementNode extends ControlStructureNode {
+public sealed interface TryStatementNode extends ControlStructureNode permits TryStatementNodeImpl {
 
     /**
      * Body of this try.

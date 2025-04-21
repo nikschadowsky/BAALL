@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 21.04.2024
  */
-public class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
+public final class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNode {
 
     private ExpressionNode condition;
     private StatementsNode body;

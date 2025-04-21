@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignme
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ElementAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.OperatorNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression.UnaryExpressionNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.StatementNode;
 
 /**
@@ -9,7 +10,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.Statement
  *
  * @since 29.07.2024
  */
-public interface ReassignmentNode extends StatementNode {
+public sealed interface ReassignmentNode extends StatementNode permits UnaryExpressionNode, VariableReassignmentNode {
 
     /**
      * Access of the element to be updated.

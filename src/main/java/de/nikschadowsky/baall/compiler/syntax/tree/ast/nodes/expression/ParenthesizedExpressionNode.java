@@ -7,7 +7,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.TermNode;
  *
  * @since 29.07.2024
  */
-public interface ParenthesizedExpressionNode extends TermNode {
+public sealed interface ParenthesizedExpressionNode extends TermNode permits ParenthesizedExpressionNodeImpl {
 
     /**
      * Inner evaluable expression surrounded by parentheses.

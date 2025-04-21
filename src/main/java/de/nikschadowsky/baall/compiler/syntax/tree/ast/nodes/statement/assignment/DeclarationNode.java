@@ -9,7 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.TypeNode;
  *
  * @since 29.07.2024
  */
-public interface DeclarationNode extends StatementNode {
+public sealed interface DeclarationNode extends StatementNode permits ConstantDeclarationNode, VariableDeclarationNode {
 
     /**
      * Type of the declared element.

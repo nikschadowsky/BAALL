@@ -45,7 +45,7 @@ class LiteralParserImplTest {
 
     @Test
     void parseLiteral() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),
@@ -56,7 +56,7 @@ class LiteralParserImplTest {
                 "}",
                 ","
         );
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -146,7 +146,7 @@ class LiteralParserImplTest {
 
     @Test
     void parseListLiteral() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -192,7 +192,7 @@ class LiteralParserImplTest {
 
     @Test
     void parseStructDefinition() {
-        ExpressionNode mockedExpression = mock(ExpressionNode.class);
+        ExpressionNode mockedExpression = parserMockerExtension.mockExpressionNode();
         parserMockerExtension.mockExpressionParserExecution(
                 programParser,
                 exprParser -> exprParser.parseExpression(any()),
@@ -276,7 +276,7 @@ class LiteralParserImplTest {
 
     @Test
     void parseFunctionDefinition() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 statementParser -> statementParser.parseStatements(any()),

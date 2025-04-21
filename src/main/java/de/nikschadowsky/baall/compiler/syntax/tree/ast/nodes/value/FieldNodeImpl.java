@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 27.01.2025
  */
-public class FieldNodeImpl extends AbstractNode implements FieldNode {
+public final class FieldNodeImpl extends AbstractNode implements FieldNode {
 
     private TypeNode type;
     private IdentifierNode name;

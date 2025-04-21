@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @since 29.07.2024
  */
-public interface FunctionCallNode extends TermNode, StatementNode {
+public sealed interface FunctionCallNode extends TermNode, StatementNode permits FunctionCallNodeImpl {
 
     /**
      * Identifier of the called function.

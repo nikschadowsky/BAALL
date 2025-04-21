@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @since 14.04.2024
  */
-public class ProgramNodeImpl extends AbstractNode implements ProgramNode {
+public final class ProgramNodeImpl extends AbstractNode implements ProgramNode {
 
     private ImportsNode imports;
     private StatementsNode statements;

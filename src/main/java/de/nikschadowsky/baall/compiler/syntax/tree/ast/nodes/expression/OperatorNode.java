@@ -9,7 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
  *
  * @since 27.01.2025
  */
-public interface OperatorNode extends Node {
+public sealed interface OperatorNode extends Node permits OperatorNodeImpl {
 
     /**
      * Token representing the operator in the source code.

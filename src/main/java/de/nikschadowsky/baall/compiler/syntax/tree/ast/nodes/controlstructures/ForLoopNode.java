@@ -12,7 +12,7 @@ import java.util.Optional;
  *
  * @since 30.07.2024
  */
-public interface ForLoopNode extends ControlStructureNode {
+public sealed interface ForLoopNode extends ControlStructureNode permits ForLoopNodeImpl {
 
     /**
      * Identifier used inside counting for loop.

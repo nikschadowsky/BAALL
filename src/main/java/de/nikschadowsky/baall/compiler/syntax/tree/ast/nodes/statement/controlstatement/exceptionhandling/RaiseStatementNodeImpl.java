@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.08.2024
  */
-public class RaiseStatementNodeImpl extends AbstractNode implements RaiseStatementNode {
+public final class RaiseStatementNodeImpl extends AbstractNode implements RaiseStatementNode {
 
     private FunctionCallNode exception;
 

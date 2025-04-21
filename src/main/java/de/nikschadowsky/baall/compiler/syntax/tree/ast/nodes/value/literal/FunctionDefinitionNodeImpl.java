@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @since 28.07.2024
  */
-public class FunctionDefinitionNodeImpl extends AbstractNode implements FunctionDefinitionNode {
+public final class FunctionDefinitionNodeImpl extends AbstractNode implements FunctionDefinitionNode {
 
     private List<FieldNode> parameters = Collections.emptyList();
     private StatementsNode functionBody;

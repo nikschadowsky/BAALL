@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @since 13.04.2024
  */
-public class ImportsNodeImpl extends AbstractNode implements ImportsNode {
+public final class ImportsNodeImpl extends AbstractNode implements ImportsNode {
 
     private final List<Token> imports = new ArrayList<>();
 

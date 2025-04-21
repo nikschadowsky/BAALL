@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @since 29.07.2024
  */
-public interface StatementsNode extends Node {
+public sealed interface StatementsNode extends Node permits StatementsNodeImpl {
 
     /**
      * Statements of this block. All statements are in the same scope.

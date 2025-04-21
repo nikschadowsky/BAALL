@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 30.07.2024
  */
-public class BreakStatementNodeImpl extends AbstractNode implements BreakStatementNode {
+public final class BreakStatementNodeImpl extends AbstractNode implements BreakStatementNode {
 
     public BreakStatementNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);

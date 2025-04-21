@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 29.07.2024
  */
-public class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpressionNode {
+public final class BinaryExpressionNodeImpl extends AbstractNode implements BinaryExpressionNode {
 
     private TermNode leftOperand;
     private OperatorNode operator;

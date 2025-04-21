@@ -16,7 +16,7 @@ import java.util.Optional;
 /**
  * @since 11.08.2024
  */
-public class TryStatementNodeImpl extends AbstractNode implements TryStatementNode {
+public final class TryStatementNodeImpl extends AbstractNode implements TryStatementNode {
 
     private StatementsNode body;
     private List<InterceptStatementNode> interceptBlocks = Collections.emptyList();

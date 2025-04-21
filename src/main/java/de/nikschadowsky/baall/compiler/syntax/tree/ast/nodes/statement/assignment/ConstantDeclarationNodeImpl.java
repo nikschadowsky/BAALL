@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 30.07.2024
  */
-public class ConstantDeclarationNodeImpl extends AbstractNode implements ConstantDeclarationNode {
+public final class ConstantDeclarationNodeImpl extends AbstractNode implements ConstantDeclarationNode {
 
     private TypeNode type;
     private IdentifierNode identifier;

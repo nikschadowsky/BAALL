@@ -14,7 +14,7 @@ import java.util.Optional;
 /**
  * @since 24.07.2024
  */
-public class ConditionalNodeImpl extends AbstractNode implements ConditionalNode {
+public final class ConditionalNodeImpl extends AbstractNode implements ConditionalNode {
 
     private ExpressionNode condition;
     private StatementsNode thenBranch;

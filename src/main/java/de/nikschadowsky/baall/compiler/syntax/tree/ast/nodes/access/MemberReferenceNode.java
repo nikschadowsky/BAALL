@@ -4,7 +4,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access;
 /**
  * @since 11.03.2025
  */
-public interface MemberReferenceNode extends CompositeIdentifierNode{
+public sealed interface MemberReferenceNode extends CompositeIdentifierNode permits MemberReferenceNodeImpl {
 
     ElementAccessNode getSelf();
 

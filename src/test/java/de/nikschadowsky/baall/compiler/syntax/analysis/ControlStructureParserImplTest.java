@@ -60,7 +60,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseControlStructure() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -147,7 +147,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseConditional() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -254,7 +254,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseElseBlock() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -377,7 +377,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseForLoop() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -388,7 +388,7 @@ class ControlStructureParserImplTest {
 
         assertThat(programParser.getStatementParser().parseStatements(new TokenQueueTestBuilder().build())).isNotNull();
 
-        ReassignmentNode mockedReassignment = mock(ReassignmentNode.class);
+        ReassignmentNode mockedReassignment = parserMockerExtension.mockReassignmentNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseReassignment(any()),
@@ -469,7 +469,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseWhileLoop() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -541,7 +541,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseTryStatement() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -682,7 +682,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseInterceptStatements() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -753,7 +753,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseInterceptStatement() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),
@@ -834,7 +834,7 @@ class ControlStructureParserImplTest {
 
     @Test
     void parseEnsureStatement() {
-        StatementsNode mockedStatements = mock(StatementsNode.class);
+        StatementsNode mockedStatements = parserMockerExtension.mockStatementsNode();
         parserMockerExtension.mockStatementParserExecution(
                 programParser,
                 stmtParser -> stmtParser.parseStatements(any()),

@@ -232,12 +232,11 @@ class ExpressionParserImplTest {
 
     @Test
     void parseParenthesizedExpression() {
-        TokenQueue queue =
-                new TokenQueueTestBuilder().separator("(")
-                                           .number("expression")
-                                           .separator(")")
-                                           .separator(";")
-                                           .build();
+        TokenQueue queue = new TokenQueueTestBuilder().separator("(")
+                                                      .number("expression")
+                                                      .separator(")")
+                                                      .separator(";")
+                                                      .build();
         ParseResult<ParenthesizedExpressionNode> actual = expressionParser.parseParenthesizedExpression(queue);
         assertThat(actual).isSuccessful()
                           .map(NodeAssertionFactory::create)

@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 11.08.2024
  */
-public class EnsureStatementNodeImpl extends AbstractNode implements EnsureStatementNode {
+public final class EnsureStatementNodeImpl extends AbstractNode implements EnsureStatementNode {
 
     private StatementsNode body;
 

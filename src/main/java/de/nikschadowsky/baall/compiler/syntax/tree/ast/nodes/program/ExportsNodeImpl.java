@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * @since 21.04.2024
  */
-public class ExportsNodeImpl extends AbstractNode implements ExportsNode {
+public final class ExportsNodeImpl extends AbstractNode implements ExportsNode {
 
     private List<ElementAccessNode> exports = Collections.emptyList();
     private IdentifierNode namespace;

@@ -5,7 +5,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.expression;
  *
  * @since 29.07.2024
  */
-public interface PrefixOperationNode extends ExpressionNode {
+public sealed interface PrefixOperationNode extends ExpressionNode permits PrefixOperationNodeImpl {
 
     /**
      * Operator of the prefix operation.

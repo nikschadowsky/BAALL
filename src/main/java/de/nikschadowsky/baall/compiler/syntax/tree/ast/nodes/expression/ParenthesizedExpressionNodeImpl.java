@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 29.07.2024
  */
-public class ParenthesizedExpressionNodeImpl extends AbstractNode implements ParenthesizedExpressionNode {
+public final class ParenthesizedExpressionNodeImpl extends AbstractNode implements ParenthesizedExpressionNode {
 
     private ExpressionNode innerExpression;
 

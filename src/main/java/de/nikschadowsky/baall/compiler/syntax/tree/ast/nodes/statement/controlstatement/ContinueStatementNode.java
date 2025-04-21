@@ -4,5 +4,5 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controls
 /**
  * @since 10.03.2025
  */
-public interface ContinueStatementNode extends LoopControlStatementNode {
+public sealed interface ContinueStatementNode extends LoopControlStatementNode permits ContinueStatementNodeImpl {
 }

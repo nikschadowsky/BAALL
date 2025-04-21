@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @since 29.07.2024
  */
-public class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpressionNode {
+public final class UnaryExpressionNodeImpl extends AbstractNode implements UnaryExpressionNode {
 
     private ElementAccessNode identifierAccess;
     private boolean isPrefix;

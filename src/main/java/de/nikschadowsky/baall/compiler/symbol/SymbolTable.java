@@ -21,7 +21,7 @@ public class SymbolTable {
             "There is already a symbol registered with identifier '%s'";
 
     public void registerSymbol(
-            String identifier,
+            SymbolTableIdentifier identifier,
             Scope scope,
             BaallType type,
             boolean isConstant,
@@ -34,7 +34,7 @@ public class SymbolTable {
     }
 
     public void registerFunction(
-            String identifier,
+            StringIdentifier identifier,
             Scope scope,
             FunctionType type,
             boolean isConstant,
@@ -51,7 +51,16 @@ public class SymbolTable {
         }
     }
 
-    public boolean hasSymbolRegisteredInScope(String identifier, Scope scope) {
+    /**
+     * Checks if a symbol with the same identifier is registered. A symbol is regarded as registered in the same scope
+     * if it can be accessed directly from the passed scope. This means if you pass a minor scope and there is a symbol
+     * in the scope hierarchy up to the nearest major scope (inclusive), this method will return true.
+     *
+     * @param identifier identifier to check
+     * @param scope      scope of access
+     * @return if there is a symbol accessible from this scope with the same identifier
+     */
+    public boolean hasSymbolRegisteredInScope(SymbolTableIdentifier identifier, Scope scope) {
         return findNode(scope).map(node -> node.stream()
                                                .filter(s -> scope.canAccess(s.scope()))
                                                .anyMatch(s -> s.identifier().equals(identifier)))
@@ -59,7 +68,7 @@ public class SymbolTable {
     }
 
 
-    public boolean isConstant(String identifier, Scope scope) throws NoSymbolFoundException {
+    public boolean isConstant(SymbolTableIdentifier identifier, Scope scope) throws NoSymbolFoundException {
         Node node = findNode(scope).orElseThrow(
                 () -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope))
         );
@@ -84,12 +93,11 @@ public class SymbolTable {
          */
 
 
-
         // todo implement
         return Optional.empty();
     }
 
-    private Scope resolveScope(Scope base, ScopeElevationNode scopeElevationNode) throws OutOfScopeException{
+    private Scope resolveScope(Scope base, ScopeElevationNode scopeElevationNode) throws OutOfScopeException {
         return null;
     }
 
@@ -106,6 +114,12 @@ public class SymbolTable {
         });
     }
 
+    /**
+     * Finds a node in the set of nodes. It uses the passed scope to determine the next major scope.
+     *
+     * @param scope major or minor scope
+     * @return optional node of the passed scope's nearest major
+     */
     private Optional<Node> findNode(Scope scope) {
         Scope major = getMajor(scope);
         return Optional.ofNullable(nodes.get(major));
@@ -127,7 +141,7 @@ public class SymbolTable {
     private final LinkedHashMap<Scope, Node> nodes = new LinkedHashMap<>();
 
     private sealed interface Symbol permits Function, SymbolImpl {
-        String identifier();
+        SymbolTableIdentifier identifier();
 
         Scope scope();
 
@@ -139,11 +153,11 @@ public class SymbolTable {
     private sealed interface SymbolTableEntry permits SymbolImpl, Node {
     }
 
-    private record Function(String identifier, Scope scope, FunctionType type, boolean isConstant,
+    private record Function(StringIdentifier identifier, Scope scope, FunctionType type, boolean isConstant,
                             LineInformation lineInformation) implements Symbol {
     }
 
-    private record SymbolImpl(String identifier, Scope scope, BaallType type, boolean isConstant,
+    private record SymbolImpl(SymbolTableIdentifier identifier, Scope scope, BaallType type, boolean isConstant,
                               LineInformation lineInformation) implements SymbolTableEntry, Symbol {
     }
 
@@ -162,6 +176,7 @@ public class SymbolTable {
          * use-before-declare
          */
         private final List<Function> functionDeclarations = new ArrayList<>();
+
         private final List<SymbolTableEntry> symbols = new ArrayList<>();
 
         private Node(Scope own, @Nullable Node parent) {

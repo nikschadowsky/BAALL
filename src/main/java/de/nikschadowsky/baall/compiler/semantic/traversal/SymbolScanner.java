@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallTypeFactory;
 import de.nikschadowsky.baall.compiler.semantic.type.TypeTable;
+import de.nikschadowsky.baall.compiler.symbol.StringIdentifier;
 import de.nikschadowsky.baall.compiler.symbol.SymbolAlreadyExistsException;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.symbol.Token;
@@ -32,7 +33,13 @@ public class SymbolScanner extends ScopeTraverser {
         BaallType type = mapNodeToBaallType(that.getType(), data);
         Token identifier = that.getIdentifier().getIdentifier();
         try {
-            symbolTable.registerSymbol(identifier.value(), data, type, true, identifier.lineInformation());
+            symbolTable.registerSymbol(
+                    StringIdentifier.of(identifier.value()),
+                    data,
+                    type,
+                    true,
+                    identifier.lineInformation()
+            );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
         }
@@ -44,7 +51,13 @@ public class SymbolScanner extends ScopeTraverser {
         BaallType type = mapNodeToBaallType(that.getType(), data);
         Token identifier = that.getIdentifier().getIdentifier();
         try {
-            symbolTable.registerSymbol(identifier.value(), data, type, false, identifier.lineInformation());
+            symbolTable.registerSymbol(
+                    StringIdentifier.of(identifier.value()),
+                    data,
+                    type,
+                    false,
+                    identifier.lineInformation()
+            );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
         }
@@ -56,7 +69,13 @@ public class SymbolScanner extends ScopeTraverser {
         BaallType type = mapNodeToBaallType(that.getType(), data);
         Token identifier = that.getIdentifier().getIdentifier();
         try {
-            symbolTable.registerSymbol(identifier.value(), data, type, true, identifier.lineInformation());
+            symbolTable.registerSymbol(
+                    StringIdentifier.of(identifier.value()),
+                    data,
+                    type,
+                    true,
+                    identifier.lineInformation()
+            );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
         }

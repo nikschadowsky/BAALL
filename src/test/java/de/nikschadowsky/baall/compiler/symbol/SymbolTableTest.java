@@ -23,13 +23,17 @@ class SymbolTableTest {
     private final PrimitiveType primitiveType = BaallTypeFactory.create()
                                                                 .createPrimitiveType(PrimitiveTypeNode.Kind.STRUCT);
     private final FunctionType functionType = BaallTypeFactory.create().createFunctionType(primitiveType, List.of());
-    private final Scope majorScope = Scope.create(Scope.ROOT);
-    private final Scope minorScope1 = Scope.createLogicalScope(majorScope);
-    private final Scope majorSubscope = Scope.create(majorScope);
-    private final Scope minorScope2 = Scope.createLogicalScope(majorSubscope);
+
+    private final Scope mainScope = Scope.create(Scope.ROOT);
+    private final Scope minorChildA = Scope.createLogicalScope(mainScope);
+    private final Scope minorChildB = Scope.createLogicalScope(mainScope);
+    private final Scope majorChildA = Scope.create(minorChildA);
+    private final Scope minorGrandchildOfA = Scope.createLogicalScope(majorChildA);
+
     private final LineInformation lineInformation1 = new LineInformation(0, 0);
     private final LineInformation lineInformation2 = new LineInformation(0, 2);
 
+    // unit under test
     private SymbolTable symbolTable;
 
     @BeforeEach
@@ -38,66 +42,67 @@ class SymbolTableTest {
     }
 
     @Test
-    void registerSymbol() {
+    void registerSymbolAndFunction() {
         assertThatCode(() -> symbolTable.registerSymbol(
                 StringIdentifier.of("identifier"),
-                majorScope,
+                mainScope,
                 primitiveType,
                 true,
                 lineInformation1
         )).doesNotThrowAnyException();
 
-        // there is no symbol overloading
+        // registering a symbol with the same identifier in a minor scope should fail
         assertThatThrownBy(() -> symbolTable.registerSymbol(
                 StringIdentifier.of("identifier"),
-                majorScope,
+                minorChildA,
                 primitiveType,
                 false,
                 lineInformation2
         )).isInstanceOf(SymbolAlreadyExistsException.class);
 
-        // ... even when you mix functions and symbols
+        // registering a function with the same identifier in a minor scope should fail
         assertThatThrownBy(() -> symbolTable.registerFunction(
                 StringIdentifier.of("identifier"),
-                majorScope,
+                minorChildB,
                 functionType,
                 true,
                 lineInformation1
         )).isInstanceOf(SymbolAlreadyExistsException.class);
 
+        // registering in another major scope should work
         assertThatCode(() -> symbolTable.registerSymbol(
                 StringIdentifier.of("identifier"),
-                majorSubscope,
+                majorChildA,
                 primitiveType,
-                true,
-                lineInformation1
-        )).doesNotThrowAnyException();
-
-        assertThatCode(() -> symbolTable.registerFunction(
-                StringIdentifier.of("identifier"),
-                minorScope2,
-                functionType,
                 true,
                 lineInformation1
         )).doesNotThrowAnyException();
 
         assertThatCode(() -> symbolTable.registerSymbol(
                 NestedIdentifier.of("first", "second1"),
-                majorScope,
+                minorChildA,
                 primitiveType,
                 false,
                 lineInformation1
         )).doesNotThrowAnyException();
         assertThatCode(() -> symbolTable.registerSymbol(
                 NestedIdentifier.of("first", "second2"),
-                majorScope,
+                minorChildA,
                 primitiveType,
                 false,
                 lineInformation1
         )).doesNotThrowAnyException();
+        assertThatCode(() -> symbolTable.registerSymbol(
+                NestedIdentifier.of("first", "second1"),
+                minorChildB,
+                primitiveType,
+                false,
+                lineInformation1
+        )).doesNotThrowAnyException();
+
         assertThatThrownBy(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second2"),
-                minorScope1,
+                NestedIdentifier.of("first", "second1"),
+                minorChildA,
                 primitiveType,
                 false,
                 lineInformation1
@@ -106,31 +111,34 @@ class SymbolTableTest {
 
     @Test
     void hasSymbolRegisteredInScope() throws SymbolAlreadyExistsException {
-        assertThat(symbolTable).doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT);
+        assertThat(symbolTable).doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), mainScope);
         symbolTable.registerSymbol(
                 StringIdentifier.of("identifier"),
-                majorScope,
+                mainScope,
                 primitiveType,
                 true,
                 lineInformation1
         );
 
-        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), majorScope)
-                               .hasSymbolRegistered(StringIdentifier.of("identifier"), minorScope1)
+        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), mainScope)
+                               .hasSymbolRegistered(StringIdentifier.of("identifier"), minorChildA)
+                               .hasSymbolRegistered(StringIdentifier.of("identifier"), minorChildB)
                                .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("function"), majorScope);
+                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
+                               .doesNotHaveSymbolRegistered(StringIdentifier.of("function"), mainScope);
 
         symbolTable.registerFunction(
                 StringIdentifier.of("function"),
-                majorScope,
+                mainScope,
                 functionType,
                 false,
                 lineInformation2
         );
-        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), majorScope)
-                               .hasSymbolRegistered(StringIdentifier.of("function"), majorScope)
-                               .hasSymbolRegistered(StringIdentifier.of("function"), minorScope1)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT);
+        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), mainScope)
+                               .hasSymbolRegistered(StringIdentifier.of("function"), mainScope)
+                               .hasSymbolRegistered(StringIdentifier.of("function"), minorChildA)
+                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
+                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), majorChildA);
 
         symbolTable.registerSymbol(
                 StringIdentifier.of("identifier"),
@@ -143,90 +151,14 @@ class SymbolTableTest {
 
         symbolTable.registerSymbol(
                 NestedIdentifier.of("first", "second"),
-                majorScope,
+                mainScope,
                 primitiveType,
                 true,
                 lineInformation1
         );
-        assertThat(symbolTable).hasSymbolRegistered(NestedIdentifier.of("first", "second"), minorScope1);
-    }
-
-    @Test
-    void testScopeHierarchy() throws SymbolAlreadyExistsException {
-        symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                majorScope,
-                primitiveType,
-                true,
-                lineInformation1
-        );
-
-        // registering in another major should work
-        assertThatCode(
-                () -> symbolTable.registerSymbol(
-                        StringIdentifier.of("identifier"),
-                        Scope.ROOT,
-                        primitiveType,
-                        true,
-                        lineInformation1
-                )
-        ).doesNotThrowAnyException();
-        // registering in the same major should not work
-        assertThatThrownBy(
-                () -> symbolTable.registerSymbol(
-                        StringIdentifier.of("identifier"),
-                        majorScope,
-                        functionType,
-                        true,
-                        lineInformation1
-                )
-        ).isInstanceOf(SymbolAlreadyExistsException.class);
-
-        // registering with the same identifier in a minor scope should fail
-        assertThatThrownBy(
-                () -> symbolTable.registerSymbol(
-                        StringIdentifier.of("identifier"),
-                        minorScope1,
-                        primitiveType,
-                        false,
-                        lineInformation2
-                )
-        ).isInstanceOf(SymbolAlreadyExistsException.class);
-        assertThatThrownBy(
-                () -> symbolTable.registerFunction(
-                        StringIdentifier.of("identifier"),
-                        minorScope1,
-                        functionType,
-                        true,
-                        lineInformation2
-                )
-        ).isInstanceOf(SymbolAlreadyExistsException.class);
-
-        // nested elements are allowed
-        assertThatCode(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("identifier", "element1"),
-                majorScope,
-                functionType,
-                true,
-                lineInformation2
-        )).doesNotThrowAnyException();
-        // even in minor scopes
-        assertThatCode(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("identifier", "element2"),
-                minorScope1,
-                functionType,
-                true,
-                lineInformation2
-        )).doesNotThrowAnyException();
-
-        symbolTable.registerSymbol(StringIdentifier.of("other"), minorScope1, primitiveType, true, lineInformation2);
-        assertThatCode(() -> symbolTable.registerSymbol(
-                StringIdentifier.of("other"),
-                Scope.createLogicalScope(majorScope),
-                functionType,
-                true,
-                lineInformation2
-        )).doesNotThrowAnyException();
+        assertThat(symbolTable).hasSymbolRegistered(NestedIdentifier.of("first", "second"), minorChildA)
+                               .hasSymbolRegistered(NestedIdentifier.of("first", "second"), mainScope)
+                               .doesNotHaveSymbolRegistered(NestedIdentifier.of("first", "second"), majorChildA);
     }
 
     @Test
@@ -237,26 +169,33 @@ class SymbolTableTest {
     @Test
     void isConstant() throws SymbolAlreadyExistsException {
         symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                majorScope,
+                StringIdentifier.of("main"),
+                mainScope,
                 primitiveType,
                 true,
                 lineInformation1
         );
-        assertThat(symbolTable).isConstant(StringIdentifier.of("identifier"), majorScope);
+        assertThat(symbolTable).isConstant(StringIdentifier.of("main"), mainScope);
+        assertThatThrownBy(
+                () -> symbolTable.isConstant(StringIdentifier.of("main"), minorChildB)
+        ).isInstanceOf(NoSymbolFoundException.class);
 
         symbolTable.registerSymbol(
                 StringIdentifier.of("identifier2"),
-                majorScope,
+                majorChildA,
                 primitiveType,
                 false,
                 lineInformation2
         );
-        assertThat(symbolTable).isNotConstant(StringIdentifier.of("identifier2"), majorScope);
+        assertThat(symbolTable).isNotConstant(StringIdentifier.of("identifier2"), majorChildA);
+        assertThatThrownBy(
+                () -> symbolTable.isConstant(StringIdentifier.of("identifier2"), minorGrandchildOfA)
+        ).isInstanceOf(NoSymbolFoundException.class);
 
         assertThatThrownBy(() -> symbolTable.isConstant(
                 StringIdentifier.of("invalid"),
-                majorScope
+                mainScope
         )).isInstanceOf(NoSymbolFoundException.class);
     }
+
 }

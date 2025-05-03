@@ -2,16 +2,15 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.controls
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @since 11.08.2024
@@ -56,6 +55,33 @@ public final class TryStatementNodeImpl extends AbstractNode implements TryState
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.TRY;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof TryStatementNodeImpl that)) return false;
+        return Objects.equals(getBody(), that.getBody())
+                       && Objects.equals(getInterceptBlocks(), that.getInterceptBlocks())
+                       && Objects.equals(getEnsureBlock(), that.getEnsureBlock())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getBody(), getInterceptBlocks(), getEnsureBlock(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "try {s} %s%s".formatted(
+                getInterceptBlocks().stream()
+                                    .map(InterceptStatementNode::getDisplayDescriptor)
+                                    .collect(Collectors.joining(" ")),
+                getEnsureBlock().map(Node::getDisplayDescriptor)
+                                .map(" %s"::formatted)
+                                .orElse("")
+        );
     }
 
     @Override

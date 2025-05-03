@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 29.07.2024
  */
@@ -50,6 +52,30 @@ public final class BinaryExpressionNodeImpl extends AbstractNode implements Bina
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.BINARY_EXPRESSION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof BinaryExpressionNodeImpl that)) return false;
+        return Objects.equals(getLeftOperand(), that.getLeftOperand())
+                       && Objects.equals(getOperator(), that.getOperator())
+                       && Objects.equals(getRightOperand(), that.getRightOperand())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getLeftOperand(), getOperator(), getRightOperand(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s %s %s".formatted(
+                getLeftOperand().getDisplayDescriptor(),
+                getOperator().getDisplayDescriptor(),
+                getRightOperand().getDisplayDescriptor()
+        );
     }
 
     @Override

@@ -23,7 +23,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public sealed interface Node extends ASTVisitable
         permits AbstractNode, ExpressionNode, OperatorNode, ExportsNode, ImportsNode, ProgramNode, StatementsNode,
-        StatementNode, EnsureStatementNode, InterceptStatementNode, TypeNode, FieldNode {
+                StatementNode, EnsureStatementNode, InterceptStatementNode, TypeNode, FieldNode {
+
+    /**
+     * Returns a human-readable representation of this node.
+     *
+     * @return human-readable representation of this node; cannot be null
+     */
+    @NotNull
+    String getDisplayDescriptor();
 
     /**
      * Type of the node. Can be used for type checking without instanceof.

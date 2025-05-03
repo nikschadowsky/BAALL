@@ -10,10 +10,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @since 21.04.2024
@@ -65,6 +63,30 @@ public final class ExportsNodeImpl extends AbstractNode implements ExportsNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.EXPORT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ExportsNodeImpl that)) return false;
+        return Objects.equals(getExportedElements(), that.getExportedElements())
+                       && Objects.equals(getNamespace(), that.getNamespace())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getExportedElements(), getNamespace(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "export {%s}%s;".formatted(
+                getExportedElements().stream()
+                                     .map(ElementAccessNode::getDisplayDescriptor)
+                                     .collect(Collectors.joining(",")),
+                getNamespace().map(IdentifierNode::getDisplayDescriptor).map(" as %s"::formatted).orElse("")
+        );
     }
 
     @Override

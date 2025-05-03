@@ -6,6 +6,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 29.07.2024
  */
@@ -29,6 +31,24 @@ public final class ParenthesizedExpressionNodeImpl extends AbstractNode implemen
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PAREN_EXPRESSION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ParenthesizedExpressionNodeImpl that)) return false;
+        return Objects.equals(getInnerExpressionNode(), that.getInnerExpressionNode())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInnerExpressionNode(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "(%s)".formatted(getInnerExpressionNode().getDisplayDescriptor());
     }
 
     @Override

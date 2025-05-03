@@ -10,6 +10,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -75,6 +76,43 @@ public final class ForLoopNodeImpl extends AbstractNode implements ForLoopNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.FOR;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ForLoopNodeImpl that)) return false;
+        return Objects.equals(getIdentifier(), that.getIdentifier())
+                       && Objects.equals(getStartIndexExpression(), that.getStartIndexExpression())
+                       && Objects.equals(getEndIndexExpression(), that.getEndIndexExpression())
+                       && Objects.equals(getOptionalStepperStatement(), that.getOptionalStepperStatement())
+                       && Objects.equals(getBody(), that.getBody())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                getIdentifier(),
+                getStartIndexExpression(),
+                getEndIndexExpression(),
+                getOptionalStepperStatement(),
+                getBody(),
+                getNodeType()
+        );
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "for %s=%s..%s%s {%s}".formatted(
+                getIdentifier().getIdentifier().getDisplayDescriptor(), // we just want the identifier here
+                getStartIndexExpression().getDisplayDescriptor(),
+                getEndIndexExpression().getDisplayDescriptor(),
+                getOptionalStepperStatement().map(ReassignmentNode::getDisplayDescriptor)
+                                             .map("::%s"::formatted)
+                                             .orElse(""),
+                getBody().getDisplayDescriptor()
+        );
     }
 
     @Override

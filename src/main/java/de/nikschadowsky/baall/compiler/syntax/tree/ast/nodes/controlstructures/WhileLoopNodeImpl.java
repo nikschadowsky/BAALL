@@ -8,6 +8,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 21.04.2024
  */
@@ -41,6 +43,25 @@ public final class WhileLoopNodeImpl extends AbstractNode implements WhileLoopNo
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.WHILE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof WhileLoopNodeImpl that)) return false;
+        return Objects.equals(getCondition(), that.getCondition())
+                       && Objects.equals(getBody(), that.getBody())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCondition(), getBody(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "while %s {%s}".formatted(getCondition().getDisplayDescriptor(), getBody().getDisplayDescriptor());
     }
 
     @Override

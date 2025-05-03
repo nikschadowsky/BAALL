@@ -6,6 +6,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 30.07.2024
  */
@@ -23,6 +25,23 @@ public final class ContinueStatementNodeImpl extends AbstractNode implements Con
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.CONTINUE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ContinueStatementNodeImpl that)) return false;
+        return getNodeType().equals(that.getNodeType()) && getStatementType().equals(that.getStatementType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "continue";
     }
 
     @Override

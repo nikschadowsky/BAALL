@@ -8,6 +8,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 09.03.2025
  */
@@ -41,6 +43,25 @@ public final class IdentifierTypeNodeImpl extends AbstractNode implements Identi
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.IDENTIFIER_TYPE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof IdentifierTypeNodeImpl that)) return false;
+        return Objects.equals(getType(), that.getType())
+                       && isNoneSafe() == that.isNoneSafe()
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getType(), isNoneSafe(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s%s".formatted(getType().getDisplayDescriptor(), isNoneSafe() ? "!" : "");
     }
 
     @Override

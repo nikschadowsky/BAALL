@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 09.03.2025
  */
@@ -35,6 +37,24 @@ public final class ListTypeNodeImpl extends AbstractNode implements ListTypeNode
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.NESTED_TYPE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ListTypeNodeImpl that)) return false;
+        return Objects.equals(getInnerType(), that.getInnerType())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInnerType(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s[]".formatted(getInnerType().getDisplayDescriptor());
     }
 
     @Override

@@ -14,20 +14,26 @@ public sealed interface PrimitiveTypeNode extends SimpleTypeNode permits Primiti
     Kind getKind();
 
     enum Kind {
-        STRING(SyntaxSet.LANGUAGE_ELEMENTS.get("string")),
-        NUMBER(SyntaxSet.LANGUAGE_ELEMENTS.get("number")),
-        BOOLEAN(SyntaxSet.LANGUAGE_ELEMENTS.get("boolean")),
-        STRUCT(SyntaxSet.LANGUAGE_ELEMENTS.get("struct")),
-        EXCEPTION(SyntaxSet.LANGUAGE_ELEMENTS.get("exception"));
+        STRING(SyntaxSet.LANGUAGE_ELEMENTS.get("string"), "string"),
+        NUMBER(SyntaxSet.LANGUAGE_ELEMENTS.get("number"), "number"),
+        BOOLEAN(SyntaxSet.LANGUAGE_ELEMENTS.get("boolean"), "boolean"),
+        STRUCT(SyntaxSet.LANGUAGE_ELEMENTS.get("struct"), "struct"),
+        EXCEPTION(SyntaxSet.LANGUAGE_ELEMENTS.get("exception"), "exception");
 
         private final LanguageElement mapping;
+        private final String displayDescriptor;
 
-        Kind(LanguageElement mapping) {
+        Kind(LanguageElement mapping, String displayDescriptor) {
             this.mapping = mapping;
+            this.displayDescriptor = displayDescriptor;
         }
 
         public static Kind findMapping(Token token) {
             return Arrays.stream(values()).filter(kind -> kind.mapping.matches(token)).findFirst().orElseThrow();
+        }
+
+        public String getDisplayDescriptor() {
+            return displayDescriptor;
         }
     }
 }

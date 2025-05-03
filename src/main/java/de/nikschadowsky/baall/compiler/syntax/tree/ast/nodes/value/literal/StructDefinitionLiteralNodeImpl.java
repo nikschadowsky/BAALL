@@ -11,6 +11,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @since 29.07.2024
@@ -35,6 +37,23 @@ public final class StructDefinitionLiteralNodeImpl extends AbstractNode implemen
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.STRUCT_DEFINITION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StructDefinitionLiteralNodeImpl that)) return false;
+        return Objects.equals(getFields(), that.getFields()) && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFields(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return getFields().stream().map(FieldNode::getDisplayDescriptor).collect(Collectors.joining(",", "(", ")"));
     }
 
     @Override

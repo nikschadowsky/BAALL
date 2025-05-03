@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 11.08.2024
  */
@@ -30,6 +32,23 @@ public final class RaiseStatementNodeImpl extends AbstractNode implements RaiseS
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.RAISE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof RaiseStatementNodeImpl that)) return false;
+        return Objects.equals(getException(), that.getException()) && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getException(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "raise %s".formatted(getException().getDisplayDescriptor());
     }
 
     @Override

@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 29.07.2024
  */
@@ -50,6 +52,28 @@ public final class UnaryExpressionNodeImpl extends AbstractNode implements Unary
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.UNARY_EXPRESSION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof UnaryExpressionNodeImpl that)) return false;
+        return Objects.equals(getElementAccess(), that.getElementAccess())
+                       && Objects.equals(getOperator(), that.getOperator())
+                       && isPrefix() == that.isPrefix()
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getElementAccess(), getOperator(), isPrefix(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        String op = getOperator().getDisplayDescriptor();
+        String element = getElementAccess().getDisplayDescriptor();
+        return isPrefix() ? "%s%s".formatted(op, element) : "%s%s".formatted(element, op);
     }
 
     @Override

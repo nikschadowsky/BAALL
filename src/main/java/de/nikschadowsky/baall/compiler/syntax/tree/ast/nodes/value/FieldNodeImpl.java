@@ -9,6 +9,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 27.01.2025
  */
@@ -39,10 +41,28 @@ public final class FieldNodeImpl extends AbstractNode implements FieldNode {
         this.name = name;
     }
 
-
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.FIELD;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof FieldNodeImpl that)) return false;
+        return Objects.equals(getType(), that.getType())
+                       && Objects.equals(getIdentifier(), that.getIdentifier())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getType(), getIdentifier(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s: %s".formatted(getType().getDisplayDescriptor(), getIdentifier().getDisplayDescriptor());
     }
 
     @Override

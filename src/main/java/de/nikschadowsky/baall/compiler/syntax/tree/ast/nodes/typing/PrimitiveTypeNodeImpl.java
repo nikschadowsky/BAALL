@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 09.03.2025
  */
@@ -35,6 +37,23 @@ public final class PrimitiveTypeNodeImpl extends AbstractNode implements Primiti
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PRIMITIVE_TYPE;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof PrimitiveTypeNodeImpl that)) return false;
+        return getKind() == that.getKind() && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getKind(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s".formatted(getKind().getDisplayDescriptor());
     }
 
     @Override

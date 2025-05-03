@@ -8,6 +8,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 11.08.2024
  */
@@ -41,6 +43,29 @@ public final class InterceptStatementNodeImpl extends AbstractNode implements In
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.INTERCEPT;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof InterceptStatementNodeImpl that)) return false;
+        return Objects.equals(getCaughtException(), that.getCaughtException())
+                       && Objects.equals(getBody(), that.getBody())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCaughtException(), getBody(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "intercept %s: %s {%s}".formatted(
+                getCaughtException().getType().getDisplayDescriptor(),
+                getCaughtException().getIdentifier().getDisplayDescriptor(),
+                getBody().getDisplayDescriptor()
+        );
     }
 
     @Override

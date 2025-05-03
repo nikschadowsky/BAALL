@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @since 14.04.2024
@@ -63,6 +64,30 @@ public final class ProgramNodeImpl extends AbstractNode implements ProgramNode {
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.PROGRAM;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ProgramNodeImpl that)) return false;
+        return Objects.equals(getImports(), that.getImports()) && Objects.equals(getStatements(), that.getStatements())
+                       && Objects.equals(getExports(), that.getExports())
+                       && Objects.equals(getDiagnosticCollector(), that.getDiagnosticCollector())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getImports(), getStatements(), getExports(), getDiagnosticCollector(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s%s%s".formatted(
+                getImports().getDisplayDescriptor(),
+                getStatements().getDisplayDescriptor(),
+                getExports().getDisplayDescriptor()
+        );
     }
 
     @Override

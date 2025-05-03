@@ -9,6 +9,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 30.07.2024
  */
@@ -52,6 +54,26 @@ public final class ConstantDeclarationNodeImpl extends AbstractNode implements C
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.CONSTANT_DECLARATION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ConstantDeclarationNodeImpl that)) return false;
+        return Objects.equals(getType(), that.getType())
+                       && Objects.equals(getIdentifier(), that.getIdentifier())
+                       && Objects.equals(getInitializationValue(), that.getInitializationValue())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getType(), getIdentifier(), getInitializationValue(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s: %s := %s".formatted(getType().getDisplayDescriptor(), getIdentifier().getDisplayDescriptor(), getInitializationValue());
     }
 
     @Override

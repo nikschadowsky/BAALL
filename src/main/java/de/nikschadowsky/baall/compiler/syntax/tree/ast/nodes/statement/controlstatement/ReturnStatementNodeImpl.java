@@ -7,6 +7,8 @@ import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * @since 30.07.2024
  */
@@ -30,6 +32,23 @@ public final class ReturnStatementNodeImpl extends AbstractNode implements Retur
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.RETURN;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ReturnStatementNodeImpl that)) return false;
+        return Objects.equals(getReturnExpression(), that.getReturnExpression()) && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getReturnExpression(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "return %s".formatted(getReturnExpression().getDisplayDescriptor());
     }
 
     @Override

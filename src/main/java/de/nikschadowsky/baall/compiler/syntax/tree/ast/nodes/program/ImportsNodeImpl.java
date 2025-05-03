@@ -12,6 +12,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @since 13.04.2024
@@ -56,6 +58,22 @@ public final class ImportsNodeImpl extends AbstractNode implements ImportsNode {
         return NodeType.IMPORT;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ImportsNodeImpl that)) return false;
+        return Objects.equals(getImports(), that.getImports()) && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getImports(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return getImports().stream().map(Token::value).map("use \"%s\";"::formatted).collect(Collectors.joining());
+    }
 
     @Override
     public <D, R> R accept(ASTVisitor<D, R> visitor, D data) {

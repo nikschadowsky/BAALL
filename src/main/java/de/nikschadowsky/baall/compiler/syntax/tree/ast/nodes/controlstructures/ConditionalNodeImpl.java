@@ -9,6 +9,7 @@ import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -73,6 +74,31 @@ public final class ConditionalNodeImpl extends AbstractNode implements Condition
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.IF;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ConditionalNodeImpl that)) return false;
+        return Objects.equals(getCondition(), that.getCondition())
+                       && Objects.equals(getThenBlock(), that.getThenBlock())
+                       && Objects.equals(getElseBranch(), that.getElseBranch())
+                       && getConditionBranch() == that.getConditionBranch()
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCondition(), getThenBlock(), getElseBranch(), getConditionBranch(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "%s? {%s}%s".formatted(
+                getCondition().getDisplayDescriptor(),
+                getThenBlock().getDisplayDescriptor(),
+                getElseBranch().map(ConditionalNode::getDisplayDescriptor).map(" | %s"::formatted).orElse("")
+        );
     }
 
     @Override

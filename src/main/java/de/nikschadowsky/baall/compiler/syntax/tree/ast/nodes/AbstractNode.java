@@ -16,6 +16,18 @@ public abstract non-sealed class AbstractNode implements Node {
         this.diagnostics = diagnostics;
     }
 
+    /**
+     * Compares a node to
+     */
+    public abstract boolean equals(Object obj);
+
+    public abstract int hashCode();
+
+    @Override
+    public String toString() {
+        return getDisplayDescriptor();
+    }
+
     @Override
     public @NotNull NodeDiagnosticCollector getDiagnosticCollector() {
         return diagnostics;

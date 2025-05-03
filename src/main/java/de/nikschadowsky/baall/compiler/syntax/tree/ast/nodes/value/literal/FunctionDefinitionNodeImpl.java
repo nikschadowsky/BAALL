@@ -2,6 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
@@ -12,6 +13,8 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @since 28.07.2024
@@ -46,6 +49,28 @@ public final class FunctionDefinitionNodeImpl extends AbstractNode implements Fu
     @Override
     public @NotNull NodeType getNodeType() {
         return NodeType.FUNCTION_DEFINITION;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof FunctionDefinitionNodeImpl that)) return false;
+        return Objects.equals(getParameters(), that.getParameters())
+                       && Objects.equals(getFunctionBody(), that.getFunctionBody())
+                       && getNodeType().equals(that.getNodeType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getParameters(), getFunctionBody(), getNodeType());
+    }
+
+    @Override
+    public @NotNull String getDisplayDescriptor() {
+        return "(%s) {%s}".formatted(
+                getParameters().stream().map(Node::getDisplayDescriptor).collect(Collectors.joining(",")),
+                getFunctionBody().getDisplayDescriptor()
+        );
     }
 
     @Override

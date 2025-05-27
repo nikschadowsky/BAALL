@@ -1,4 +1,4 @@
-# Typing
+# Typing system
 
 BAALL follows a strict, static and explicit typing model. The language features builtin types. While primitive types are
 the basis of the typesystem, the definition of composition types allows for very flexible typing. Every field or
@@ -26,10 +26,10 @@ struct: myValidType := (...);  // ✅ this is correct
 struct: myInvalidType = (...); // ❌ compilation error
 ```
 
-###### use-before-declare
+###### Use-before-declare
 
 Functions and user types support use-before-declare. This is typesafe and none-safe behavior on user types because
-structs and exceptions are constants and therefore cannot be none.
+structs and exceptions are constants and therefore are none-safe.
 
 With functions there needs to be a restriction. Only
 constant function declarations are use-before-declare because they are known at compile time and functions are none-safe
@@ -43,3 +43,10 @@ number<>: myVariableFunction = () {...}  // ❌ does not support use-before-decl
 
 The compiler enforces this behavior and will raise a compilation exception if you try to use a variable function before
 it is declared.
+
+###### Of scopes and types
+
+As mentioned in [Use-before-declare](#use-before-declare) BAALL types can be used before they appear in your code. This
+behavior extends across scope borders. BAALL's scoping model disallows the declaration of elements with identical
+identifiers within a major scope. This forces all use-before-declare types to be unambiguous within their major scope
+meaning there cannot be an element with the same identifier in this major scope.

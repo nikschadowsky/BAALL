@@ -15,6 +15,8 @@ Example:
 
 A function type that returns a number and expects a parameterless string function.
 
+Function types are none-safe by default. Fields that can hold a function, therefore, cannot be none.
+
 ###### **list type**:
 
 A list type is a type declaring something as a variable size container of some other type. A list type is declared by

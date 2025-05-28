@@ -1,9 +1,10 @@
 package de.nikschadowsky.baall.compiler.util;
 
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Queue;
+import de.nikschadowsky.baall.compiler.semantic.type.FunctionType;
+
+import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 
 /**
  * @since 15.02.2024
@@ -49,4 +50,18 @@ public class CollectionUtility {
         }
         return true;
     }
+
+    public static <S, T> List<T> duplicates(Collection<S> collection, Function<S, T> equalityMapper) {
+        Set<T> set = new HashSet<>();
+        List<T> duplicates = new ArrayList<>();
+        collection.stream().map(equalityMapper).forEach(
+                e -> {
+                    if (!set.add(e)) {
+                        duplicates.add(e);
+                    }
+                }
+        );
+        return duplicates;
+    }
+
 }

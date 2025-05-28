@@ -49,7 +49,7 @@ for i=0..10{
 
 char: no = none;
 
-exception: myCustomException := (string: message, int epochTime)
+exception: myCustomException := (string: message, number: epochTime)
 
 raise myCustomException("exception cause", 1230451);
 

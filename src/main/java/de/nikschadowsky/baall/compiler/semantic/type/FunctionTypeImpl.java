@@ -13,4 +13,9 @@ record FunctionTypeImpl(BaallType returnType, List<BaallType> parameterTypes) im
     public List<BaallType> getParameterTypes() {
         return Collections.unmodifiableList(parameterTypes);
     }
+
+    @Override
+    public boolean isNoneSafe() {
+        return true;
+    }
 }

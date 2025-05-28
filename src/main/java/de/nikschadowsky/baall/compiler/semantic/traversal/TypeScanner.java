@@ -10,6 +10,7 @@ import de.nikschadowsky.baall.compiler.symbol.TypeAlreadyExistsException;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.ConstantDeclarationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.statement.assignment.VariableDeclarationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.StructDefinitionLiteralNode;
 
 public class TypeScanner extends ScopeTraverser {
 
@@ -25,16 +26,17 @@ public class TypeScanner extends ScopeTraverser {
 
     @Override
     public Boolean visitConstantDeclaration(ConstantDeclarationNode that, Scope scope) {
-        if (that.getType() instanceof PrimitiveTypeNode type) {
-            Token identifier = that.getIdentifier().getIdentifier();
+        if (that.getType() instanceof PrimitiveTypeNode type && that.getInitializationValue() instanceof StructDefinitionLiteralNode structDefinition) {
             try {
                 switch (type.getKind()) {
-                    case STRUCT -> table.registerType(identifier.value(), scope, TypeReference.Kind.STRUCT);
-                    case EXCEPTION -> table.registerType(identifier.value(), scope, TypeReference.Kind.EXCEPTION);
+                    case STRUCT ->
+                            table.registerType(that.getIdentifier(), scope, TypeReference.Kind.STRUCT, structDefinition);
+                    case EXCEPTION ->
+                            table.registerType(that.getIdentifier(), scope, TypeReference.Kind.EXCEPTION, structDefinition);
                 }
             } catch (TypeAlreadyExistsException e) {
                 diagnosticCollector.addError(new SemanticDiagnostic(
-                        "Type with name '%s' already declared in this scope!".formatted(identifier))
+                        "Type with name '%s' already declared in this scope!".formatted(that.getIdentifier().getIdentifier().value()))
                 );
             }
         }

@@ -3,6 +3,7 @@ package de.nikschadowsky.baall.compiler.syntax.analysis;
 import de.nikschadowsky.baall.compiler._utility.ParserMockerExtension;
 import de.nikschadowsky.baall.compiler._utility.TokenQueueTestBuilder;
 import de.nikschadowsky.baall.compiler._utility.ast.NodeAssertionFactory;
+import de.nikschadowsky.baall.compiler._utility.ast.nodes.ExpressionNodeAssertion;
 import de.nikschadowsky.baall.compiler._utility.ast.nodes.TypeNodeAssertion;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
@@ -490,24 +491,24 @@ class AuxiliaryParserImplTest {
         actual = auxiliaryParser.parseElementAccess(queue);
         assertThat(actual).isSuccessful().map(NodeAssertionFactory::create)
                           .isMemberReference()
-                          .hasSelfMatching(a -> a.isIdentifier().hasName("myIdentifier1"))
+                          .hasSelectedMatching(a -> a.hasName("myIdentifier2"))
                           .mapToInner()
                           .isIdentifier()
-                          .hasName("myIdentifier2");
+                          .hasName("myIdentifier1");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("$")
                                            .identifier("myIdentifier1")
                                            .separator("[")
-                                           .number("expr")
+                                           .number("expr0")
                                            .separator("]")
                                            .separator(".")
                                            .identifier("myIdentifier2")
                                            .separator("[")
-                                           .number("expr")
+                                           .number("expr1")
                                            .separator("]")
                                            .separator("[")
-                                           .number("expr")
+                                           .number("expr2")
                                            .separator("]")
                                            .separator(";")
                                            .build();
@@ -515,22 +516,20 @@ class AuxiliaryParserImplTest {
         assertThat(actual).isSuccessful().map(NodeAssertionFactory::create)
                           .isScopeElevation()
                           .mapToInner()
+                          .isIndexedAccess()
+                          .hasIndexMatching(b -> b.isEqualTo(mockedExpression))
+                          .mapToInner()
+                          .isIndexedAccess()
+                          .hasIndexMatching(b -> b.isEqualTo(mockedExpression))
+                          .mapToInner()
                           .isMemberReference()
-                          .hasSelfMatching(a -> a.isIndexedAccess()
-                                                 .hasIndexMatching(a1 -> a1.isEqualTo(mockedExpression))
-                                                 .mapToInner()
-                                                 .isIdentifier()
-                                                 .hasName("myIdentifier1")
-                          )
+                          .hasSelectedMatching(b -> b.hasName("myIdentifier2"))
                           .mapToInner()
                           .isIndexedAccess()
-                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
-                          .mapToInner()
-                          .isIndexedAccess()
-                          .hasIndexMatching(a -> a.isEqualTo(mockedExpression))
+                          .hasIndexMatching(b -> b.isEqualTo(mockedExpression))
                           .mapToInner()
                           .isIdentifier()
-                          .hasName("myIdentifier2");
+                          .hasName("myIdentifier1");
         assertThat(queue).hasNextTokenValueMatch(";");
 
         queue = new TokenQueueTestBuilder().operator("$").separator(";").build();

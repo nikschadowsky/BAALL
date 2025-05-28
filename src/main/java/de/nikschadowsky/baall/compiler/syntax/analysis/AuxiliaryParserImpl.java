@@ -458,33 +458,53 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
         }
         queue.mergeBranch(parsedArrayIndices.getTokenQueueId());
 
-        ElementAccessNode self = parsedIdentifier.getParseResult();
+        ElementAccessNode inner = parsedIdentifier.getParseResult();
 
         for (ExpressionNode index : parsedArrayIndices.getParseResult()) {
             IndexedAccessNodeImpl indexNode = astFactory.createIndexedAccessNode();
             indexNode.setIndex(index);
-            indexNode.setInner(self);
-            self = indexNode;
+            indexNode.setInner(inner);
+            inner = indexNode;
         }
 
         if (SyntaxSet.LANGUAGE_ELEMENTS.get(".").matches(queue.peek())) {
             queue.poll();
-
-            MemberReferenceNodeImpl node = astFactory.createMemberReferenceNode();
-
-            ParseResult<ElementAccessNode> parsedElementAccess =
-                    parseElementAccessWithoutScopeElevation(queue.branchOff());
-            if (parsedElementAccess.isUnsuccessful()) {
-                return ParseResult.unsuccessfulParse(parsedElementAccess.getDiagnostic(), queue.getId());
-            }
-            queue.mergeBranch(parsedElementAccess.getTokenQueueId());
-            node.setSelf(self);
-            node.setInner(parsedElementAccess.getParseResult());
-
-            self = node;
+            return parseMemberSelection(queue, inner);
         }
 
-        return ParseResult.successfulParse(self, queue.getId());
+        return ParseResult.successfulParse(inner, queue.getId());
+    }
+
+    private ParseResult<ElementAccessNode> parseMemberSelection(TokenQueue queue, ElementAccessNode inner) {
+        ParseResult<IdentifierNode> parsedIdentifier = parseIdentifier(queue.branchOff());
+        if (parsedIdentifier.isUnsuccessful()) {
+            return ParseResult.unsuccessfulParse(parsedIdentifier.getDiagnostic(), queue.getId());
+        }
+        queue.mergeBranch(parsedIdentifier.getTokenQueueId());
+
+        ComponentAccessNodeImpl node = astFactory.createMemberReferenceNode();
+        node.setSelected(parsedIdentifier.getParseResult());
+        node.setInner(inner);
+        inner = node;
+
+        ParseResult<List<ExpressionNode>> parsedArrayIndices = parseListIndexInformation(queue.branchOff());
+        if (parsedArrayIndices.isUnsuccessful()) {
+            return ParseResult.unsuccessfulParse(parsedArrayIndices.getDiagnostic(), queue.getId());
+        }
+        queue.mergeBranch(parsedArrayIndices.getTokenQueueId());
+
+        for (ExpressionNode index : parsedArrayIndices.getParseResult()) {
+            IndexedAccessNodeImpl indexNode = astFactory.createIndexedAccessNode();
+            indexNode.setIndex(index);
+            indexNode.setInner(inner);
+            inner = indexNode;
+        }
+
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(".").matches(queue.peek())) {
+            queue.poll();
+            return parseMemberSelection(queue, inner);
+        }
+        return ParseResult.successfulParse(inner, queue.getId());
     }
 
     @PartialParse

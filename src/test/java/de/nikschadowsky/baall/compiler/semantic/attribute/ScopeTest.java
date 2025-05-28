@@ -25,4 +25,18 @@ class ScopeTest {
         assertThat(c).canAccess(Scope.ROOT);
         assertThat(c).cannotAccess(b);
     }
+
+    @Test
+    void getMajor() {
+        Scope a = Scope.createLogicalScope(Scope.ROOT);
+        assertThat(a.getMajor()).isEqualTo(Scope.ROOT);
+        Scope b = Scope.createLogicalScope(a);
+        assertThat(b.getMajor()).isEqualTo(Scope.ROOT);
+
+        Scope c = Scope.createLogicalScope(b);
+        assertThat(c.getMajor()).isEqualTo(Scope.ROOT);
+
+        Scope d = Scope.create(c);
+        assertThat(d.getMajor()).isEqualTo(d);
+    }
 }

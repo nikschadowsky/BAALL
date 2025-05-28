@@ -1,6 +1,7 @@
 package de.nikschadowsky.baall.compiler.semantic.attribute;
 
 
+import de.nikschadowsky.baall.compiler.symbol.OutOfScopeException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -57,6 +58,16 @@ public class Scope {
 
     public boolean isMajor() {
         return true;
+    }
+
+    public Scope getMajor() throws OutOfScopeException {
+        Scope current = this;
+        while (!current.isMajor()) {
+            current = current.getParent().orElseThrow(
+                    () -> new OutOfScopeException("Scope hierarchy does not have a major scope as its root!")
+            );
+        }
+        return current;
     }
 
     @Override

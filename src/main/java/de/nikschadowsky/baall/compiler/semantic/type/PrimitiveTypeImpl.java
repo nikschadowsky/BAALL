@@ -4,39 +4,25 @@ import org.jetbrains.annotations.NotNull;
 
 enum PrimitiveTypeImpl implements PrimitiveType {
 
-    NUMBER_TYPE {
-        @Override
-        public @NotNull Kind getKind() {
-            return Kind.NUMBER;
-        }
-    },
+    NUMBER_TYPE(Kind.NUMBER),
+    STRING_TYPE(Kind.STRING),
+    BOOLEAN_TYPE(Kind.BOOLEAN),
+    EXCEPTION_TYPE(Kind.EXCEPTION),
+    STRUCT_TYPE(Kind.STRUCT);
 
-    STRING_TYPE {
-        @Override
-        public @NotNull Kind getKind() {
-            return Kind.STRING;
-        }
-    },
+    private final Kind kind;
 
-    BOOLEAN_TYPE {
-        @Override
-        public @NotNull Kind getKind() {
-            return Kind.BOOLEAN;
-        }
-    },
+    PrimitiveTypeImpl(Kind kind) {
+        this.kind = kind;
+    }
 
-    EXCEPTION_TYPE {
-        @Override
-        public @NotNull Kind getKind() {
-            return Kind.EXCEPTION;
-        }
-    },
+    @Override
+    public @NotNull Kind getKind() {
+        return kind;
+    }
 
-    STRUCT_TYPE {
-        @Override
-        public @NotNull Kind getKind() {
-            return Kind.STRUCT;
-        }
-    };
-
+    @Override
+    public boolean isNoneSafe() {
+        return true;
+    }
 }

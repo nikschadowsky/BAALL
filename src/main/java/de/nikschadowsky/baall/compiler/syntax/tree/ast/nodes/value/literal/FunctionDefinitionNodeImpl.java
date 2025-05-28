@@ -3,17 +3,17 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.NodeType;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.AbstractNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.StatementsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FieldNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.ASTVisitor;
+import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnostic;
 import de.nikschadowsky.baall.compiler.syntax.tree.util.NodeDiagnosticCollector;
+import de.nikschadowsky.baall.compiler.util.CollectionUtility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +35,16 @@ public final class FunctionDefinitionNodeImpl extends AbstractNode implements Fu
 
     public void setParameters(@NotNull List<FieldNode> parameters) {
         this.parameters = new ArrayList<>(parameters);
+        checkIntegrity();
+    }
+
+    private void checkIntegrity() {
+        List<IdentifierNode> duplicates = CollectionUtility.duplicates(parameters, FieldNode::getIdentifier);
+        duplicates.forEach(identifierNode -> getDiagnosticCollector().report(new NodeDiagnostic(
+                "There is already a parameter with this identifier.",
+                identifierNode.getIdentifier(),
+                NodeDiagnostic.ReportingLevel.ERROR)
+        ));
     }
 
     @Override

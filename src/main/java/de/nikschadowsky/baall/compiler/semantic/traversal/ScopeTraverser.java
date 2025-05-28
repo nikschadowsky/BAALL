@@ -4,7 +4,7 @@ import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ComponentAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
@@ -33,12 +33,12 @@ import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.FunctionCallN
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.value.literal.*;
 import de.nikschadowsky.baall.compiler.syntax.tree.traversal.SimpleTreeTraverser;
 
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
 
-    private final Map<Node, Scope> scopes = new HashMap<>();
+    private final Map<Node, Scope> scopes = new IdentityHashMap<>();
 
     /**
      * @param that node
@@ -517,8 +517,8 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitIndexedAccess(IndexedAccessNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getInnerIdentifier(), data);
-        scan(that.getInnerIdentifier(), Scope.createLogicalScope(data));
+        scan(that.getInner(), data);
+        scan(that.getInner(), Scope.createLogicalScope(data));
         return true;
     }
 
@@ -528,10 +528,10 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
      * @return true
      */
     @Override
-    public Boolean visitMemberReference(MemberReferenceNode that, Scope data) {
+    public Boolean visitMemberReference(ComponentAccessNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getSelf(), data);
-        scan(that.getInnerIdentifier(), data);
+        scan(that.getInner(), data);
+        scan(that.getSelected(), data);
         return true;
     }
 
@@ -543,7 +543,7 @@ public class ScopeTraverser extends SimpleTreeTraverser<Scope, Boolean> {
     @Override
     public Boolean visitScopeElevation(ScopeElevationNode that, Scope data) {
         scopes.put(that, data);
-        scan(that.getInnerIdentifier(), data);
+        scan(that.getInner(), data);
         return true;
     }
 }

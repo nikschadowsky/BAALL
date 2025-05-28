@@ -12,17 +12,17 @@ import java.util.Objects;
 /**
  * @since 11.03.2025
  */
-public final class MemberReferenceNodeImpl extends AbstractNode implements MemberReferenceNode {
+public final class ComponentAccessNodeImpl extends AbstractNode implements ComponentAccessNode {
 
     private ElementAccessNode inner;
-    private ElementAccessNode self;
+    private IdentifierNode selected;
 
-    public MemberReferenceNodeImpl(NodeDiagnosticCollector diagnostics) {
+    public ComponentAccessNodeImpl(NodeDiagnosticCollector diagnostics) {
         super(diagnostics);
     }
 
     @Override
-    public ElementAccessNode getInnerIdentifier() {
+    public ElementAccessNode getInner() {
         return inner;
     }
 
@@ -31,12 +31,12 @@ public final class MemberReferenceNodeImpl extends AbstractNode implements Membe
     }
 
     @Override
-    public ElementAccessNode getSelf() {
-        return self;
+    public IdentifierNode getSelected() {
+        return selected;
     }
 
-    public void setSelf(ElementAccessNode self) {
-        this.self = self;
+    public void setSelected(IdentifierNode selected) {
+        this.selected = selected;
     }
 
     @Override
@@ -47,20 +47,20 @@ public final class MemberReferenceNodeImpl extends AbstractNode implements Membe
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof MemberReferenceNodeImpl that)) return false;
-        return Objects.equals(getSelf(), that.getSelf())
-                       && Objects.equals(getInnerIdentifier(), that.getInnerIdentifier())
+        if (!(obj instanceof ComponentAccessNodeImpl that)) return false;
+        return Objects.equals(getSelected(), that.getSelected())
+                       && Objects.equals(getInner(), that.getInner())
                        && getNodeType().equals(that.getNodeType());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getSelf(), getInnerIdentifier(), getNodeType());
+        return Objects.hash(getSelected(), getInner(), getNodeType());
     }
 
     @Override
     public @NotNull String getDisplayDescriptor() {
-        return "%s.%s".formatted(getSelf().getDisplayDescriptor(), getInnerIdentifier().getDisplayDescriptor());
+        return "%s.%s".formatted(getInner().getDisplayDescriptor(), getSelected().getDisplayDescriptor());
     }
 
     @Override

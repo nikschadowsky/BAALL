@@ -21,7 +21,7 @@ public final class ScopeElevationNodeImpl extends AbstractNode implements ScopeE
     }
 
     @Override
-    public ElementAccessNode getInnerIdentifier() {
+    public ElementAccessNode getInner() {
         return inner;
     }
 
@@ -38,18 +38,18 @@ public final class ScopeElevationNodeImpl extends AbstractNode implements ScopeE
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof ScopeElevationNodeImpl that)) return false;
-        return Objects.equals(getInnerIdentifier(), that.getInnerIdentifier())
+        return Objects.equals(getInner(), that.getInner())
                        && getNodeType().equals(that.getNodeType());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInnerIdentifier(), getNodeType());
+        return Objects.hash(getInner(), getNodeType());
     }
 
     @Override
     public @NotNull String getDisplayDescriptor() {
-        return "$%s".formatted(getInnerIdentifier().getDisplayDescriptor());
+        return "$%s".formatted(getInner().getDisplayDescriptor());
     }
 
     @Override

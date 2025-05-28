@@ -2,7 +2,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.ast;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNodeImpl;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNodeImpl;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ComponentAccessNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNodeImpl;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNodeImpl;
@@ -199,8 +199,8 @@ public class ASTNodeFactory {
         return new IndexedAccessNodeImpl(diagnostics);
     }
 
-    public MemberReferenceNodeImpl createMemberReferenceNode() {
-        return new MemberReferenceNodeImpl(diagnostics);
+    public ComponentAccessNodeImpl createMemberReferenceNode() {
+        return new ComponentAccessNodeImpl(diagnostics);
     }
 
     public ScopeElevationNodeImpl createScopeElevationNode() {

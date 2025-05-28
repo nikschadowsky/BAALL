@@ -4,7 +4,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.traversal;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.Node;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ComponentAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
@@ -258,20 +258,20 @@ public class SimpleTreeTraverser<D, R> implements ASTVisitor<D, R> {
     @Override
     public R visitIndexedAccess(IndexedAccessNode that, D data) {
         R r = scan(that.getIndex(), data);
-        r = scanAndReduce(that.getInnerIdentifier(), data, r);
+        r = scanAndReduce(that.getInner(), data, r);
         return r;
     }
 
     @Override
-    public R visitMemberReference(MemberReferenceNode that, D data) {
-        R r = scan(that.getSelf(), data);
-        r = scanAndReduce(that.getInnerIdentifier(), data, r);
+    public R visitMemberReference(ComponentAccessNode that, D data) {
+        R r = scan(that.getInner(), data);
+        r = scanAndReduce(that.getSelected(), data, r);
         return r;
     }
 
     @Override
     public R visitScopeElevation(ScopeElevationNode that, D data) {
-        return scan(that.getInnerIdentifier(), data);
+        return scan(that.getInner(), data);
     }
 
     /*

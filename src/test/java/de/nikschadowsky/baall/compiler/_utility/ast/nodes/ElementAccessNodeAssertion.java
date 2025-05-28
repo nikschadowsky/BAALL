@@ -16,8 +16,8 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
     }
 
     public MemberReferenceNodeAssertion isMemberReference() {
-        isInstanceOf(MemberReferenceNode.class);
-        return NodeAssertionFactory.create((MemberReferenceNode) actual);
+        isInstanceOf(ComponentAccessNode.class);
+        return NodeAssertionFactory.create((ComponentAccessNode) actual);
     }
 
     public ScopeElevationNodeAssertion isScopeElevation() {
@@ -35,18 +35,18 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
         return NodeAssertionFactory.create((IdentifierNode) actual);
     }
 
-    public static class MemberReferenceNodeAssertion extends BaseAssertion<MemberReferenceNodeAssertion, MemberReferenceNode> {
+    public static class MemberReferenceNodeAssertion extends BaseAssertion<MemberReferenceNodeAssertion, ComponentAccessNode> {
 
-        public MemberReferenceNodeAssertion(MemberReferenceNode actual) {
+        public MemberReferenceNodeAssertion(ComponentAccessNode actual) {
             super(actual, MemberReferenceNodeAssertion.class);
         }
 
         public ElementAccessNodeAssertion mapToInner() {
-            return NodeAssertionFactory.create(actual.getInnerIdentifier());
+            return NodeAssertionFactory.create(actual.getInner());
         }
 
-        public MemberReferenceNodeAssertion hasSelfMatching(NodeAssertionBuilder<ElementAccessNodeAssertion> a) {
-            a.assertThat(NodeAssertionFactory.create(actual.getSelf()));
+        public MemberReferenceNodeAssertion hasSelectedMatching(NodeAssertionBuilder<IdentifierNodeAssertion> a) {
+            a.assertThat(NodeAssertionFactory.create(actual.getSelected()));
             return this;
         }
     }
@@ -58,7 +58,7 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
         }
 
         public ElementAccessNodeAssertion mapToInner() {
-            return NodeAssertionFactory.create(actual.getInnerIdentifier());
+            return NodeAssertionFactory.create(actual.getInner());
         }
     }
 
@@ -74,7 +74,7 @@ public class ElementAccessNodeAssertion extends BaseAssertion<ElementAccessNodeA
         }
 
         public ElementAccessNodeAssertion mapToInner() {
-            return NodeAssertionFactory.create(actual.getInnerIdentifier());
+            return NodeAssertionFactory.create(actual.getInner());
         }
     }
 

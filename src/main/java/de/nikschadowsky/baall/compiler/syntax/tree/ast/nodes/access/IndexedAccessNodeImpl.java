@@ -23,7 +23,7 @@ public final class IndexedAccessNodeImpl extends AbstractNode implements Indexed
     }
 
     @Override
-    public ElementAccessNode getInnerIdentifier() {
+    public ElementAccessNode getInner() {
         return inner;
     }
 
@@ -49,19 +49,19 @@ public final class IndexedAccessNodeImpl extends AbstractNode implements Indexed
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof IndexedAccessNodeImpl that)) return false;
-        return Objects.equals(getInnerIdentifier(), that.getInnerIdentifier())
+        return Objects.equals(getInner(), that.getInner())
                        && Objects.equals(getIndex(), that.getIndex())
                        && getNodeType().equals(that.getNodeType());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInnerIdentifier(), getIndex(), getNodeType());
+        return Objects.hash(getInner(), getIndex(), getNodeType());
     }
 
     @Override
     public @NotNull String getDisplayDescriptor() {
-        return "%s[%s]".formatted(getInnerIdentifier().getDisplayDescriptor(), getIndex().getDisplayDescriptor());
+        return "%s[%s]".formatted(getInner().getDisplayDescriptor(), getIndex().getDisplayDescriptor());
     }
 
     @Override

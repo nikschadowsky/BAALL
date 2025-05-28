@@ -197,7 +197,7 @@ public interface NodeAssertionFactory<ASSERTION, ACTUAL> {
         return new ElementAccessNodeAssertion.IndexedAccessNodeAssertion(actual);
     }
 
-    static ElementAccessNodeAssertion.MemberReferenceNodeAssertion create(MemberReferenceNode actual) {
+    static ElementAccessNodeAssertion.MemberReferenceNodeAssertion create(ComponentAccessNode actual) {
         return new ElementAccessNodeAssertion.MemberReferenceNodeAssertion(actual);
     }
 

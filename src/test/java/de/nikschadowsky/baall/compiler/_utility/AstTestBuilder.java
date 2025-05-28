@@ -105,10 +105,10 @@ public class AstTestBuilder {
         return node;
     }
 
-    public static MemberReferenceNode memberReference(ElementAccessNode self, ElementAccessNode inner) {
-        MemberReferenceNodeImpl node = astNodeFactory.createMemberReferenceNode();
-        node.setSelf(self);
+    public static ComponentAccessNode memberReference(ElementAccessNode inner, IdentifierNode selected) {
+        ComponentAccessNodeImpl node = astNodeFactory.createMemberReferenceNode();
         node.setInner(inner);
+        node.setSelected(selected);
         return node;
     }
 

@@ -3,7 +3,7 @@ package de.nikschadowsky.baall.compiler.syntax.tree.traversal;
 
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IndexedAccessNode;
-import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.MemberReferenceNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ComponentAccessNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.ScopeElevationNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ConditionalNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.controlstructures.ForLoopNode;
@@ -110,7 +110,7 @@ public interface ASTVisitor<D, R> {
 
     R visitIndexedAccess(IndexedAccessNode that, D data);
 
-    R visitMemberReference(MemberReferenceNode that, D data);
+    R visitMemberReference(ComponentAccessNode that, D data);
 
     R visitScopeElevation(ScopeElevationNode that, D data);
 }

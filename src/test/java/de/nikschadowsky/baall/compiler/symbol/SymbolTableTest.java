@@ -1,28 +1,44 @@
 package de.nikschadowsky.baall.compiler.symbol;
 
+import de.nikschadowsky.baall.compiler._utility.SymbolTableTestcaseBuilder;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
-import de.nikschadowsky.baall.compiler.semantic.type.BaallTypeFactory;
-import de.nikschadowsky.baall.compiler.semantic.type.FunctionType;
-import de.nikschadowsky.baall.compiler.semantic.type.PrimitiveType;
+import de.nikschadowsky.baall.compiler.semantic.type.*;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.program.ImportsNode;
 import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.typing.PrimitiveTypeNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static de.nikschadowsky.baall.compiler._utility.BaseAssertion.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static de.nikschadowsky.baall.compiler._utility.AstTestBuilder.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Fail.fail;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @since 26.03.2025
  */
 class SymbolTableTest {
 
-    private final PrimitiveType primitiveType = BaallTypeFactory.create()
-                                                                .createPrimitiveType(PrimitiveTypeNode.Kind.STRUCT);
-    private final FunctionType functionType = BaallTypeFactory.create().createFunctionType(primitiveType, List.of());
+    private TypeTableMock typeTable;
+    private BaallTypeFactory typeFactory;
+
+    private PrimitiveType primitiveType1;
+    private PrimitiveType primitiveType2;
+    private FunctionType functionType1;
+    private FunctionType functionType2;
+    private ListType listType1;
+
+    private TypeReference typeReference1;
+    private UserDefinedType userType1;
 
     private final Scope mainScope = Scope.create(Scope.ROOT);
     private final Scope minorChildA = Scope.createLogicalScope(mainScope);
@@ -31,171 +47,272 @@ class SymbolTableTest {
     private final Scope minorGrandchildOfA = Scope.createLogicalScope(majorChildA);
 
     private final LineInformation lineInformation1 = new LineInformation(0, 0);
-    private final LineInformation lineInformation2 = new LineInformation(0, 2);
 
     // unit under test
     private SymbolTable symbolTable;
 
+    private SymbolTableTestcaseBuilder testcaseBuilder;
+
     @BeforeEach
     void setUp() {
-        symbolTable = new SymbolTable();
+        typeTable = new TypeTableMock(imports());
+        typeFactory = new BaallTypeFactory(typeTable);
+
+        testcaseBuilder = new SymbolTableTestcaseBuilder(typeFactory);
+
+        typeReference1 = mock(TypeReference.class);
+
+        primitiveType1 = typeFactory.createPrimitiveType(PrimitiveTypeNode.Kind.STRUCT);
+        primitiveType2 = typeFactory.createPrimitiveType(PrimitiveTypeNode.Kind.NUMBER);
+        functionType1 = typeFactory.createFunctionType(primitiveType1, List.of());
+        functionType2 = typeFactory.createFunctionType(functionType1, List.of(primitiveType1));
+        listType1 = typeFactory.createListType(functionType1);
+        userType1 = typeFactory.createUserDefinedType(typeReference1, false);
+
+        typeTable.registerComponent(typeReference1, identifier("a"), primitiveType1);
+
+
+        symbolTable = new SymbolTable(typeFactory);
     }
 
     @Test
-    void registerSymbolAndFunction() {
-        assertThatCode(() -> symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                mainScope,
-                primitiveType,
-                true,
-                lineInformation1
-        )).doesNotThrowAnyException();
+    void registerFunction() throws SymbolAlreadyExistsException {
+        testcaseBuilder.whenConstantFunctionIsRegistered(identifier("function1"), mainScope, functionType1)
+                       .andWhenConstantFunctionIsRegistered(identifier("function2"), minorChildA, functionType1)
+                       .andWhenConstantFunctionIsRegistered(identifier("function2"), minorChildB, functionType1)
+                       .thenConstantFunctionCanBeRegistered(identifier("function1"), majorChildA, functionType1)
+                       .thenConstantFunctionCanBeRegistered(identifier("function2"), majorChildA, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function1"), mainScope, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function1"), minorChildA, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function2"), minorChildA, functionType1)
+                       .andWhenConstantFunctionIsRegistered(identifier("function3"), minorGrandchildOfA, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function3"), minorGrandchildOfA, functionType1);
 
-        // registering a symbol with the same identifier in a minor scope should fail
-        assertThatThrownBy(() -> symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                minorChildA,
-                primitiveType,
-                false,
-                lineInformation2
-        )).isInstanceOf(SymbolAlreadyExistsException.class);
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), minorChildB, primitiveType1, false)
+                       .thenConstantFunctionCannotBeRegistered(identifier("identifier"), mainScope, functionType1)
+                       .thenConstantFunctionCanBeRegistered(identifier("identifier"), minorChildA, functionType1)
+                       .thenVariableFunctionCanBeRegistered(identifier("identifier"), mainScope, functionType1);
 
-        // registering a function with the same identifier in a minor scope should fail
-        assertThatThrownBy(() -> symbolTable.registerFunction(
-                StringIdentifier.of("identifier"),
-                minorChildB,
-                functionType,
-                true,
-                lineInformation1
-        )).isInstanceOf(SymbolAlreadyExistsException.class);
-
-        // registering in another major scope should work
-        assertThatCode(() -> symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                majorChildA,
-                primitiveType,
-                true,
-                lineInformation1
-        )).doesNotThrowAnyException();
-
-        assertThatCode(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second1"),
-                minorChildA,
-                primitiveType,
-                false,
-                lineInformation1
-        )).doesNotThrowAnyException();
-        assertThatCode(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second2"),
-                minorChildA,
-                primitiveType,
-                false,
-                lineInformation1
-        )).doesNotThrowAnyException();
-        assertThatCode(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second1"),
-                minorChildB,
-                primitiveType,
-                false,
-                lineInformation1
-        )).doesNotThrowAnyException();
-
-        assertThatThrownBy(() -> symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second1"),
-                minorChildA,
-                primitiveType,
-                false,
-                lineInformation1
-        )).isInstanceOf(SymbolAlreadyExistsException.class);
+        testcaseBuilder.whenVariableFunctionIsRegistered(identifier("function1"), mainScope, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function1"), minorChildA, functionType1)
+                       .andWhenVariableFunctionIsRegistered(identifier("function2"), minorChildA, functionType1)
+                       .thenConstantFunctionCannotBeRegistered(identifier("function2"), mainScope, functionType1)
+                       .thenVariableFunctionCanBeRegistered(identifier("function2"), mainScope, functionType1);
     }
 
     @Test
-    void hasSymbolRegisteredInScope() throws SymbolAlreadyExistsException {
-        assertThat(symbolTable).doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), mainScope);
-        symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                mainScope,
-                primitiveType,
-                true,
-                lineInformation1
-        );
+    void registerSymbol() throws SymbolAlreadyExistsException {
+        testcaseBuilder.whenSymbolIsRegistered(identifier("symbol1"), mainScope, primitiveType1, true)
+                       .thenSymbolCannotBeRegistered(identifier("symbol1"), mainScope, primitiveType1, true)
+                       .andWhenSymbolIsRegistered(identifier("symbol2"), minorChildA, primitiveType1, true)
+                       .thenSymbolCanBeRegistered(identifier("symbol2"), minorChildB, primitiveType1, true)
+                       .thenSymbolCanBeRegistered(identifier("symbol2"), majorChildA, primitiveType1, true)
+                       .thenSymbolCannotBeRegistered(identifier("symbol1"), minorChildA, primitiveType1, true)
+                       .thenSymbolCannotBeRegistered(identifier("symbol2"), minorChildA, primitiveType1, true);
 
-        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), mainScope)
-                               .hasSymbolRegistered(StringIdentifier.of("identifier"), minorChildA)
-                               .hasSymbolRegistered(StringIdentifier.of("identifier"), minorChildB)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("function"), mainScope);
+        // the order of registering affects the result
+        testcaseBuilder.whenSymbolIsRegistered(identifier("symbol3"), minorGrandchildOfA, primitiveType1, true)
+                       .thenSymbolCanBeRegistered(identifier("symbol3"), majorChildA, primitiveType1, true);
 
-        symbolTable.registerFunction(
-                StringIdentifier.of("function"),
-                mainScope,
-                functionType,
-                false,
-                lineInformation2
-        );
-        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), mainScope)
-                               .hasSymbolRegistered(StringIdentifier.of("function"), mainScope)
-                               .hasSymbolRegistered(StringIdentifier.of("function"), minorChildA)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT)
-                               .doesNotHaveSymbolRegistered(StringIdentifier.of("identifier"), majorChildA);
-
-        symbolTable.registerSymbol(
-                StringIdentifier.of("identifier"),
-                Scope.ROOT,
-                primitiveType,
-                false,
-                lineInformation1
-        );
-        assertThat(symbolTable).hasSymbolRegistered(StringIdentifier.of("identifier"), Scope.ROOT);
-
-        symbolTable.registerSymbol(
-                NestedIdentifier.of("first", "second"),
-                mainScope,
-                primitiveType,
-                true,
-                lineInformation1
-        );
-        assertThat(symbolTable).hasSymbolRegistered(NestedIdentifier.of("first", "second"), minorChildA)
-                               .hasSymbolRegistered(NestedIdentifier.of("first", "second"), mainScope)
-                               .doesNotHaveSymbolRegistered(NestedIdentifier.of("first", "second"), majorChildA);
+        testcaseBuilder.whenConstantFunctionIsRegistered(identifier("function"), minorChildB, functionType1)
+                       .thenSymbolCanBeRegistered(identifier("function"), minorChildA, functionType1, false)
+                       .thenSymbolCanBeRegistered(identifier("function"), mainScope, primitiveType1, false);
     }
 
     @Test
-    void getTypeInformation() {
-        fail("not yet implemented. see SymbolTable#getTypeInformation() for details");
+    void hasSymbolRegistered() throws SymbolAlreadyExistsException {
+        symbolTable.registerSymbol(identifier("symbol1"), mainScope, primitiveType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol1"), minorChildB)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol1"), majorChildA)).isTrue();
+
+        symbolTable.registerSymbol(identifier("symbol2"), minorChildA, primitiveType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), mainScope)).isTrue();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), minorChildB)).isTrue();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), majorChildA)).isTrue();
+
+        symbolTable.registerFunction(identifier("function1"), mainScope, functionType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), mainScope)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), majorChildA)).isTrue();
+
+        symbolTable.registerFunction(identifier("function2"), minorChildA, functionType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), mainScope)).isTrue();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), minorChildB)).isTrue();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), majorChildA)).isTrue();
+
+        symbolTable.registerFunction(identifier("function3"), minorChildA, functionType1, false, lineInformation1);
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function3"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function3"), mainScope)).isTrue();
     }
 
     @Test
-    void isConstant() throws SymbolAlreadyExistsException {
-        symbolTable.registerSymbol(
-                StringIdentifier.of("main"),
-                mainScope,
-                primitiveType,
-                true,
-                lineInformation1
-        );
-        assertThat(symbolTable).isConstant(StringIdentifier.of("main"), mainScope);
-        assertThatThrownBy(
-                () -> symbolTable.isConstant(StringIdentifier.of("main"), minorChildB)
-        ).isInstanceOf(NoSymbolFoundException.class);
+    void canDeclareFunctionInScope() throws SymbolAlreadyExistsException {
+        symbolTable.registerFunction(identifier("function1"), mainScope, functionType1, true, lineInformation1);
 
-        symbolTable.registerSymbol(
-                StringIdentifier.of("identifier2"),
-                majorChildA,
-                primitiveType,
-                false,
-                lineInformation2
-        );
-        assertThat(symbolTable).isNotConstant(StringIdentifier.of("identifier2"), majorChildA);
-        assertThatThrownBy(
-                () -> symbolTable.isConstant(StringIdentifier.of("identifier2"), minorGrandchildOfA)
-        ).isInstanceOf(NoSymbolFoundException.class);
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function1"), mainScope, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function1"), minorChildA, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function1"), majorChildA, true)).isTrue();
 
-        assertThatThrownBy(() -> symbolTable.isConstant(
-                StringIdentifier.of("invalid"),
-                mainScope
-        )).isInstanceOf(NoSymbolFoundException.class);
+        symbolTable.registerFunction(identifier("function2"), minorChildA, functionType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function2"), minorChildA, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function2"), mainScope, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function2"), minorChildB, true)).isTrue();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function2"), majorChildA, true)).isTrue();
+
+        symbolTable.registerFunction(identifier("function3"), minorChildA, functionType1, false, lineInformation1);
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function3"), minorChildA, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function3"), mainScope, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("function3"), mainScope, false)).isTrue();
+
+        symbolTable.registerSymbol(identifier("identifier1"), minorChildA, functionType1, false, lineInformation1);
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier1"), minorChildA, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier1"), mainScope, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier1"), mainScope, false)).isTrue();
+
+        symbolTable.registerSymbol(identifier("identifier2"), mainScope, primitiveType1, true, lineInformation1);
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier2"), mainScope, true)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier2"), mainScope, false)).isFalse();
+        assertThat(symbolTable.canDeclareFunctionInScope(identifier("identifier2"), minorChildB, true)).isFalse();
+    }
+
+    @Test
+    void isConstant() throws SymbolAlreadyExistsException, NoSymbolFoundException {
+        symbolTable.registerFunction(identifier("constant function"), mainScope, functionType1, true, lineInformation1);
+        assertThat(symbolTable.isConstant(identifier("constant function"), mainScope)).isTrue();
+
+        symbolTable.registerFunction(identifier("variable function"), minorChildA, functionType1, false, lineInformation1);
+        assertThat(symbolTable.isConstant(identifier("variable function"), minorChildA)).isFalse();
+
+        symbolTable.registerSymbol(identifier("constant symbol"), mainScope, primitiveType1, true, lineInformation1);
+        assertThat(symbolTable.isConstant(identifier("constant symbol"), mainScope)).isTrue();
+
+        symbolTable.registerSymbol(identifier("variable symbol"), minorChildA, primitiveType1, false, lineInformation1);
+        assertThat(symbolTable.isConstant(identifier("variable symbol"), minorChildA)).isFalse();
+
+        assertThatThrownBy(() -> symbolTable.isConstant(identifier("constant function"), minorChildA)).isInstanceOf(NoSymbolFoundException.class);
+    }
+
+    @Test
+    void resolveElement() throws SymbolAlreadyExistsException {
+        testcaseBuilder.whenNoSymbolIsRegistered()
+                       .thenResolving(identifier("not declared"), mainScope).resultsInUnknown();
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), mainScope, primitiveType1, true)
+                       .thenResolving(identifier("identifier"), mainScope)
+                       .matchesConstant(primitiveType1)
+                       .thenResolving(identifier("identifier"), minorChildA)
+                       .matchesConstant(primitiveType1)
+                       .thenResolving(identifier("identifier"), minorGrandchildOfA)
+                       .matchesConstant(primitiveType1)
+                       .thenResolving(identifier("not declared"), mainScope)
+                       .resultsInUnknown();
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), minorChildA, primitiveType1, false)
+                       .thenResolving(identifier("identifier"), mainScope)
+                       .resultsInUnknown()
+                       .thenResolving(identifier("identifier"), minorChildB)
+                       .resultsInUnknown()
+                       .thenResolving(identifier("identifier"), minorChildA).matchesVariable(primitiveType1);
+
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), minorChildB, primitiveType1, false)
+                       .thenResolving(identifier("identifier"), majorChildA)
+                       .resultsInUnknown();
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), minorChildA, primitiveType1, false)
+                       .andWhenConstantFunctionIsRegistered(identifier("constant function"), mainScope, functionType1)
+                       .andWhenVariableFunctionIsRegistered(identifier("variable function"), mainScope, functionType1)
+                       .thenResolving(identifier("constant function"), minorChildA)
+                       .matchesConstant(functionType1)
+                       .thenResolving(identifier("constant function"), minorChildB)
+                       .matchesConstant(functionType1)
+                       .thenResolving(identifier("variable function"), minorChildA)
+                       .resultsInUnknown() // no hoisting on var functions
+                       .thenResolving(identifier("variable function"), mainScope);
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), mainScope, primitiveType1, false)
+                       .andWhenSymbolIsRegistered(identifier("identifier"), majorChildA, primitiveType2, false)
+                       .thenResolving(identifier("identifier"), mainScope)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(identifier("identifier"), minorGrandchildOfA)
+                       .matchesVariable(primitiveType2);
+
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), mainScope, primitiveType1, false)
+                       .thenResolving(scopeElevation(identifier("identifier")), minorChildA)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(scopeElevation(identifier("identifier")), mainScope)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(scopeElevation(scopeElevation(identifier("identifier"))), mainScope)
+                       .resultsInUnknown()
+                       .thenResolving(scopeElevation(identifier("identifier")), Scope.ROOT)
+                       .resultsInUnknown();
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("identifier"), mainScope, userType1, false)
+                       .thenResolving(memberReference(identifier("identifier"), identifier("a")), mainScope)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(scopeElevation(memberReference(identifier("identifier"), identifier("a"))), mainScope)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(scopeElevation(scopeElevation(memberReference(identifier("identifier"), identifier("a")))), majorChildA)
+                       .matchesVariable(primitiveType1)
+                       .thenResolving(scopeElevation(scopeElevation(memberReference(identifier("identifier"), identifier("a")))), mainScope)
+                       .resultsInUnknown();
+
+        testcaseBuilder.whenConstantFunctionIsRegistered(identifier("function"), minorChildA, functionType1)
+                       .thenResolving(identifier("function"), minorChildB)
+                       .resultsInUnknown()
+                       .thenResolving(identifier("function"), mainScope)
+                       .resultsInUnknown()
+                       .thenResolving(identifier("function"), majorChildA)
+                       .matchesConstant(functionType1);
+
+        testcaseBuilder.whenSymbolIsRegistered(identifier("list"), mainScope, listType1, true)
+                .thenResolving(identifier("list"), minorChildA)
+                .matchesConstant(listType1)
+                .thenResolving(scopeElevation(scopeElevation(identifier("list"))), majorChildA)
+                .matchesConstant(listType1)
+                .thenResolving(indexedAccess(identifier("list"), numberLiteral("1")), majorChildA)
+                .matchesVariable(functionType1);
+
+    }
+
+    private static class TypeTableMock extends TypeTable {
+
+        private final Map<TypeReference, HashMap<IdentifierNode, BaallType>> components = new HashMap<>();
+
+        public TypeTableMock(ImportsNode imports) {
+            super(imports);
+        }
+
+        public void registerComponent(TypeReference typeReference, IdentifierNode identifierNode, BaallType baallType) {
+            components.putIfAbsent(typeReference, new HashMap<>());
+            components.get(typeReference).put(identifierNode, baallType);
+        }
+
+        @Override
+        public BaallType getComponentType(TypeReference type, IdentifierNode field) throws NoSuchTypeException, NoSuchFieldException {
+            HashMap<IdentifierNode, BaallType> identifierNodeBaallTypeHashMap = components.get(type);
+
+            if (identifierNodeBaallTypeHashMap == null) {
+                throw new NoSuchTypeException("No such type: " + type);
+            }
+            BaallType baallType = identifierNodeBaallTypeHashMap.get(field);
+            if (baallType == null) {
+                throw new NoSuchFieldException("No such field: " + field);
+            }
+            return baallType;
+        }
+
+        @Override
+        public boolean hasField(TypeReference type, IdentifierNode field) throws NoSuchTypeException {
+            HashMap<IdentifierNode, BaallType> identifierNodeBaallTypeHashMap = components.get(type);
+            if (identifierNodeBaallTypeHashMap == null) {
+                throw new NoSuchTypeException("No such type: " + type);
+            }
+            return identifierNodeBaallTypeHashMap.containsKey(field);
+        }
     }
 
 }

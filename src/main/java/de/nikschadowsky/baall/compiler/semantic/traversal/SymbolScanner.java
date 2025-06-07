@@ -6,7 +6,6 @@ import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallTypeFactory;
 import de.nikschadowsky.baall.compiler.semantic.type.TypeTable;
-import de.nikschadowsky.baall.compiler.symbol.StringIdentifier;
 import de.nikschadowsky.baall.compiler.symbol.SymbolAlreadyExistsException;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.symbol.Token;
@@ -20,25 +19,25 @@ public class SymbolScanner extends ScopeTraverser {
     private final TypeTable typeTable;
     private final SymbolTable symbolTable;
     private final DiagnosticCollector<SemanticDiagnostic> diagnosticCollector;
-    private final BaallTypeFactory baallTypeFactory = BaallTypeFactory.create();
+    private final BaallTypeFactory baallTypeFactory;
 
     public SymbolScanner(TypeTable typeTable, SymbolTable symbolTable, DiagnosticCollector<SemanticDiagnostic> diagnosticCollector) {
         this.typeTable = typeTable;
         this.symbolTable = symbolTable;
         this.diagnosticCollector = diagnosticCollector;
+        this.baallTypeFactory = new BaallTypeFactory(typeTable);
     }
 
     @Override
     public Boolean visitConstantDeclaration(ConstantDeclarationNode that, Scope data) {
         BaallType type = mapNodeToBaallType(that.getType(), data);
-        Token identifier = that.getIdentifier().getIdentifier();
         try {
             symbolTable.registerSymbol(
-                    StringIdentifier.of(identifier.value()),
+                    that.getIdentifier(),
                     data,
                     type,
                     true,
-                    identifier.lineInformation()
+                    that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
@@ -52,11 +51,11 @@ public class SymbolScanner extends ScopeTraverser {
         Token identifier = that.getIdentifier().getIdentifier();
         try {
             symbolTable.registerSymbol(
-                    StringIdentifier.of(identifier.value()),
+                    that.getIdentifier(),
                     data,
                     type,
                     false,
-                    identifier.lineInformation()
+                    that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
@@ -70,11 +69,11 @@ public class SymbolScanner extends ScopeTraverser {
         Token identifier = that.getIdentifier().getIdentifier();
         try {
             symbolTable.registerSymbol(
-                    StringIdentifier.of(identifier.value()),
+                    that.getIdentifier(),
                     data,
                     type,
                     true,
-                    identifier.lineInformation()
+                    that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
             diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
@@ -89,7 +88,7 @@ public class SymbolScanner extends ScopeTraverser {
                     node.getParameterTypes().stream().map(n -> mapNodeToBaallType(n, currentScope)).toList()
             );
             case IdentifierTypeNode node ->
-                    baallTypeFactory.createUserDefinedType(typeTable.resolveType(node, currentScope).orElseThrow());
+                    baallTypeFactory.createUserDefinedType(typeTable.resolveType(node, currentScope), node.isNoneSafe());
             case ListTypeNode node ->
                     baallTypeFactory.createListType(mapNodeToBaallType(node.getInnerType(), currentScope));
             case PrimitiveTypeNode node -> baallTypeFactory.createPrimitiveType(node.getKind());

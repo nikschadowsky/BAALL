@@ -6,6 +6,7 @@ import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.semantic.type.BaallType;
 import de.nikschadowsky.baall.compiler.semantic.type.TypeReference;
 import de.nikschadowsky.baall.compiler.semantic.type.TypeTable;
+import de.nikschadowsky.baall.compiler.symbol.Symbol;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
 import de.nikschadowsky.baall.compiler.symbol.TokenQueue;
 import de.nikschadowsky.baall.compiler.syntax.analysis.result.ParseResult;
@@ -104,5 +105,9 @@ public class BaseAssertion<ASSERTION extends AbstractAssert<ASSERTION, OBJECT>, 
 
     public static BaallTypeAssertion assertThat(BaallType actual) {
         return new BaallTypeAssertion(actual);
+    }
+
+    public static SymbolAssertion assertThat(Symbol actual) {
+        return new SymbolAssertion(actual);
     }
 }

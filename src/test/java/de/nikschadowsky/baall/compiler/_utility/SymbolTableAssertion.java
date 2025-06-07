@@ -4,7 +4,7 @@ package de.nikschadowsky.baall.compiler._utility;
 import de.nikschadowsky.baall.compiler.semantic.attribute.Scope;
 import de.nikschadowsky.baall.compiler.symbol.NoSymbolFoundException;
 import de.nikschadowsky.baall.compiler.symbol.SymbolTable;
-import de.nikschadowsky.baall.compiler.symbol.SymbolTableIdentifier;
+import de.nikschadowsky.baall.compiler.syntax.tree.ast.nodes.access.IdentifierNode;
 
 /**
  * @since 29.03.2025
@@ -15,21 +15,21 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
         super(actual, SymbolTableAssertion.class);
     }
 
-    public SymbolTableAssertion hasSymbolRegistered(SymbolTableIdentifier identifier, Scope scope) {
+    public SymbolTableAssertion hasSymbolRegistered(IdentifierNode identifier, Scope scope) {
         return truthinessAssert(
                 a -> "Symbol '%s' is not registered in scope '%s'".formatted(identifier, scope),
-                a -> a.hasSymbolRegisteredInScope(identifier, scope)
+                a -> a.canDeclareSymbolInScope(identifier, scope)
         );
     }
 
-    public SymbolTableAssertion doesNotHaveSymbolRegistered(SymbolTableIdentifier identifier, Scope scope) {
+    public SymbolTableAssertion doesNotHaveSymbolRegistered(IdentifierNode identifier, Scope scope) {
         return falsenessAssert(
                 a -> "Symbol '%s' is registered in scope '%s'".formatted(identifier, scope),
-                a -> a.hasSymbolRegisteredInScope(identifier, scope)
+                a -> a.canDeclareSymbolInScope(identifier, scope)
         );
     }
 
-    public SymbolTableAssertion isConstant(SymbolTableIdentifier identifier, Scope scope) {
+    public SymbolTableAssertion isConstant(IdentifierNode identifier, Scope scope) {
         return truthinessAssert(
                 a -> "Symbol '%s' in scope '%s' is not constant".formatted(identifier, scope),
                 a -> {
@@ -42,7 +42,7 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
         );
     }
 
-    public SymbolTableAssertion isNotConstant(SymbolTableIdentifier identifier, Scope scope) {
+    public SymbolTableAssertion isNotConstant(IdentifierNode identifier, Scope scope) {
         return falsenessAssert(
                 a -> "Symbol '%s' in scope '%s' is constant".formatted(identifier, scope),
                 a -> {

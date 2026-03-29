@@ -45,6 +45,13 @@ public class TokenQueue {
         return queue.get(pointer);
     }
 
+    public @Nullable Token replace(Token newToken) {
+        if (hasReachedEndOfFile()) {
+            return null;
+        }
+        return queue.set(pointer, newToken);
+    }
+
     public List<Token> getAllTokens() {
         return Collections.unmodifiableList(queue);
     }

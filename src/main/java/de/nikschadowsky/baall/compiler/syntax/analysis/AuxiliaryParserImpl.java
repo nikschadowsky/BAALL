@@ -336,9 +336,15 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
 
     private ParseResult<Optional<List<TypeNode>>> parseFunctionSignature(TokenQueue queue) {
         if (!SyntaxSet.LANGUAGE_ELEMENTS.get("<").matches(queue.peek())) {
-            return ParseResult.successfulParse(Optional.empty(), queue.getId());
+            // this is the dirty fix for doubly interpreted
+            Token peek = queue.peek();
+            if (!SyntaxSet.LANGUAGE_ELEMENTS.get("<>").matches(peek)) {
+                return ParseResult.successfulParse(Optional.empty(), queue.getId());
+            }
+            queue.replace(new Token(peek.type(), ">", peek.lineInformation()));
+        } else {
+            queue.poll();
         }
-        queue.poll();
 
         List<TypeNode> functionSignature = new ArrayList<>();
 
@@ -355,10 +361,20 @@ public class AuxiliaryParserImpl implements AuxiliaryParser {
             functionSignature.addAll(additionalTypes.getParseResult());
         }
 
-        if (SyntaxSet.LANGUAGE_ELEMENTS.get(">").matches(queue.peek())) {
+        Token peek = queue.peek();
+
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(">").matches(peek)) {
             queue.poll();
             return ParseResult.successfulParse(Optional.of(functionSignature), queue.getId());
         }
+
+        // when there is an '>>' in queue, replace it with a single '>' and continue.
+        // it is not the cleanest way of handling a token use conflict, but it should solve the issue
+        if (SyntaxSet.LANGUAGE_ELEMENTS.get(">>").matches(peek)) {
+            queue.replace(new Token(peek.type(), ">", peek.lineInformation()));
+            return ParseResult.successfulParse(Optional.of(functionSignature), queue.getId());
+        }
+
         return ParseResult.unsuccessfulParse(new SyntaxDiagnostic(queue.poll(), "Expected '>'!"), queue.getId());
     }
 

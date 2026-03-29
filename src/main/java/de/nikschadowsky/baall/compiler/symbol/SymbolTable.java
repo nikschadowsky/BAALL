@@ -18,57 +18,61 @@ public class SymbolTable {
 
     private final BaallTypeFactory typeFactory;
 
-    private final LinkedHashMap<Scope, Table> allTables = new LinkedHashMap<>();
+    private final LinkedHashMap<Scope, Page> allTables = new LinkedHashMap<>();
 
     public SymbolTable(BaallTypeFactory typeFactory) {
         this.typeFactory = typeFactory;
     }
 
     /**
-     * @param identifier
-     * @param scope
-     * @param type
-     * @param isConstant
-     * @param lineInformation
-     * @throws SymbolAlreadyExistsException
+     * @param identifier      identifier of the variable
+     * @param scope           declaration scope of the variable
+     * @param type            type of the variable
+     * @param lineInformation line information for the variable
+     * @throws SymbolAlreadyExistsException if a symbol with a clashing identifier already exists in the scope
      */
-    public void registerSymbol(
+    public void registerVariable(
             IdentifierNode identifier,
             Scope scope,
             BaallType type,
-            boolean isConstant,
             LineInformation lineInformation
     ) throws SymbolAlreadyExistsException {
-        if (!canDeclareSymbolInScope(identifier, scope)) {
+        if (!canDeclareVariableInScope(identifier, scope)) {
             throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
         }
-        findOrCreateTable(scope).symbols.add(new SymbolImpl(identifier, scope, type, isConstant, lineInformation));
+        findOrCreateTable(scope).symbols.add(new VariableSymbol(identifier, scope, type, lineInformation));
     }
 
     /**
-     * @param identifier
-     * @param scope
-     * @param type
-     * @param isConstant
-     * @param lineInformation
-     * @throws SymbolAlreadyExistsException
+     * @param identifier      identifier of the constant
+     * @param scope           declaration scope of the constant
+     * @param type            type of the constant
+     * @param lineInformation line information for the constant
+     * @throws SymbolAlreadyExistsException if a symbol with a clashing identifier already exists in the scope
      */
-    public void registerFunction(
+    public void registerConstant(
             IdentifierNode identifier,
             Scope scope,
-            FunctionType type,
-            boolean isConstant,
+            BaallType type,
             LineInformation lineInformation
     ) throws SymbolAlreadyExistsException {
-        Table table = findOrCreateTable(scope);
-        if (isConstant) {
-            if (!canDeclareConstantFunction(identifier, scope)) {
-                throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
-            }
-            table.functionDeclarations.add(new Function(identifier, scope, type, true, lineInformation));
-        } else {
-            registerSymbol(identifier, scope, type, false, lineInformation);
+        Page page = findOrCreateTable(scope);
+        if (!canDeclareConstantInScope(identifier, scope)) {
+            throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
         }
+        page.constantSymbols.add(new ConstantSymbol(identifier, scope, type, lineInformation));
+    }
+
+    public void registerField(
+            IdentifierNode identifier,
+            Scope scope,
+            BaallType type,
+            LineInformation lineInformation
+    ) throws SymbolAlreadyExistsException {
+        if (!canDeclareVariableInScope(identifier, scope)) {
+            throw new SymbolAlreadyExistsException(SYMBOL_ALREADY_REGISTERED_TEMPLATE.formatted(identifier));
+        }
+        findOrCreateTable(scope).symbols.add(new ConstantSymbol(identifier, scope, type, lineInformation));
     }
 
     /**
@@ -79,13 +83,13 @@ public class SymbolTable {
      * @param scope      scope of the symbol declaration under test
      * @return true if a symbol with the specified identifier can be declared in the provided scope
      */
-    public boolean canDeclareSymbolInScope(IdentifierNode identifier, Scope scope) {
+    public boolean canDeclareVariableInScope(IdentifierNode identifier, Scope scope) {
         return streamInScope(scope, false).noneMatch(s -> Objects.equals(s.identifier(), identifier));
     }
 
     /**
      * Tests if a function with the given identifier can be declared in the given scope. If {@code isConstant == false}
-     * this method behaves exactly like {@link #canDeclareSymbolInScope(IdentifierNode, Scope)}, as specified in the
+     * this method behaves exactly like {@link #canDeclareVariableInScope(IdentifierNode, Scope)}, as specified in the
      * BAALL specification.
      *
      * @param identifier identifier of the function declaration under test
@@ -94,10 +98,10 @@ public class SymbolTable {
      * @return true if a function with the specified identifier can be declared in the provided scope
      */
     public boolean canDeclareFunctionInScope(IdentifierNode identifier, Scope scope, boolean isConstant) {
-        return isConstant ? canDeclareConstantFunction(identifier, scope) : canDeclareSymbolInScope(identifier, scope);
+        return isConstant ? canDeclareConstantInScope(identifier, scope) : canDeclareVariableInScope(identifier, scope);
     }
 
-    private boolean canDeclareConstantFunction(IdentifierNode identifier, Scope scope) {
+    private boolean canDeclareConstantInScope(IdentifierNode identifier, Scope scope) {
         return streamInScope(scope, true)
                        .noneMatch(s -> Objects.equals(s.identifier(), identifier));
     }
@@ -109,18 +113,18 @@ public class SymbolTable {
      * @throws NoSymbolFoundException
      */
     public boolean isConstant(IdentifierNode identifier, Scope scope) throws NoSymbolFoundException {
-        Table table = findExactTable(scope).orElseThrow(
+        Page page = findExactTable(scope).orElseThrow(
                 () -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(identifier, scope))
         );
 
-        return table.stream()
-                    .filter(s -> Objects.equals(s.identifier(), identifier))
-                    .findFirst()
-                    .map(Symbol::isConstant)
-                    .orElseThrow(() -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(
-                            identifier,
-                            scope
-                    )));
+        return page.stream()
+                   .filter(s -> Objects.equals(s.identifier(), identifier))
+                   .findFirst()
+                   .map(Symbol::isValueConstant)
+                   .orElseThrow(() -> new NoSymbolFoundException(NO_SYMBOL_EXCEPTION_TEMPLATE.formatted(
+                           identifier,
+                           scope
+                   )));
     }
 
     /**
@@ -220,7 +224,7 @@ public class SymbolTable {
 
     private Symbol resolveIdentifier(IdentifierNode identifierNode, Scope scope, @Nullable Scope enforcedMajor) {
         boolean enforceScope = enforcedMajor != null;
-        Optional<Table> optionalNode = enforceScope ? findExactTable(enforcedMajor) : findFirstTable(scope, false);
+        Optional<Page> optionalNode = enforceScope ? findExactTable(enforcedMajor) : findFirstTable(scope, false);
         if (optionalNode.isEmpty()) {
             return new UnknownSymbol(
                     enforceScope ? enforcedMajor : scope,
@@ -228,8 +232,8 @@ public class SymbolTable {
                     "symbol could not be resolved"
             );
         }
-        Table table = optionalNode.get();
-        List<NamedSymbol> symbols = streamScopeHierarchy(table, false)
+        Page page = optionalNode.get();
+        List<NamedSymbol> symbols = streamScopeHierarchy(page, false)
                                             .filter(s -> Objects.equals(s.identifier(), identifierNode))
                                             .toList();
         if (symbols.isEmpty()) {
@@ -262,22 +266,22 @@ public class SymbolTable {
      * @param scope scope to look up the table
      * @return the found or created table
      */
-    private Table findOrCreateTable(Scope scope) {
+    private Page findOrCreateTable(Scope scope) {
         if (scope == null) {
             return null;
         }
         if (allTables.containsKey(scope)) {
             return allTables.get(scope);
         }
-        Table parent = findOrCreateTable(scope.getParent().orElse(null));
-        Table table = new Table(scope, parent);
+        Page parent = findOrCreateTable(scope.getParent().orElse(null));
+        Page page = new Page(scope, parent);
 
         if (parent != null) {
             // add entry to parent
-            parent.symbols.add(table);
+            parent.symbols.add(page);
         }
-        allTables.put(scope, table);
-        return table;
+        allTables.put(scope, page);
+        return page;
     }
 
     /**
@@ -289,7 +293,7 @@ public class SymbolTable {
      *                    find a table to a scope until it reaches the root of the scope tree
      * @return an empty optional if no table was found, otherwise the found table wrapped in an optional
      */
-    private Optional<Table> findFirstTable(Scope scope, boolean stopAtMajor) {
+    private Optional<Page> findFirstTable(Scope scope, boolean stopAtMajor) {
         while (!allTables.containsKey(scope)) {
             Optional<Scope> parent = scope.getParent();
             // either at the root of the global scope tree or at the root of the major scope tree
@@ -309,7 +313,7 @@ public class SymbolTable {
      * @param scope scope to look up the table for
      * @return the found table wrapped in an optional, or an empty optional if no table was found
      */
-    private Optional<Table> findExactTable(Scope scope) {
+    private Optional<Page> findExactTable(Scope scope) {
         return Optional.ofNullable(allTables.get(scope));
     }
 
@@ -325,7 +329,7 @@ public class SymbolTable {
      * the order of the symbols is descending, starting from the first major scope
      */
     private Stream<NamedSymbol> streamInScope(Scope scope, boolean flattenInnerTables) {
-        Optional<Table> firstTable = findFirstTable(scope, true);
+        Optional<Page> firstTable = findFirstTable(scope, true);
 
         return firstTable.map(t -> {
             if (t.own.equals(scope)) {
@@ -344,18 +348,18 @@ public class SymbolTable {
      * Creates a stream of all accessible declared symbols and functions from the provided table up until it either hits
      * a major scope when {@code stopAtMajor == true} or the root of the table tree.
      *
-     * @param table       table from which the hierarchy should be analyzed
+     * @param page        table from which the hierarchy should be analyzed
      * @param stopAtMajor when true, this method will stop at the first major scope; when false, this method will
      *                    continue until the root of the table tree is reached
      * @return a stream of all accessible declared symbols and functions from the provided table up until it either hits
      * a major scope or the root of the table tree; the order of the symbols is descending, starting from either the
      * table root or the first major scope
      */
-    private Stream<NamedSymbol> streamScopeHierarchy(Table table, boolean stopAtMajor) {
-        if (stopAtMajor && table.own.isMajor()) {
-            return table.stream();
+    private Stream<NamedSymbol> streamScopeHierarchy(Page page, boolean stopAtMajor) {
+        if (stopAtMajor && page.own.isMajor()) {
+            return page.stream();
         }
-        return Stream.concat(streamTableParent(table, table.parent, stopAtMajor), table.stream());
+        return Stream.concat(streamTableParent(page, page.parent, stopAtMajor), page.stream());
     }
 
     /**
@@ -370,12 +374,12 @@ public class SymbolTable {
      * hits a major scope or the root of the table tree; the order of the symbols is descending, starting from either
      * the table root or the first major scope
      */
-    private Stream<NamedSymbol> streamTableParent(Table target, Table parent, boolean stopAtMajor) {
+    private Stream<NamedSymbol> streamTableParent(Page target, Page parent, boolean stopAtMajor) {
         if (parent == null) {
             return Stream.empty();
         }
         Stream<NamedSymbol> stream = Stream.concat(
-                parent.functionDeclarations(),
+                parent.constantDeclarations(),
                 parent.symbolDeclarations()
                       .takeWhile(e -> !e.equals(target))
                       .filter(NamedSymbol.class::isInstance)
@@ -391,13 +395,13 @@ public class SymbolTable {
      * Interface of a symbol that can have a name and, therefore, isn't unknown. This interface is purposefully exposed
      * within its package.
      */
-    sealed interface NamedSymbol extends Symbol permits Component, Function, SymbolImpl {
+    sealed interface NamedSymbol extends Symbol permits Component, ConstantSymbol, FieldSymbol, VariableSymbol {
     }
 
     /**
      * Interface marking a valid entry in the symbol list of a symbol table.
      */
-    private sealed interface SymbolTableEntry permits SymbolImpl, Table {
+    private sealed interface SymbolTableEntry permits ConstantSymbol, FieldSymbol, Page, VariableSymbol {
     }
 
     /**
@@ -406,7 +410,7 @@ public class SymbolTable {
      * @param parent          symbol of which this component is a part of
      * @param scope           scope of the parent
      * @param type            type of the component
-     * @param isConstant      flag if the component is constant or not
+     * @param isValueConstant flag if the component is constant or not
      * @param lineInformation line information of the parent declaration
      */
     private record Component(
@@ -414,7 +418,7 @@ public class SymbolTable {
             @NotNull Symbol parent,
             @NotNull Scope scope,
             @NotNull BaallType type,
-            boolean isConstant,
+            boolean isValueConstant,
             @NotNull LineInformation lineInformation
     ) implements NamedSymbol {
 
@@ -439,25 +443,33 @@ public class SymbolTable {
     }
 
     /**
-     * Record depicting a function declaration.
+     * Symbol for any constant declared. Constants support use-before declaration and, therefore, are handled
+     * separately.
      *
-     * @param identifier      identifier of the function declared
-     * @param scope           scope of the function declaration
-     * @param type            type of the function
-     * @param isConstant      flag if the function is constant or not
-     * @param lineInformation line information of the function declaration
+     * @param identifier      identifier of the constant
+     * @param scope           declaration scope of the constant
+     * @param type            type of the constant
+     * @param lineInformation line information about the constant
      */
-    private record Function(
+    private record ConstantSymbol(
             @NotNull IdentifierNode identifier,
             @NotNull Scope scope,
-            @NotNull FunctionType type,
-            boolean isConstant,
+            @NotNull BaallType type,
             @NotNull LineInformation lineInformation
-    ) implements NamedSymbol {
+    ) implements SymbolTableEntry, NamedSymbol {
+
+        @Override
+        public boolean isValueConstant() {
+            return true;
+        }
 
         @Override
         public @NotNull String description() {
-            return "function '%s' with type '%s' at line %s".formatted(identifier.getDisplayDescriptor(), type, lineInformation);
+            return "constant symbol '%s' with type '%s' at line %s".formatted(
+                    identifier.getDisplayDescriptor(),
+                    type,
+                    lineInformation
+            );
         }
 
         @Override
@@ -467,25 +479,58 @@ public class SymbolTable {
     }
 
     /**
-     * Record depicting a symbol declaration.
+     * Symbol for any variable declared. Variables are handled like sub-scopes.
      *
-     * @param identifier      identifier of the symbol declared
-     * @param scope           scope of the symbol declaration
-     * @param type            type of the symbol
-     * @param isConstant      flag if the symbol is constant or not
-     * @param lineInformation line information of the symbol declaration
+     * @param identifier      identifier of the variable
+     * @param scope           declaration scope of the variable
+     * @param type            type of the variable
+     * @param lineInformation line information about the variable
      */
-    private record SymbolImpl(
+    private record VariableSymbol(
             @NotNull IdentifierNode identifier,
             @NotNull Scope scope,
             @NotNull BaallType type,
-            boolean isConstant,
             @NotNull LineInformation lineInformation
     ) implements SymbolTableEntry, NamedSymbol {
 
         @Override
+        public boolean isValueConstant() {
+            return false;
+        }
+
+        @Override
         public @NotNull String description() {
-            return "symbol '%s' with type '%s' at line %s".formatted(identifier.getDisplayDescriptor(), type, lineInformation);
+            return "variable symbol '%s' with type '%s' at line %s".formatted(
+                    identifier.getDisplayDescriptor(),
+                    type,
+                    lineInformation
+            );
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return description();
+        }
+    }
+
+    private record FieldSymbol(
+            @NotNull IdentifierNode identifier,
+            @NotNull Scope scope,
+            @NotNull BaallType type,
+            @NotNull LineInformation lineInformation
+    ) implements SymbolTableEntry, NamedSymbol {
+        @Override
+        public boolean isValueConstant() {
+            return true;
+        }
+
+        @Override
+        public @NotNull String description() {
+            return "variable symbol '%s' with type '%s' at line %s".formatted(
+                    identifier.getDisplayDescriptor(),
+                    type,
+                    lineInformation
+            );
         }
 
         @Override
@@ -513,7 +558,7 @@ public class SymbolTable {
         }
 
         @Override
-        public boolean isConstant() {
+        public boolean isValueConstant() {
             return true;
         }
 
@@ -537,21 +582,24 @@ public class SymbolTable {
      * Table where symbols and constant function declarations are stored. A table is always associated with a scope. It
      * should be ensured that there is a one-to-one mapping between scopes and tables within a symbol table instance.
      */
-    private final static class Table implements SymbolTableEntry {
+    private final static class Page implements SymbolTableEntry {
 
         /**
          * major scope. todo better typing?
          */
         private final Scope own;
 
-        private final @Nullable SymbolTable.Table parent;
+        /**
+         * null when root
+         */
+        private final @Nullable SymbolTable.Page parent;
         /**
          * use-before-declare
          */
-        private final List<Function> functionDeclarations = new ArrayList<>();
+        private final List<ConstantSymbol> constantSymbols = new ArrayList<>();
         private final List<SymbolTableEntry> symbols = new ArrayList<>();
 
-        private Table(Scope own, @Nullable SymbolTable.Table parent) {
+        private Page(Scope own, @Nullable SymbolTable.Page parent) {
             this.own = own;
             this.parent = parent;
         }
@@ -564,10 +612,11 @@ public class SymbolTable {
          */
         Stream<NamedSymbol> stream() {
             return Stream.concat(
-                    functionDeclarations.stream(),
+                    constantSymbols.stream(),
                     symbols.stream()
                            .filter(NamedSymbol.class::isInstance)
-                           .map(NamedSymbol.class::cast));
+                           .map(NamedSymbol.class::cast)
+            );
         }
 
         /**
@@ -586,8 +635,8 @@ public class SymbolTable {
          * @return stream of all declared function declarations from this table; the order of the symbols is equal to
          * the order of registration
          */
-        Stream<Function> functionDeclarations() {
-            return functionDeclarations.stream();
+        Stream<ConstantSymbol> constantDeclarations() {
+            return constantSymbols.stream();
         }
 
         /**
@@ -599,10 +648,12 @@ public class SymbolTable {
          */
         Stream<NamedSymbol> streamFlattened() {
             Stream<NamedSymbol> flattenedChildren = symbolDeclarations().flatMap(e -> switch (e) {
-                case Table table -> table.streamFlattened();
-                case SymbolImpl symbol -> Stream.of(symbol);
+                case Page page -> page.streamFlattened();
+                case ConstantSymbol constantSymbol -> Stream.of(constantSymbol);
+                case VariableSymbol variableSymbol -> Stream.of(variableSymbol);
+                case FieldSymbol fieldSymbol -> Stream.of(fieldSymbol);
             });
-            return Stream.concat(functionDeclarations(), flattenedChildren);
+            return Stream.concat(constantDeclarations(), flattenedChildren);
         }
     }
 }

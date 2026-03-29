@@ -18,14 +18,14 @@ public class SymbolTableAssertion extends BaseAssertion<SymbolTableAssertion, Sy
     public SymbolTableAssertion hasSymbolRegistered(IdentifierNode identifier, Scope scope) {
         return truthinessAssert(
                 a -> "Symbol '%s' is not registered in scope '%s'".formatted(identifier, scope),
-                a -> a.canDeclareSymbolInScope(identifier, scope)
+                a -> a.canDeclareVariableInScope(identifier, scope)
         );
     }
 
     public SymbolTableAssertion doesNotHaveSymbolRegistered(IdentifierNode identifier, Scope scope) {
         return falsenessAssert(
                 a -> "Symbol '%s' is registered in scope '%s'".formatted(identifier, scope),
-                a -> a.canDeclareSymbolInScope(identifier, scope)
+                a -> a.canDeclareVariableInScope(identifier, scope)
         );
     }
 

@@ -12,16 +12,13 @@ import org.junit.jupiter.api.Test;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static de.nikschadowsky.baall.compiler._utility.AstTestBuilder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.InstanceOfAssertFactories.list;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @since 26.03.2025
@@ -122,29 +119,29 @@ class SymbolTableTest {
     @Test
     void hasSymbolRegistered() throws SymbolAlreadyExistsException {
         symbolTable.registerSymbol(identifier("symbol1"), mainScope, primitiveType1, true, lineInformation1);
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol1"), minorChildB)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol1"), majorChildA)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol1"), minorChildB)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol1"), majorChildA)).isTrue();
 
         symbolTable.registerSymbol(identifier("symbol2"), minorChildA, primitiveType1, true, lineInformation1);
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), minorChildA)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), mainScope)).isTrue();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), minorChildB)).isTrue();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("symbol2"), majorChildA)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol2"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol2"), mainScope)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol2"), minorChildB)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("symbol2"), majorChildA)).isTrue();
 
         symbolTable.registerFunction(identifier("function1"), mainScope, functionType1, true, lineInformation1);
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), mainScope)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), minorChildA)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function1"), majorChildA)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function1"), mainScope)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function1"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function1"), majorChildA)).isTrue();
 
         symbolTable.registerFunction(identifier("function2"), minorChildA, functionType1, true, lineInformation1);
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), minorChildA)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), mainScope)).isTrue();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), minorChildB)).isTrue();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function2"), majorChildA)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function2"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function2"), mainScope)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function2"), minorChildB)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function2"), majorChildA)).isTrue();
 
         symbolTable.registerFunction(identifier("function3"), minorChildA, functionType1, false, lineInformation1);
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function3"), minorChildA)).isFalse();
-        assertThat(symbolTable.canDeclareSymbolInScope(identifier("function3"), mainScope)).isTrue();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function3"), minorChildA)).isFalse();
+        assertThat(symbolTable.canDeclareVariableInScope(identifier("function3"), mainScope)).isTrue();
     }
 
     @Test

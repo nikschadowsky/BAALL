@@ -5,8 +5,8 @@ import java.util.List;
 
 record FunctionTypeImpl(BaallType returnType, List<BaallType> parameterTypes) implements FunctionType {
 
-    public FunctionTypeImpl(BaallType returnType, BaallType... types) {
-        this(returnType, types == null ? List.of() : List.of(types));
+    public FunctionTypeImpl(BaallType returnType, BaallType... parameterTypes) {
+        this(returnType, parameterTypes == null ? List.of() : List.of(parameterTypes));
     }
 
     @Override

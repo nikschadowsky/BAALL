@@ -14,7 +14,7 @@ public sealed interface Symbol extends Exportable permits SymbolTable.NamedSymbo
 
     @NotNull BaallType type();
 
-    boolean isConstant();
+    boolean isValueConstant();
 
     @NotNull LineInformation lineInformation();
 

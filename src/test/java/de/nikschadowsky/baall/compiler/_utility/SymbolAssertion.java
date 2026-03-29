@@ -26,14 +26,14 @@ public class SymbolAssertion extends BaseAssertion<SymbolAssertion, Symbol> {
     public SymbolAssertion isConstant() {
         return truthinessAssert(
                 s -> "Symbol " + s + " is variable!",
-                Symbol::isConstant
+                Symbol::isValueConstant
         );
     }
 
     public SymbolAssertion isVariable() {
         return falsenessAssert(
                 s -> "Symbol " + s + "is constant!",
-                Symbol::isConstant
+                Symbol::isValueConstant
         );
     }
 

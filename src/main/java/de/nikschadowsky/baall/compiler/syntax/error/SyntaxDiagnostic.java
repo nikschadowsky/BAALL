@@ -27,6 +27,6 @@ public class SyntaxDiagnostic extends Diagnostic {
 
     @Override
     public String getFormatted() {
-        return "%s:";
+        return "%s: %s".formatted(message, token);
     }
 }

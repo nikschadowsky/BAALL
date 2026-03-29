@@ -32,15 +32,14 @@ public class SymbolScanner extends ScopeTraverser {
     public Boolean visitConstantDeclaration(ConstantDeclarationNode that, Scope data) {
         BaallType type = mapNodeToBaallType(that.getType(), data);
         try {
-            symbolTable.registerSymbol(
+            symbolTable.registerConstant(
                     that.getIdentifier(),
                     data,
                     type,
-                    true,
                     that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
-            diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
+            diagnosticCollector.addError(new SemanticDiagnostic(e.getMessage()));
         }
         return super.visitConstantDeclaration(that, data);
     }
@@ -48,17 +47,15 @@ public class SymbolScanner extends ScopeTraverser {
     @Override
     public Boolean visitVariableDeclaration(VariableDeclarationNode that, Scope data) {
         BaallType type = mapNodeToBaallType(that.getType(), data);
-        Token identifier = that.getIdentifier().getIdentifier();
         try {
-            symbolTable.registerSymbol(
+            symbolTable.registerVariable(
                     that.getIdentifier(),
                     data,
                     type,
-                    false,
                     that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
-            diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
+            diagnosticCollector.addError(new SemanticDiagnostic(e.getMessage()));
         }
         return super.visitVariableDeclaration(that, data);
     }
@@ -66,17 +63,15 @@ public class SymbolScanner extends ScopeTraverser {
     @Override
     public Boolean visitField(FieldNode that, Scope data) {
         BaallType type = mapNodeToBaallType(that.getType(), data);
-        Token identifier = that.getIdentifier().getIdentifier();
         try {
-            symbolTable.registerSymbol(
+            symbolTable.registerField(
                     that.getIdentifier(),
                     data,
                     type,
-                    true,
                     that.getIdentifier().getIdentifier().lineInformation()
             );
         } catch (SymbolAlreadyExistsException e) {
-            diagnosticCollector.addError(new SemanticDiagnostic("There already exists an element with this "));
+            diagnosticCollector.addError(new SemanticDiagnostic(e.getMessage()));
         }
         return super.visitField(that, data);
     }
